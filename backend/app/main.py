@@ -2,6 +2,9 @@ from fastapi import FastAPI, UploadFile, File
 from typing import List
 from .schemas import SearchRequest, SearchResponse, AskRequest, AskResponse, IngestResponse
 from .ingestion import process_upload
+from .retrieval import perform_search
+from .answering import generate_answer
+from .config import TOP_K
 
 app = FastAPI(
     title="Notes RAG Assistant API",
@@ -41,16 +44,18 @@ async def ingest_documents(files: List[UploadFile] = File(...)):
 
 @app.post("/search", response_model=SearchResponse)
 def search(request: SearchRequest):
-    # Placeholder for Stage 1 Step 4
+    top_k = request.top_k if request.top_k is not None else TOP_K
+    results = perform_search(request.query, top_k)
     return SearchResponse(
         query=request.query,
-        results=[]
+        results=results
     )
 
 @app.post("/ask", response_model=AskResponse)
 def ask(request: AskRequest):
-    # Placeholder for Stage 1 Step 4
+    results = perform_search(request.query, TOP_K)
+    answer = generate_answer(request.query, results)
     return AskResponse(
-        answer="I don't know yet.",
-        sources=[]
+        answer=answer,
+        sources=results
     )
