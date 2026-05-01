@@ -1,3 +1,30 @@
+# User specific
+notes_rag_stage1.md
+
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+
+# Environment
 .env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Project Data
+backend/data/raw/*
+backend/data/processed/*
+!backend/data/raw/.gitkeep
+!backend/data/processed/.gitkeep
+
+# IDEs
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
