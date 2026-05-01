@@ -1,5 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, File
+from typing import List
 from .schemas import SearchRequest, SearchResponse, AskRequest, AskResponse, IngestResponse
+from .ingestion import process_upload
 
 app = FastAPI(
     title="Notes RAG Assistant API",
@@ -16,13 +18,25 @@ def read_root():
     }
 
 @app.post("/ingest", response_model=IngestResponse)
-def ingest_documents():
-    # Placeholder for Stage 1 Step 3
+async def ingest_documents(files: List[UploadFile] = File(...)):
+    total_chunks = 0
+    file_names = []
+    
+    for file in files:
+        if not file.filename.endswith((".txt", ".md")):
+            continue
+            
+        chunks = await process_upload(file)
+        total_chunks += len(chunks)
+        file_names.append(file.filename)
+        
+    status = "success" if file_names else "no valid files uploaded"
+    
     return IngestResponse(
-        files_ingested=0,
-        chunks_created=0,
-        file_names=[],
-        status="not implemented yet"
+        files_ingested=len(file_names),
+        chunks_created=total_chunks,
+        file_names=file_names,
+        status=status
     )
 
 @app.post("/search", response_model=SearchResponse)
