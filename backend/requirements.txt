@@ -4,3 +4,6 @@ scikit-learn
 numpy
 pydantic
 python-multipart
+sentence-transformers
+chromadb
+httpx

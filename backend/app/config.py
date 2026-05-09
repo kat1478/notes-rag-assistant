@@ -17,3 +17,14 @@ CHUNK_OVERLAP = 50
 
 # Retrieval settings
 TOP_K = 3
+
+# Chroma settings
+CHROMA_DIR = DATA_DIR / "chroma"
+CHROMA_DIR.mkdir(parents=True, exist_ok=True)
+
+# Embedding settings
+EMBEDDING_MODEL = "all-MiniLM-L6-v2"
+
+# Ollama settings
+OLLAMA_BASE_URL = "http://localhost:11434"
+OLLAMA_MODEL = "llama3.2:3b"

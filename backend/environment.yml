@@ -8,3 +8,7 @@ dependencies:
   - pydantic
   - scikit-learn
   - python-multipart
+  - pip:
+      - sentence-transformers
+      - chromadb
+      - httpx
