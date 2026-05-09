@@ -8,7 +8,7 @@ from .config import TOP_K
 
 app = FastAPI(
     title="Notes RAG Assistant API",
-    description="Backend API for Stage 1 of Notes RAG Assistant",
+    description="Backend API for Stage 2 of Notes RAG Assistant",
     version="1.0.0"
 )
 
