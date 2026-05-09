@@ -1,5 +1,6 @@
 # User specific
 notes_rag_stage1.md
+notes_rag_stage2.md
 
 # Python
 __pycache__/
@@ -18,8 +19,10 @@ venv.bak/
 # Project Data
 backend/data/raw/*
 backend/data/processed/*
+backend/data/chroma/*
 !backend/data/raw/.gitkeep
 !backend/data/processed/.gitkeep
+!backend/data/chroma/.gitkeep
 
 # IDEs
 .vscode/
