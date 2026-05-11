@@ -1,6 +1,10 @@
 from fastapi import FastAPI, UploadFile, File
 from typing import List
-from .schemas import SearchRequest, SearchResponse, AskRequest, AskResponse, IngestResponse
+from .schemas import (
+    SearchRequest, SearchResponse,
+    AskRequest, AskResponse,
+    IngestResponse, FileIngestDetail,
+)
 from .ingestion import process_upload
 from .retrieval import perform_search
 from .answering import generate_answer
@@ -9,7 +13,7 @@ from .config import TOP_K
 app = FastAPI(
     title="Notes RAG Assistant API",
     description="Backend API for Stage 2 of Notes RAG Assistant",
-    version="1.0.0"
+    version="2.0.0"
 )
 
 @app.get("/")
@@ -21,22 +25,39 @@ def read_root():
     }
 
 @app.post("/ingest", response_model=IngestResponse)
-async def ingest_document(file: UploadFile = File(...)):
-    if not file.filename.endswith((".txt", ".md")):
-        return IngestResponse(
-            files_ingested=0,
-            chunks_created=0,
-            file_names=[],
-            status="unsupported file type"
-        )
-        
-    chunks = await process_upload(file)
-    
+async def ingest_documents(
+    files: List[UploadFile] = File(..., description="One or more .txt/.md files to ingest")
+):
+    total_chunks = 0
+    file_names = []
+    file_details = []
+
+    for file in files:
+        if not file.filename.endswith((".txt", ".md")):
+            file_details.append(FileIngestDetail(
+                file_name=file.filename,
+                chunks_created=0,
+                status="skipped: unsupported file type"
+            ))
+            continue
+
+        chunks = await process_upload(file)
+        total_chunks += len(chunks)
+        file_names.append(file.filename)
+        file_details.append(FileIngestDetail(
+            file_name=file.filename,
+            chunks_created=len(chunks),
+            status="success"
+        ))
+
+    status = "success" if file_names else "no valid files uploaded"
+
     return IngestResponse(
-        files_ingested=1,
-        chunks_created=len(chunks),
-        file_names=[file.filename],
-        status="success"
+        files_ingested=len(file_names),
+        chunks_created=total_chunks,
+        file_names=file_names,
+        file_details=file_details,
+        status=status
     )
 
 @app.post("/search", response_model=SearchResponse)
@@ -56,3 +77,4 @@ def ask(request: AskRequest):
         answer=answer,
         sources=results
     )
+

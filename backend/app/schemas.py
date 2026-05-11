@@ -25,9 +25,16 @@ class AskRequest(BaseModel):
 class AskResponse(BaseModel):
     answer: str
     sources: List[ChunkResponse]
-    
+
+class FileIngestDetail(BaseModel):
+    file_name: str
+    chunks_created: int
+    status: str
+
 class IngestResponse(BaseModel):
     files_ingested: int
     chunks_created: int
     file_names: List[str]
+    file_details: List[FileIngestDetail] = []
     status: str
+
