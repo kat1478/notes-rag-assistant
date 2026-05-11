@@ -25,9 +25,33 @@ def read_root():
     }
 
 @app.post("/ingest", response_model=IngestResponse)
-async def ingest_documents(
-    files: List[UploadFile] = File(..., description="One or more .txt/.md files to ingest")
-):
+async def ingest_document(file: UploadFile = File(...)):
+    """Ingest a single .txt or .md file. Use /ingest/batch for multiple files."""
+    if not file.filename.endswith((".txt", ".md")):
+        return IngestResponse(
+            files_ingested=0,
+            chunks_created=0,
+            file_names=[],
+            file_details=[FileIngestDetail(
+                file_name=file.filename, chunks_created=0, status="unsupported file type"
+            )],
+            status="unsupported file type"
+        )
+
+    chunks = await process_upload(file)
+    return IngestResponse(
+        files_ingested=1,
+        chunks_created=len(chunks),
+        file_names=[file.filename],
+        file_details=[FileIngestDetail(
+            file_name=file.filename, chunks_created=len(chunks), status="success"
+        )],
+        status="success"
+    )
+
+@app.post("/ingest/batch", response_model=IngestResponse)
+async def ingest_documents_batch(files: List[UploadFile] = File(...)):
+    """Ingest multiple .txt/.md files at once."""
     total_chunks = 0
     file_names = []
     file_details = []
