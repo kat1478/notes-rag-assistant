@@ -1,6 +1,5 @@
 # User specific
-notes_rag_stage1.md
-notes_rag_stage2.md
+notes_rag_stage*.md
 
 # Python
 __pycache__/
