@@ -16,7 +16,10 @@ def generate_from_ollama(prompt: str) -> str:
     payload = {
         "model": OLLAMA_MODEL,
         "prompt": prompt,
-        "stream": False
+        "stream": False,
+        "options": {
+            "temperature": 0.0
+        }
     }
     
     logger.info(f"Sending request to Ollama ({OLLAMA_MODEL}) at {url}, timeout={OLLAMA_TIMEOUT}s")

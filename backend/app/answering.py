@@ -24,10 +24,10 @@ def generate_answer(query: str, sources: List[ChunkResponse]) -> str:
 Note that the context notes are written in Polish, and the question is in English.
 
 Follow these rules strictly:
-1. Answer the question using ONLY the facts directly mentioned in the context. Translate the terms appropriately.
-2. Rely on the context even if it is partial, as long as it contains the core answer to the question.
-3. The context may contain some irrelevant chunks. Ignore any irrelevant information and do NOT refuse to answer just because some parts of the context are unrelated.
-4. Cite the sources you used in your answer using bracketed notations like "[Source 1]", "[Source 2]", etc.
+1. Answer the question in the same language as the question.
+2. Answer using ONLY facts directly mentioned in the context. Translate technical terms appropriately across languages.
+3. Rely on the context even if it is partial, as long as it contains the core answer.
+4. If you are answering the question, you MUST include at least one bracketed source citation (e.g. "[Source 1]", "[Source 2]") at the end of your sentence or paragraph.
 5. If the context does not contain any information relevant to the question at all, say: "I don't have enough information to answer that based on the notes." Do NOT append this refusal message if you have already answered the question.
 
 Context:
