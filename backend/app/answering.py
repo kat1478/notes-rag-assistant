@@ -20,12 +20,15 @@ def generate_answer(query: str, sources: List[ChunkResponse]) -> str:
         
     context_block = "\n".join(context_parts)
     
-    prompt = f"""You are a helpful assistant answering questions based only on the provided context.
+    prompt = f"""You are an assistant answering questions based only on the provided context notes.
+Note that the context notes are written in Polish, and the question is in English.
+
 Follow these rules strictly:
-1. Answer ONLY from the provided context.
-2. If the context is insufficient to answer the question, say "I don't have enough information to answer that based on the notes."
-3. Do not fabricate or invent facts.
-4. Include source references (e.g., "[Source 1]") in your final output.
+1. Answer the question using ONLY the facts directly mentioned in the context. Translate the terms appropriately.
+2. Rely on the context even if it is partial, as long as it contains the core answer to the question.
+3. The context may contain some irrelevant chunks. Ignore any irrelevant information and do NOT refuse to answer just because some parts of the context are unrelated.
+4. Cite the sources you used in your answer using bracketed notations like "[Source 1]", "[Source 2]", etc.
+5. If the context does not contain any information relevant to the question at all, say: "I don't have enough information to answer that based on the notes." Do NOT append this refusal message if you have already answered the question.
 
 Context:
 {context_block}
