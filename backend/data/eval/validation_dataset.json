@@ -1,0 +1,155 @@
+[
+  {
+    "id": "val001",
+    "question": "What is the goal of inductive learning?",
+    "category": "direct_fact",
+    "expected_file": "notatka_11_indukcja.txt",
+    "should_answer": true,
+    "expected_key_points": ["pozyskanie wiedzy lub umiejętności na podstawie zewnętrznej informacji trenującej", "autonomiczna poprawa jakości wykonywania zadania"],
+    "notes": ""
+  },
+  {
+    "id": "val002",
+    "question": "What is the difference between representation bias and preference bias?",
+    "category": "comparison",
+    "expected_file": "notatka_11_indukcja.txt",
+    "should_answer": true,
+    "expected_key_points": ["obciążenie reprezentacji zawęża przestrzeń modeli", "obciążenie preferencji wprowadza kryteria wyboru, np. prostotę"],
+    "notes": ""
+  },
+  {
+    "id": "val003",
+    "question": "How large is the hypothesis space for Boolean conjunctions with n attributes?",
+    "category": "direct_fact",
+    "expected_file": "notatka_11_indukcja.txt",
+    "should_answer": true,
+    "expected_key_points": ["|H| = 3^n + 1"],
+    "notes": ""
+  },
+  {
+    "id": "val004",
+    "question": "How does holdout help estimate model quality?",
+    "category": "explanation",
+    "expected_file": "notatka_12_jakosc.txt",
+    "should_answer": true,
+    "expected_key_points": ["losowy podział danych na rozłączne zbiory trenujący i testowy", "błąd na zbiorze testowym służy jako estymator błędu rzeczywistego"],
+    "notes": ""
+  },
+  {
+    "id": "val005",
+    "question": "What is the difference between k-fold cross-validation and holdout?",
+    "category": "comparison",
+    "expected_file": "notatka_12_jakosc.txt",
+    "should_answer": true,
+    "expected_key_points": ["holdout dzieli dane raz na zbiór trenujący i testowy", "k-krotna walidacja krzyżowa dzieli dane na k części i powtarza proces k razy"],
+    "notes": ""
+  },
+  {
+    "id": "val006",
+    "question": "Why does MSE penalize large errors more strongly than MAE?",
+    "category": "explanation",
+    "expected_file": "notatka_12_jakosc.txt",
+    "should_answer": true,
+    "expected_key_points": ["MSE podnosi różnice do kwadratu", "MAE traktuje błędy liniowo"],
+    "notes": ""
+  },
+  {
+    "id": "val007",
+    "question": "What is the core assumption behind the naive Bayes classifier?",
+    "category": "direct_fact",
+    "expected_file": "notatka_13_bayes.txt",
+    "should_answer": true,
+    "expected_key_points": ["naiwne założenie o niezależności atrybutów warunkowanej klasą"],
+    "notes": ""
+  },
+  {
+    "id": "val008",
+    "question": "How does naive Bayes handle missing attribute values?",
+    "category": "direct_fact",
+    "expected_file": "notatka_13_bayes.txt",
+    "should_answer": true,
+    "expected_key_points": ["pomija te atrybuty podczas obliczania iloczynu prawdopodobieństw"],
+    "notes": ""
+  },
+  {
+    "id": "val009",
+    "question": "Compare naive Bayes with decision trees.",
+    "category": "comparison",
+    "expected_file": "notatka_13_bayes.txt",
+    "should_answer": true,
+    "expected_key_points": ["bayes buduje globalny model statystyczny", "drzewa decyzyjne dokonują sekwencyjnego, lokalnego podziału przestrzeni cech"],
+    "notes": ""
+  },
+  {
+    "id": "val010",
+    "question": "What is a Markov Decision Process in reinforcement learning?",
+    "category": "direct_fact",
+    "expected_file": "notatka_14_wzmacnianie.txt",
+    "should_answer": true,
+    "expected_key_points": ["skończony zbiór stanów, akcji, funkcja przejść i funkcja nagród"],
+    "notes": ""
+  },
+  {
+    "id": "val011",
+    "question": "What is the Markov property?",
+    "category": "direct_fact",
+    "expected_file": "notatka_14_wzmacnianie.txt",
+    "should_answer": true,
+    "expected_key_points": ["prawdopodobieństwa przejść i nagrody zależą wyłącznie od aktualnego stanu i akcji, a nie od historii"],
+    "notes": ""
+  },
+  {
+    "id": "val012",
+    "question": "What is the difference between episodic tasks “to success” and “to failure”?",
+    "category": "comparison",
+    "expected_file": "notatka_14_wzmacnianie.txt",
+    "should_answer": true,
+    "expected_key_points": ["do-sukcesu dąży do jak najszybszego zakończenia z dodatnią nagrodą na końcu", "do-porażki stara się opóźnić koniec najdłużej, bo koniec wiąże się z karą"],
+    "notes": ""
+  },
+  {
+    "id": "val013",
+    "question": "What makes Q-Learning an off-policy algorithm?",
+    "category": "explanation",
+    "expected_file": "notatka_15_qlearning.txt",
+    "should_answer": true,
+    "expected_key_points": ["w formule aktualizacji zakłada wybór akcji maksymalizującej Q w kolejnym stanie, niezależnie od strategii"],
+    "notes": ""
+  },
+  {
+    "id": "val014",
+    "question": "Compare Q-Learning with Sarsa.",
+    "category": "comparison",
+    "expected_file": "notatka_15_qlearning.txt",
+    "should_answer": true,
+    "expected_key_points": ["Q-Learning jest off-policy (zakłada wybór akcji maksymalizującej Q)", "Sarsa jest on-policy (czeka na rzeczywisty wybór kolejnej akcji)"],
+    "notes": ""
+  },
+  {
+    "id": "val015",
+    "question": "What problem is solved by epsilon-greedy in Q-Learning?",
+    "category": "explanation",
+    "expected_file": "notatka_15_qlearning.txt",
+    "should_answer": true,
+    "expected_key_points": ["dylemat eksploracji kontra eksploatacji"],
+    "notes": ""
+  },
+  {
+    "id": "val016",
+    "question": "Who wrote “Pan Tadeusz”?",
+    "category": "distraction_resistance",
+    "expected_file": "notatka_11_indukcja.txt",
+    "should_answer": true,
+    "expected_key_points": ["Adam Mickiewicz wrote Pan Tadeusz", "lies completely outside the thematic scope of inductive learning"],
+    "notes": ""
+  },
+  {
+    "id": "val017",
+    "question": "How much is a reduced cinema ticket?",
+    "category": "out_of_scope",
+    "expected_file": "",
+    "should_answer": false,
+    "expected_key_points": ["should refuse to answer", "information not present in the notes"],
+    "notes": ""
+  }
+]

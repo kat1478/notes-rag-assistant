@@ -1,0 +1,387 @@
+[
+  {
+    "id": "q001",
+    "question": "What is gradient descent used for?",
+    "category": "direct_fact",
+    "expected_file": "notatka_studenta_01_gradient.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "optimization algorithm",
+      "minimizes a cost function",
+      "iteratively moves toward a minimum"
+    ],
+    "notes": ""
+  },
+  {
+    "id": "q002",
+    "question": "What does the gradient represent in gradient descent?",
+    "category": "direct_fact",
+    "expected_file": "notatka_studenta_01_gradient.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "vector of partial derivatives",
+      "direction of steepest increase"
+    ],
+    "notes": ""
+  },
+  {
+    "id": "q003",
+    "question": "What happens if the learning rate is too large in gradient descent?",
+    "category": "explanation",
+    "expected_file": "notatka_studenta_01_gradient.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "can overshoot the minimum",
+      "may fail to converge"
+    ],
+    "notes": ""
+  },
+  {
+    "id": "q004",
+    "question": "How does SGD differ from batch gradient descent?",
+    "category": "comparison",
+    "expected_file": "notatka_studenta_01_gradient.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "SGD updates after each example",
+      "batch uses the whole dataset",
+      "SGD introduces noise",
+      "SGD can escape local minima more easily"
+    ],
+    "notes": ""
+  },
+  {
+    "id": "q005",
+    "question": "What does TF-IDF stand for?",
+    "category": "direct_fact",
+    "expected_file": "student_note_02_tfidf.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "Term Frequency-Inverse Document Frequency"
+    ],
+    "notes": ""
+  },
+  {
+    "id": "q006",
+    "question": "Why is IDF needed in TF-IDF?",
+    "category": "explanation",
+    "expected_file": "student_note_02_tfidf.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "common words appear everywhere",
+      "IDF downweights common terms",
+      "helps identify important words"
+    ],
+    "notes": ""
+  },
+  {
+    "id": "q007",
+    "question": "How is IDF calculated in the notes?",
+    "category": "direct_fact",
+    "expected_file": "student_note_02_tfidf.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "logarithm of total number of documents divided by the number of documents containing the term"
+    ],
+    "notes": ""
+  },
+  {
+    "id": "q008",
+    "question": "Why is TF-IDF better than a simple Bag of Words count?",
+    "category": "comparison",
+    "expected_file": "student_note_02_tfidf.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "Bag of Words ignores word importance",
+      "TF-IDF considers frequency and rarity",
+      "high score means frequent in one document and rare in the collection"
+    ],
+    "notes": ""
+  },
+  {
+    "id": "q009",
+    "question": "What is Dijkstra’s algorithm used for?",
+    "category": "direct_fact",
+    "expected_file": "notatka_studenta_03_dijkstra.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "find the shortest path in a graph"
+    ],
+    "notes": ""
+  },
+  {
+    "id": "q010",
+    "question": "What is edge relaxation in Dijkstra’s algorithm?",
+    "category": "direct_fact",
+    "expected_file": "notatka_studenta_03_dijkstra.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "if a shorter path to a vertex is found through another vertex",
+      "update the stored distance"
+    ],
+    "notes": ""
+  },
+  {
+    "id": "q011",
+    "question": "Why does Dijkstra’s algorithm require non-negative edge weights?",
+    "category": "explanation",
+    "expected_file": "notatka_studenta_03_dijkstra.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "negative weights can break correctness",
+      "algorithm may fail to find the optimal path",
+      "Bellman-Ford is better for negative weights"
+    ],
+    "notes": ""
+  },
+  {
+    "id": "q012",
+    "question": "How is Dijkstra different from A*?",
+    "category": "comparison",
+    "expected_file": "notatka_studenta_03_dijkstra.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "Dijkstra does not use a heuristic",
+      "A* uses a heuristic"
+    ],
+    "notes": ""
+  },
+  {
+    "id": "q013",
+    "question": "How does binary search work on a sorted array?",
+    "category": "direct_fact",
+    "expected_file": "student_note_04_binary_search.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "check the middle element",
+      "discard half of the array each step",
+      "repeat on left or right half depending on comparison"
+    ],
+    "notes": ""
+  },
+  {
+    "id": "q014",
+    "question": "What is the time complexity of binary search?",
+    "category": "direct_fact",
+    "expected_file": "student_note_04_binary_search.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "O(log n)"
+    ],
+    "notes": ""
+  },
+  {
+    "id": "q015",
+    "question": "Why is 'low + (high - low) / 2' preferred when calculating the midpoint?",
+    "category": "explanation",
+    "expected_file": "student_note_04_binary_search.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "avoids integer overflow",
+      "important for very large arrays"
+    ],
+    "notes": ""
+  },
+  {
+    "id": "q016",
+    "question": "In the notes’ example, how many steps does binary search need to find 7 in [1, 3, 5, 7, 9]?",
+    "category": "example",
+    "expected_file": "student_note_04_binary_search.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "two steps"
+    ],
+    "notes": ""
+  },
+  {
+    "id": "q017",
+    "question": "What is entropy in decision trees?",
+    "category": "direct_fact",
+    "expected_file": "notatka_studenta_05_drzewa.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "measure of disorder or impurity in the data"
+    ],
+    "notes": ""
+  },
+  {
+    "id": "q018",
+    "question": "What is information gain in decision trees?",
+    "category": "direct_fact",
+    "expected_file": "notatka_studenta_05_drzewa.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "reduction in entropy after a split",
+      "choose the split with the largest information gain"
+    ],
+    "notes": ""
+  },
+  {
+    "id": "q019",
+    "question": "Why are random forests usually more stable than a single decision tree?",
+    "category": "comparison",
+    "expected_file": "notatka_studenta_05_drzewa.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "many trees are combined",
+      "average or vote across trees",
+      "more resistant to errors of a single tree",
+      "less prone to overfitting"
+    ],
+    "notes": ""
+  },
+  {
+    "id": "q020",
+    "question": "Why can a single decision tree overfit?",
+    "category": "explanation",
+    "expected_file": "notatka_studenta_05_drzewa.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "can memorize the training data",
+      "tends to overfit"
+    ],
+    "notes": ""
+  },
+  {
+    "id": "q021",
+    "question": "What is the formula of the ReLU activation function?",
+    "category": "direct_fact",
+    "expected_file": "student_note_06_relu.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "f(x) = max(0, x)"
+    ],
+    "notes": ""
+  },
+  {
+    "id": "q022",
+    "question": "Why is ReLU computationally efficient compared to Sigmoid or Tanh?",
+    "category": "comparison",
+    "expected_file": "student_note_06_relu.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "simple max comparison",
+      "does not require expensive exponential calculations"
+    ],
+    "notes": ""
+  },
+  {
+    "id": "q023",
+    "question": "What is the dying ReLU problem?",
+    "category": "direct_fact",
+    "expected_file": "student_note_06_relu.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "neurons get stuck at zero",
+      "stop learning because the gradient is zero"
+    ],
+    "notes": ""
+  },
+  {
+    "id": "q024",
+    "question": "If the input to ReLU is -5, what is the output?",
+    "category": "example",
+    "expected_file": "student_note_06_relu.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "0"
+    ],
+    "notes": ""
+  },
+  {
+    "id": "q025",
+    "question": "Which optimization algorithm iteratively moves in the opposite direction of the gradient?",
+    "category": "paraphrase",
+    "expected_file": "notatka_studenta_01_gradient.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "gradient descent"
+    ],
+    "notes": ""
+  },
+  {
+    "id": "q026",
+    "question": "Which text representation method downweights words that appear in many documents?",
+    "category": "paraphrase",
+    "expected_file": "student_note_02_tfidf.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "TF-IDF"
+    ],
+    "notes": ""
+  },
+  {
+    "id": "q027",
+    "question": "Which search algorithm repeatedly halves the search space?",
+    "category": "paraphrase",
+    "expected_file": "student_note_04_binary_search.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "binary search"
+    ],
+    "notes": ""
+  },
+  {
+    "id": "q028",
+    "question": "Compare batch gradient descent and SGD based on the notes.",
+    "category": "comparison",
+    "expected_file": "notatka_studenta_01_gradient.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "batch uses all data",
+      "SGD updates after each example",
+      "SGD is noisier",
+      "SGD can escape local minima more easily"
+    ],
+    "notes": ""
+  },
+  {
+    "id": "q029",
+    "question": "What is the capital of France?",
+    "category": "out_of_scope",
+    "expected_file": "",
+    "should_answer": false,
+    "expected_key_points": [
+      "should refuse or say there is not enough information in the notes"
+    ],
+    "notes": ""
+  },
+  {
+    "id": "q030",
+    "question": "What is Bellman-Ford used for?",
+    "category": "out_of_scope",
+    "expected_file": "",
+    "should_answer": false,
+    "expected_key_points": [
+      "should avoid answering from outside knowledge",
+      "may only mention that the notes say Bellman-Ford is better for negative weights if grounded carefully"
+    ],
+    "notes": ""
+  },
+  {
+    "id": "q031",
+    "question": "Is the weather in Warsaw relevant to gradient descent?",
+    "category": "distraction_resistance",
+    "expected_file": "notatka_studenta_01_gradient.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "no",
+      "weather is irrelevant",
+      "the note explicitly says it has nothing to do with the algorithm"
+    ],
+    "notes": ""
+  },
+  {
+    "id": "q032",
+    "question": "Did Adam Mickiewicz use decision trees to write Pan Tadeusz?",
+    "category": "distraction_resistance",
+    "expected_file": "notatka_studenta_05_drzewa.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "no",
+      "the sentence is a humorous distraction",
+      "not part of decision tree logic"
+    ],
+    "notes": ""
+  }
+]
