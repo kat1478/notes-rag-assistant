@@ -21,10 +21,18 @@ class SearchResponse(BaseModel):
 
 class AskRequest(BaseModel):
     query: str
+    top_k: Optional[int] = None
+
+class AskResponseMetadata(BaseModel):
+    top_k_used: int
+    retrieval_mode: str
+    generation_mode: str
+    response_time_ms: float
 
 class AskResponse(BaseModel):
     answer: str
     sources: List[ChunkResponse]
+    metadata: Optional[AskResponseMetadata] = None
 
 class FileIngestDetail(BaseModel):
     file_name: str

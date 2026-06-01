@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes RAG Assistant — Local grounded helper</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo-area">
+                <div class="logo-icon">📂</div>
+                <h1>Notes RAG Assistant</h1>
+            </div>
+            <p class="subtitle">A local, grounded helper that answers questions using ONLY your indexed notes. No external knowledge fallback.</p>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="app-main">
+            <!-- Left panel: input & settings -->
+            <section class="control-panel">
+                <div class="card search-card">
+                    <div class="card-header">
+                        <h2>Ask Notes Assistant</h2>
+                        <span class="badge">Local Only</span>
+                    </div>
+                    
+                    <form id="ask-form">
+                        <div class="form-group">
+                            <label for="question-input">Your Question</label>
+                            <textarea 
+                                id="question-input" 
+                                placeholder="Type a question (e.g., What is the dying ReLU problem? or Jak działa algorytm Dijkstry?)..." 
+                                required
+                                rows="4"
+                            ></textarea>
+                        </div>
+
+                        <div class="settings-row">
+                            <div class="form-group top_k-group">
+                                <label for="top_k-select">
+                                    Sources count (top_k): <span id="top_k-val">3</span>
+                                </label>
+                                <input type="range" id="top_k-select" min="1" max="10" value="3" step="1">
+                            </div>
+                            
+                            <div class="form-group toggle-group">
+                                <label class="switch">
+                                    <input type="checkbox" id="toggle-diagnostics" checked>
+                                    <span class="slider round"></span>
+                                </label>
+                                <span class="toggle-label">Show Diagnostics</span>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="submit-btn" class="btn btn-primary">
+                            <span>Ask Notes</span>
+                            <div class="btn-glow"></div>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Example questions -->
+                <div class="card examples-card">
+                    <h3>Example Questions</h3>
+                    <div class="examples-grid">
+                        <button class="example-btn" data-question="What is the dying ReLU problem?">What is the dying ReLU problem?</button>
+                        <button class="example-btn" data-question="Jak działa algorytm Dijkstry i jaka jest jego złożoność?">Jak działa algorytm Dijkstry?</button>
+                        <button class="example-btn" data-question="Explain TF-IDF step by step.">Explain TF-IDF step by step.</button>
+                        <button class="example-btn" data-question="What is the capital of France?">What is the capital of France? (Out-of-scope test)</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right panel: responses, sources & diagnostics -->
+            <section class="results-panel">
+                <!-- Status/Error messages -->
+                <div id="error-container" class="alert alert-error hidden">
+                    <div class="alert-icon">⚠️</div>
+                    <div class="alert-content">
+                        <h4 id="error-title">Backend Connection Error</h4>
+                        <p id="error-message">Could not connect to the local RAG backend. Please verify that the server is running on http://127.0.0.1:8000.</p>
+                        <button id="retry-btn" class="btn btn-secondary btn-sm">Retry</button>
+                    </div>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loading-container" class="card loading-card hidden">
+                    <div class="spinner-container">
+                        <div class="spinner"></div>
+                    </div>
+                    <p class="loading-text">Searching local vector store & generating grounded response using Llama 3.2...</p>
+                </div>
+
+                <!-- Answer Container -->
+                <div id="answer-container" class="card answer-card hidden">
+                    <div class="card-header">
+                        <h3>Grounded Answer</h3>
+                        <button id="clear-btn" class="btn btn-text btn-sm">Clear</button>
+                    </div>
+                    <div class="answer-body">
+                        <p id="answer-text"></p>
+                    </div>
+                </div>
+
+                <!-- Sources Container -->
+                <div id="sources-container" class="card sources-card hidden">
+                    <h3>Retrieved Sources</h3>
+                    <p class="sources-intro">The context chunks retrieved from your local files and fed to the LLM:</p>
+                    <div id="sources-list" class="sources-list">
+                        <!-- Dynamic source cards will be added here -->
+                    </div>
+                </div>
+
+                <!-- Collapsible Diagnostics panel -->
+                <div id="diagnostics-container" class="card diagnostics-card hidden">
+                    <div class="card-header" id="diagnostics-toggle">
+                        <h3>System Diagnostics</h3>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="diagnostics-body" id="diagnostics-body">
+                        <div class="diagnostic-grid">
+                            <div class="diag-item">
+                                <span class="diag-label">Retrieval Mode:</span>
+                                <span class="diag-value" id="diag-retrieval-mode">-</span>
+                            </div>
+                            <div class="diag-item">
+                                <span class="diag-label">Generation Mode:</span>
+                                <span class="diag-value" id="diag-generation-mode">-</span>
+                            </div>
+                            <div class="diag-item">
+                                <span class="diag-label">top_k Used:</span>
+                                <span class="diag-value" id="diag-top-k">-</span>
+                            </div>
+                            <div class="diag-item">
+                                <span class="diag-label">Backend Response Time:</span>
+                                <span class="diag-value" id="diag-response-time">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Empty state -->
+                <div id="empty-state" class="card empty-card">
+                    <div class="empty-icon">🔍</div>
+                    <h3>Waiting for Question</h3>
+                    <p>Enter a question in the search panel or choose one of the examples to query your local knowledge base.</p>
+                </div>
+            </section>
+        </main>
+        
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>Notes RAG Assistant (Stage 4) • Local-first & Grounded RAG MVP</p>
+        </footer>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,14 +1,19 @@
 from fastapi import FastAPI, UploadFile, File
+from fastapi.responses import RedirectResponse
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from typing import List
+from pathlib import Path
+import time
 from .schemas import (
     SearchRequest, SearchResponse,
-    AskRequest, AskResponse,
+    AskRequest, AskResponse, AskResponseMetadata,
     IngestResponse, FileIngestDetail,
 )
 from .ingestion import process_upload
 from .retrieval import perform_search
 from .answering import generate_answer
-from .config import TOP_K
+from .config import TOP_K, OLLAMA_MODEL
 
 app = FastAPI(
     title="Notes RAG Assistant API",
@@ -16,8 +21,24 @@ app = FastAPI(
     version="2.0.0"
 )
 
+# CORS middleware for local development
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Serve the static frontend files
+frontend_dir = Path(__file__).resolve().parent.parent.parent / "frontend"
+if frontend_dir.exists():
+    app.mount("/frontend", StaticFiles(directory=str(frontend_dir), html=True), name="frontend")
+
 @app.get("/")
 def read_root():
+    if (frontend_dir / "index.html").exists():
+        return RedirectResponse(url="/frontend/")
     return {
         "project": "Notes RAG Assistant",
         "status": "running",
@@ -95,10 +116,20 @@ def search(request: SearchRequest):
 
 @app.post("/ask", response_model=AskResponse)
 def ask(request: AskRequest):
-    results = perform_search(request.query, TOP_K)
+    start_time = time.time()
+    top_k = request.top_k if request.top_k is not None else TOP_K
+    results = perform_search(request.query, top_k)
     answer = generate_answer(request.query, results)
+    elapsed_ms = (time.time() - start_time) * 1000
+    
     return AskResponse(
         answer=answer,
-        sources=results
+        sources=results,
+        metadata=AskResponseMetadata(
+            top_k_used=top_k,
+            retrieval_mode="hybrid (Chroma semantic + TF-IDF fallback)",
+            generation_mode=f"Ollama ({OLLAMA_MODEL})",
+            response_time_ms=round(elapsed_ms, 2)
+        )
     )
 
