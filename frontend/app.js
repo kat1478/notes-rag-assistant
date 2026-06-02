@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const topKVal = document.getElementById('top_k-val');
     const toggleDiagnostics = document.getElementById('toggle-diagnostics');
     const submitBtn = document.getElementById('submit-btn');
+    const connectionStatus = document.getElementById('connection-status');
     
     const errorContainer = document.getElementById('error-container');
     const errorMessage = document.getElementById('error-message');
@@ -46,6 +47,31 @@ document.addEventListener('DOMContentLoaded', () => {
             return 'http://127.0.0.1:8000/ask';
         }
         return '/ask';
+    };
+
+    // Check backend connection status
+    const checkConnection = async () => {
+        const statusText = connectionStatus.querySelector('.status-text');
+        
+        let healthUrl;
+        if (window.location.protocol === 'file:' || window.location.hostname === '') {
+            healthUrl = 'http://127.0.0.1:8000/health';
+        } else {
+            healthUrl = '/health';
+        }
+
+        try {
+            const response = await fetch(healthUrl, { method: 'GET' });
+            if (response.ok) {
+                connectionStatus.className = 'status-indicator connected';
+                statusText.textContent = 'Backend connected';
+            } else {
+                throw new Error('Not OK response');
+            }
+        } catch (err) {
+            connectionStatus.className = 'status-indicator disconnected';
+            statusText.textContent = 'Backend unavailable';
+        }
     };
 
     // Clean UI state
@@ -96,6 +122,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const data = await response.json();
             
+            // Mark connected
+            connectionStatus.className = 'status-indicator connected';
+            connectionStatus.querySelector('.status-text').textContent = 'Backend connected';
+            
             // Hide loading
             loadingContainer.classList.add('hidden');
             
@@ -121,6 +151,10 @@ document.addEventListener('DOMContentLoaded', () => {
             
         } catch (err) {
             console.error('Error fetching RAG response:', err);
+            // Mark disconnected
+            connectionStatus.className = 'status-indicator disconnected';
+            connectionStatus.querySelector('.status-text').textContent = 'Backend unavailable';
+            
             loadingContainer.classList.add('hidden');
             errorMessage.textContent = `Could not get a response from the local RAG backend. details: ${err.message}. Ensure python backend is running.`;
             errorContainer.classList.remove('hidden');
@@ -135,6 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     retryBtn.addEventListener('click', () => {
+        checkConnection();
         submitQuestion(questionInput.value);
     });
 
@@ -219,4 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
             submitQuestion(question);
         });
     });
+
+    // Check connection on page load
+    checkConnection();
 });

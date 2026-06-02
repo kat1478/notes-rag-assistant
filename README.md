@@ -44,6 +44,31 @@ Once the backend server starts up:
 
 ---
 
+## Stage 4 Demo Flow
+
+To demonstrate the application flow step-by-step:
+1. **Start the Backend**: Start the uvicorn backend server (see instructions above).
+2. **Open the Application**: Open `http://localhost:8000/` in your browser. Verify that the **Connection Status Indicator** in the header displays **"Backend connected"** (green dot).
+3. **Ask an In-Scope Question**:
+   - Click the example question `"What is the dying ReLU problem?"`.
+   - Verify that the loading spinner appears, followed by a grounded answer citing the sources.
+4. **Inspect Sources**:
+   - Look at the "Retrieved Sources" section.
+   - Click on the `[Source 1]` citation badge inside the answer text to verify that the UI smoothly scrolls to and highlights the corresponding note source card.
+5. **Open Diagnostics**:
+   - Verify that the "Show Diagnostics" check is checked.
+   - Expand the "System Diagnostics" panel and inspect parameters like response time, default `top_k`, and active modes.
+6. **Ask an Out-of-Scope Question**:
+   - Click the example question `"What is the capital of France?"` or type a custom unrelated query.
+   - Verify that the system refuses to answer and does not invent information.
+7. **Run Smoke Tests**:
+   - Run the automated validation script to verify all service contracts:
+     ```bash
+     python backend/smoke_test.py
+     ```
+
+---
+
 ## Known Limitations (from Stage 3 Evaluation)
 
 - **Local LLM Latency**: Generating answers using local models (Llama 3.2) on CPU-only hardware can take from 5 to 30 seconds. Cold-starts (first query) may take longer while loading embedding weights.

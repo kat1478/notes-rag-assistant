@@ -42,7 +42,17 @@ def read_root():
     return {
         "project": "Notes RAG Assistant",
         "status": "running",
-        "endpoints": ["/ingest", "/search", "/ask"]
+        "endpoints": ["/ingest", "/search", "/ask", "/health"]
+    }
+
+@app.get("/health")
+def health_check():
+    return {
+        "status": "healthy",
+        "service": "Notes RAG Assistant API",
+        "version": "2.0.0",
+        "ollama_model": OLLAMA_MODEL,
+        "top_k_default": TOP_K
     }
 
 @app.post("/ingest", response_model=IngestResponse)

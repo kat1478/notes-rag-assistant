@@ -17,8 +17,12 @@
             <div class="logo-area">
                 <div class="logo-icon">📂</div>
                 <h1>Notes RAG Assistant</h1>
+                <div id="connection-status" class="status-indicator checking">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Checking backend...</span>
+                </div>
             </div>
-            <p class="subtitle">A local, grounded helper that answers questions using ONLY your indexed notes. No external knowledge fallback.</p>
+            <p class="subtitle">A local, grounded assistant that answers questions using ONLY your indexed notes. General knowledge fallback is disabled, and the system will refuse queries out of notes scope.</p>
         </header>
 
         <!-- Main Workspace -->
@@ -28,7 +32,7 @@
                 <div class="card search-card">
                     <div class="card-header">
                         <h2>Ask Notes Assistant</h2>
-                        <span class="badge">Local Only</span>
+                        <span class="badge">Grounded RAG</span>
                     </div>
                     
                     <form id="ask-form">
@@ -36,7 +40,7 @@
                             <label for="question-input">Your Question</label>
                             <textarea 
                                 id="question-input" 
-                                placeholder="Type a question (e.g., What is the dying ReLU problem? or Jak działa algorytm Dijkstry?)..." 
+                                placeholder="Ask a question (e.g., What is the dying ReLU problem? or Jak działa algorytm Dijkstry?)..." 
                                 required
                                 rows="4"
                             ></textarea>
@@ -150,7 +154,7 @@
                 <div id="empty-state" class="card empty-card">
                     <div class="empty-icon">🔍</div>
                     <h3>Waiting for Question</h3>
-                    <p>Enter a question in the search panel or choose one of the examples to query your local knowledge base.</p>
+                    <p>Enter a question in the search panel or choose one of the examples to query your local knowledge base. Answers are strictly grounded in retrieved local note sources.</p>
                 </div>
             </section>
         </main>

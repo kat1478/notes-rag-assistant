@@ -725,3 +725,52 @@ input:checked + .slider:before {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* Connection Status Indicator */
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-left: 1rem;
+    transition: var(--transition-smooth);
+}
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--text-muted);
+}
+.status-indicator.checking .status-dot {
+    background-color: #f59e0b;
+    box-shadow: 0 0 8px #f59e0b;
+    animation: statusPulse 1.5s infinite;
+}
+.status-indicator.connected .status-dot {
+    background-color: #10b981;
+    box-shadow: 0 0 8px #10b981;
+}
+.status-indicator.disconnected .status-dot {
+    background-color: #ef4444;
+    box-shadow: 0 0 8px #ef4444;
+}
+.status-indicator.checking {
+    color: #f59e0b;
+}
+.status-indicator.connected {
+    color: #10b981;
+}
+.status-indicator.disconnected {
+    color: #ef4444;
+}
+
+@keyframes statusPulse {
+    0% { opacity: 0.4; }
+    50% { opacity: 1; }
+    100% { opacity: 0.4; }
+}
