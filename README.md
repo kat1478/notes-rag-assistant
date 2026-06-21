@@ -11,11 +11,17 @@ Repository: https://github.com/kat1478/notes-rag-assistant
 
 ---
 
-## Demo
+## Demo screenshots
 
-- **Application Home Screen**: [docs/screenshots/app_home.png](docs/screenshots/app_home.png) (TODO)
-- **Answer with Sources**: [docs/screenshots/answer_with_sources.png](docs/screenshots/answer_with_sources.png) (TODO)
-- **Diagnostics Panel**: [docs/screenshots/diagnostics_panel.png](docs/screenshots/diagnostics_panel.png) (TODO)
+- **App Home Screen**: The main query interface showing connection status.
+  ![App Home Screen](docs/screenshots/app_home.png)
+- **Answer with Sources**: Grounded answer output with highlighted interactive citations.
+  ![Answer with Sources 1](docs/screenshots/answer_with_sources_1.png)
+  ![Answer with Sources 2](docs/screenshots/answer_with_sources_2.png)
+  ![Answer with Sources 3](docs/screenshots/answer_with_sources_3.png)
+- **Diagnostics Panel**: Real-time insights showing retrieval latency, similarity scores, and LLM parameters.
+  ![Diagnostics Panel 1](docs/screenshots/diagnostics_panel.png)
+  ![Diagnostics Panel 2](docs/screenshots/diagnostics_panel_2.png)
 
 ---
 
@@ -28,6 +34,12 @@ challenges that are documented in the [Known Limitations](#known-limitations) se
 
 The project is built in stages, each with its own evaluation pass — retrieval quality, answer quality, and a
 final validation run on previously unseen notes.
+
+---
+
+## Current status
+
+The application is fully local-first, runs on local Ollama, has no external dependencies/API keys, and is fully functional for query serving and evaluation.
 
 ---
 
@@ -48,7 +60,7 @@ flowchart LR
         RET --> VDB
         RET --> EXP["Neighbor context<br/>expansion (±1 chunk)"]
         EXP --> ANS["Answering<br/>grounded prompt + citation rules"]
-        ANS --> LLM[\"Ollama (llama3.2:3b)\"]
+        ANS --> LLM["Ollama (llama3.2:3b)"]
         LLM --> API
     end
 
@@ -78,7 +90,7 @@ flowchart LR
 ### 2. Setup Ollama
 Start Ollama on your machine and run the following command to pull the required Llama 3.2 3B model:
 ```bash
-ollama run llama3.2:3b
+ollama pull llama3.2:3b
 ```
 
 ### 3. Install
@@ -94,11 +106,15 @@ Drop your `.txt` or `.md` study notes into the directory:
 ```
 backend/data/notes/
 ```
+After dropping the notes, they must be ingested into the vector database by running the following command inside the `backend/` directory:
+```bash
+python -m app.run_retrieval_eval --reset-and-reingest
+```
 
 ### 5. Run the Backend
 Start the FastAPI server:
 ```bash
-python -m uvicorn app.main:app
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 
 ### 6. Open the App
@@ -108,6 +124,21 @@ Navigate to **http://localhost:8000/** in your browser. The root URL automatical
 To verify the complete pipeline, run the smoke test:
 ```bash
 python smoke_test.py
+```
+
+### 8. Verification
+The smoke test has been executed and passed successfully. Example output from the run:
+```
+Starting Stage 4 Smoke Test against http://127.0.0.1:8000...
+
+[PASS] GET /health - Model: llama3.2:3b
+[PASS] GET / - Resolved URL: http://127.0.0.1:8000/frontend/
+[PASS] GET /frontend/ - HTML loaded successfully
+Sending POST /ask ('What is ReLU?')... (LLM inference may take 5-20 seconds)
+[PASS] POST /ask - Answer length: 132 chars, time: 46614.58 ms
+
+--- Summary ---
+All smoke tests PASSED!
 ```
 
 ---
@@ -166,7 +197,7 @@ Based on validation run insights, the system has the following limitations:
 
 - **Cross-lingual retrieval gap:** The monolingual English embedding model (`all-MiniLM-L6-v2`) fails on Polish concepts with no spelling/lexical overlap (e.g., *indukcja* vs *inductive*). Retrieval succeeds when technical terms share spelling roots across English/Polish (e.g., *Bayes* → *Bayesowski* or *Markov* → *Markowa*), but fails when there is no orthographic overlap (e.g., *hypothesis space* vs *przestrzeń wersji*).
 - **Context fragmentation:** The 1-hop neighbor expansion (±1 chunk) misses relevant information lying 2+ chunks away from the primary hit.
-- **Latency / model limitations:** The small model (`llama3.2:3b`) running on CPU is slow (averaging ~39.0 seconds per response) and sensitive to prompt/context size. Under large context sizes, it can become overly cautious and refuse to answer even when the answer is present in the context.
+- **Latency / model limitations:** The small model (`llama3.2:3b`) running on CPU is slow (averaging ~39.0 seconds per response) and sensitive to prompt/context size. Under large context sizes, it can become overly cautious and refuse to answer even when the answer is present in the context. Note: The first query after startup may take 30-45+ seconds as Ollama loads the model into memory; subsequent queries are faster.
 
 For a full failure analysis, see [`validation_summary.md`](backend/data/eval/validation_summary.md) and the Stage 3D comparison docs in [`backend/data/eval/`](backend/data/eval/).
 
@@ -195,7 +226,7 @@ frontend/              # vanilla HTML/CSS/JS UI
 
 ## Roadmap / Next steps
 
-- [ ] **Migrate generation to OpenRouter** (free hosted model) — removes the local-GPU/Ollama barrier and cuts latency.
+- [ ] **Future Work: Migrate generation to OpenRouter** (free hosted model) — removes the local-GPU/Ollama barrier and cuts latency.
 - [ ] **Reranking** — add a cross-encoder reranker over the top-k candidates to improve answer precision.
 - [ ] **Hybrid search** — combine dense (embeddings) with sparse (BM25) retrieval instead of TF-IDF fallback.
 - [ ] **Multilingual embeddings** — swap `all-MiniLM-L6-v2` for a multilingual model to close the cross-lingual gap.
@@ -208,4 +239,4 @@ frontend/              # vanilla HTML/CSS/JS UI
 
 ## License
 
-Released under the MIT License — see [`LICENSE`](LICENSE).
+Released under the MIT License.
