@@ -1,0 +1,2 @@
+Placeholder for diagnostics_panel.png.
+Replace this file with the actual screenshot of the application's diagnostics panel.
