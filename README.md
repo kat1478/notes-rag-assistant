@@ -1,6 +1,6 @@
 # Notes RAG Assistant
 
-> A local-first, **grounded** question-answering assistant over your own study notes. It is a grounded notes assistant, not a general chatbot, designed to answer with source citations (returning cited source snippets when answering). It answers **only** from indexed notes — no external-knowledge fallback. If the answer isn't in the notes, it refuses instead of hallucinating.
+> A local-first question-answering assistant over your own study notes. It is not a general chatbot: it answers only from indexed notes, returns source citations when answering, and refuses when the notes do not contain enough information.
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-backend-009688)
@@ -19,7 +19,7 @@ Repository: https://github.com/kat1478/notes-rag-assistant
   ![Answer with Sources 1](docs/screenshots/answer_with_sources_1.png)
   ![Answer with Sources 2](docs/screenshots/answer_with_sources_2.png)
   ![Answer with Sources 3](docs/screenshots/answer_with_sources_3.png)
-- **Diagnostics Panel**: Real-time insights showing retrieval latency, similarity scores, and LLM parameters.
+- **Diagnostics Panel**: Runtime metadata such as `top_k`, retrieval mode, generation mode, model name, and response time.
   ![Diagnostics Panel 2](docs/screenshots/diagnostics_panel_2.png)
 
 ---
@@ -38,7 +38,17 @@ final validation run on previously unseen notes.
 
 ## Current status
 
-The application is fully local-first, runs on local Ollama, has no external dependencies/API keys, and is fully functional for query serving and evaluation.
+This repository contains a working local MVP:
+
+- FastAPI backend with `/ask`, `/search`, `/ingest`, `/ingest/batch`, and `/health`
+- persistent ChromaDB vector store
+- local Ollama generation with `llama3.2:3b`
+- static browser frontend with clickable source citations
+- diagnostics panel and backend connection indicator
+- smoke test for the Stage 4 application layer
+- retrieval, answer-quality, and validation evaluation artifacts
+
+The next planned technical step is adding OpenRouter as an optional hosted LLM provider.
 
 ---
 
@@ -240,9 +250,19 @@ frontend/              # vanilla HTML/CSS/JS UI
 
 ---
 
+## What makes it more than a chatbot?
+
+- It separates retrieval evaluation from answer evaluation.
+- It refuses when the notes do not contain enough information.
+- It exposes retrieved source chunks instead of hiding them.
+- It includes a validation run on unseen notes.
+- It ships with a local frontend and smoke test, not only an API endpoint.
+
+---
+
 ## Roadmap / Next steps
 
-- [ ] **Future Work: Migrate generation to OpenRouter** (free hosted model) — removes the local-GPU/Ollama barrier and cuts latency.
+- [ ] **Add OpenRouter provider** — optional hosted generation backend to reduce local setup friction and potentially improve latency.
 - [ ] **Reranking** — add a cross-encoder reranker over the top-k candidates to improve answer precision.
 - [ ] **Hybrid search** — combine dense (embeddings) with sparse (BM25) retrieval instead of TF-IDF fallback.
 - [ ] **Multilingual embeddings** — swap `all-MiniLM-L6-v2` for a multilingual model to close the cross-lingual gap.
