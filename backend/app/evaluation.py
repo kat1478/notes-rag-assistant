@@ -96,7 +96,10 @@ def is_refusal_response(answer_text: str) -> bool:
         "insufficient information",
         "nie znaleziono w notatkach informacji",
         "nie mam wystarczających informacji",
-        "nie posiadam informacji"
+        "nie posiadam informacji",
+        # Polish refusals the model produces instead of the fixed English sentence (seen 2026-10-17)
+        "nie ma informacji",
+        "brak informacji"
     ]
     answer_lower = answer_text.lower()
     return any(phrase in answer_lower for phrase in refusal_phrases)
