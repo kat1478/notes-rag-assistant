@@ -3,167 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notes RAG Assistant — Local grounded helper</title>
-    <!-- Google Fonts -->
+    <title>notes-rag — grounded answers from your notes</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="app-container">
-        <!-- Header -->
-        <header class="app-header">
-            <div class="logo-area">
-                <div class="logo-icon">📂</div>
-                <h1>Notes RAG Assistant</h1>
-                <div id="connection-status" class="status-indicator checking">
-                    <span class="status-dot"></span>
-                    <span class="status-text">Checking backend...</span>
-                </div>
+    <header class="topbar">
+        <div class="brand">
+            <span class="brand-mark" aria-hidden="true"></span>
+            <span class="brand-name">notes-rag</span>
+        </div>
+        <div id="backend-status" class="backend-status" data-state="checking" role="status">
+            <span class="dot" aria-hidden="true"></span>
+            <span class="backend-label">connecting…</span>
+        </div>
+        <nav class="topbar-links">
+            <a href="/docs" target="_blank" rel="noopener">API</a>
+            <a href="https://github.com/kat1478/notes-rag-assistant" target="_blank" rel="noopener">GitHub</a>
+        </nav>
+    </header>
+
+    <section class="query">
+        <form id="ask-form" class="query-form" autocomplete="off">
+            <label for="question-input" class="visually-hidden">Question</label>
+            <span class="prompt" aria-hidden="true">&gt;</span>
+            <input
+                id="question-input"
+                class="query-input"
+                type="text"
+                placeholder="Ask your notes — e.g. What is the dying ReLU problem?"
+                required
+            >
+            <div class="topk" title="Number of chunks retrieved before ±1 neighbor expansion">
+                <span class="topk-label">top_k</span>
+                <button type="button" class="topk-btn" data-step="-1" aria-label="Decrease top_k">−</button>
+                <output id="topk-value" class="topk-value" aria-live="polite">3</output>
+                <button type="button" class="topk-btn" data-step="1" aria-label="Increase top_k">+</button>
             </div>
-            <p class="subtitle">A local, grounded assistant that answers questions using ONLY your indexed notes. General knowledge fallback is disabled, and the system will refuse queries out of notes scope.</p>
-        </header>
+            <button type="submit" id="submit-btn" class="ask-btn">
+                Ask <kbd>⏎</kbd>
+            </button>
+        </form>
+        <div class="examples">
+            <span class="examples-label">try</span>
+            <button type="button" class="chip" data-question="What is the dying ReLU problem?">dying ReLU</button>
+            <button type="button" class="chip" data-question="Jak działa algorytm Dijkstry i jaka jest jego złożoność?">Dijkstra (PL)</button>
+            <button type="button" class="chip" data-question="Explain TF-IDF step by step.">TF-IDF</button>
+            <button type="button" class="chip chip-muted" data-question="What is the capital of France?">capital of France <span class="chip-note">out of scope</span></button>
+        </div>
+    </section>
 
-        <!-- Main Workspace -->
-        <main class="app-main">
-            <!-- Left panel: input & settings -->
-            <section class="control-panel">
-                <div class="card search-card">
-                    <div class="card-header">
-                        <h2>Ask Notes Assistant</h2>
-                        <span class="badge">Grounded RAG</span>
-                    </div>
-                    
-                    <form id="ask-form">
-                        <div class="form-group">
-                            <label for="question-input">Your Question</label>
-                            <textarea 
-                                id="question-input" 
-                                placeholder="Ask a question (e.g., What is the dying ReLU problem? or Jak działa algorytm Dijkstry?)..." 
-                                required
-                                rows="4"
-                            ></textarea>
-                        </div>
+    <main class="workspace">
+        <section class="panel answer-panel" aria-labelledby="answer-heading">
+            <header class="panel-head">
+                <h2 id="answer-heading">Answer</h2>
+                <span id="answer-status" class="tag" hidden></span>
+                <span id="answer-time" class="panel-meta"></span>
+            </header>
 
-                        <div class="settings-row">
-                            <div class="form-group top_k-group">
-                                <label for="top_k-select">
-                                    Sources count (top_k): <span id="top_k-val">3</span>
-                                </label>
-                                <input type="range" id="top_k-select" min="1" max="10" value="3" step="1">
-                            </div>
-                            
-                            <div class="form-group toggle-group">
-                                <label class="switch">
-                                    <input type="checkbox" id="toggle-diagnostics" checked>
-                                    <span class="slider round"></span>
-                                </label>
-                                <span class="toggle-label">Show Diagnostics</span>
-                            </div>
-                        </div>
+            <div id="view-empty" class="panel-body empty">
+                <p>Answers come <strong>only</strong> from your indexed notes. Every claim carries a citation
+                    <span class="cite cite-demo">1</span> that points to the exact chunk in the context panel.
+                    If the notes don't cover the question, the model refuses instead of guessing.</p>
+                <dl class="hints">
+                    <div><dt>retrieved</dt><dd>chunk found by semantic search (top_k)</dd></div>
+                    <div><dt>±1 neighbor</dt><dd>adjacent chunk added for context</dd></div>
+                    <div><dt>cited</dt><dd>chunk the answer actually relies on</dd></div>
+                </dl>
+            </div>
 
-                        <button type="submit" id="submit-btn" class="btn btn-primary">
-                            <span>Ask Notes</span>
-                            <div class="btn-glow"></div>
-                        </button>
-                    </form>
-                </div>
+            <div id="view-loading" class="panel-body" hidden>
+                <ol class="steps" aria-live="polite">
+                    <li class="step done">query sent</li>
+                    <li class="step active">retrieving chunks &amp; generating answer <span id="elapsed" class="mono">0.0 s</span></li>
+                </ol>
+                <p class="note">Local CPU inference takes ~30–45 s. The first request after startup is slower while the model loads.</p>
+            </div>
 
-                <!-- Example questions -->
-                <div class="card examples-card">
-                    <h3>Example Questions</h3>
-                    <div class="examples-grid">
-                        <button class="example-btn" data-question="What is the dying ReLU problem?">What is the dying ReLU problem?</button>
-                        <button class="example-btn" data-question="Jak działa algorytm Dijkstry i jaka jest jego złożoność?">Jak działa algorytm Dijkstry?</button>
-                        <button class="example-btn" data-question="Explain TF-IDF step by step.">Explain TF-IDF step by step.</button>
-                        <button class="example-btn" data-question="What is the capital of France?">What is the capital of France? (Out-of-scope test)</button>
-                    </div>
-                </div>
-            </section>
+            <div id="view-error" class="panel-body" hidden>
+                <p class="error-title">Backend not reachable</p>
+                <p id="error-detail" class="note"></p>
+                <p class="note">Start it from <code>backend/</code>:</p>
+                <pre class="cmd">python -m uvicorn app.main:app --host 127.0.0.1 --port 8000</pre>
+                <button type="button" id="retry-btn" class="ghost-btn">Retry</button>
+            </div>
 
-            <!-- Right panel: responses, sources & diagnostics -->
-            <section class="results-panel">
-                <!-- Status/Error messages -->
-                <div id="error-container" class="alert alert-error hidden">
-                    <div class="alert-icon">⚠️</div>
-                    <div class="alert-content">
-                        <h4 id="error-title">Backend Connection Error</h4>
-                        <p id="error-message">Could not connect to the local RAG backend. Please verify that the server is running on http://127.0.0.1:8000.</p>
-                        <button id="retry-btn" class="btn btn-secondary btn-sm">Retry</button>
-                    </div>
-                </div>
+            <div id="view-answer" class="panel-body" hidden>
+                <p id="answer-question" class="answer-question"></p>
+                <div id="answer-text" class="answer-text" aria-live="polite"></div>
+            </div>
+        </section>
 
-                <!-- Loading State -->
-                <div id="loading-container" class="card loading-card hidden">
-                    <div class="spinner-container">
-                        <div class="spinner"></div>
-                    </div>
-                    <p class="loading-text">Searching local vector store & generating grounded response using Llama 3.2...</p>
-                </div>
+        <section class="panel context-panel" aria-labelledby="context-heading">
+            <header class="panel-head">
+                <h2 id="context-heading">Context</h2>
+                <span id="context-summary" class="panel-meta">chunks sent to the LLM, in prompt order</span>
+            </header>
+            <ol id="sources-list" class="sources"></ol>
+        </section>
+    </main>
 
-                <!-- Answer Container -->
-                <div id="answer-container" class="card answer-card hidden">
-                    <div class="card-header">
-                        <h3>Grounded Answer</h3>
-                        <button id="clear-btn" class="btn btn-text btn-sm">Clear</button>
-                    </div>
-                    <div class="answer-body">
-                        <p id="answer-text"></p>
-                    </div>
-                </div>
+    <footer id="run-stats" class="stats" aria-label="Run statistics">
+        <div class="stat"><span class="stat-k">retrieval</span><span class="stat-v" id="stat-retrieval">—</span></div>
+        <div class="stat"><span class="stat-k">generation</span><span class="stat-v" id="stat-generation">—</span></div>
+        <div class="stat"><span class="stat-k">top_k</span><span class="stat-v" id="stat-topk">—</span></div>
+        <div class="stat"><span class="stat-k">chunks</span><span class="stat-v" id="stat-chunks">—</span></div>
+        <div class="stat"><span class="stat-k">cited</span><span class="stat-v" id="stat-cited">—</span></div>
+        <div class="stat"><span class="stat-k">latency</span><span class="stat-v" id="stat-latency">—</span></div>
+    </footer>
 
-                <!-- Sources Container -->
-                <div id="sources-container" class="card sources-card hidden">
-                    <h3>Retrieved Sources</h3>
-                    <p class="sources-intro">The context chunks retrieved from your local files and fed to the LLM:</p>
-                    <div id="sources-list" class="sources-list">
-                        <!-- Dynamic source cards will be added here -->
-                    </div>
-                </div>
-
-                <!-- Collapsible Diagnostics panel -->
-                <div id="diagnostics-container" class="card diagnostics-card hidden">
-                    <div class="card-header" id="diagnostics-toggle">
-                        <h3>System Diagnostics</h3>
-                        <span class="toggle-icon">▼</span>
-                    </div>
-                    <div class="diagnostics-body" id="diagnostics-body">
-                        <div class="diagnostic-grid">
-                            <div class="diag-item">
-                                <span class="diag-label">Retrieval Mode:</span>
-                                <span class="diag-value" id="diag-retrieval-mode">-</span>
-                            </div>
-                            <div class="diag-item">
-                                <span class="diag-label">Generation Mode:</span>
-                                <span class="diag-value" id="diag-generation-mode">-</span>
-                            </div>
-                            <div class="diag-item">
-                                <span class="diag-label">top_k Used:</span>
-                                <span class="diag-value" id="diag-top-k">-</span>
-                            </div>
-                            <div class="diag-item">
-                                <span class="diag-label">Backend Response Time:</span>
-                                <span class="diag-value" id="diag-response-time">-</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Empty state -->
-                <div id="empty-state" class="card empty-card">
-                    <div class="empty-icon">🔍</div>
-                    <h3>Waiting for Question</h3>
-                    <p>Enter a question in the search panel or choose one of the examples to query your local knowledge base. Answers are strictly grounded in retrieved local note sources.</p>
-                </div>
-            </section>
-        </main>
-        
-        <!-- Footer -->
-        <footer class="app-footer">
-            <p>Notes RAG Assistant (Stage 4) • Local-first & Grounded RAG MVP</p>
-        </footer>
-    </div>
     <script src="app.js"></script>
 </body>
 </html>

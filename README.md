@@ -13,14 +13,22 @@ Repository: https://github.com/kat1478/notes-rag-assistant
 
 ## Demo screenshots
 
-- **App Home Screen**: The main query interface showing connection status.
-  ![App Home Screen](docs/screenshots/app_home.png)
-- **Answer with Sources**: Grounded answer output with highlighted interactive citations.
-  ![Answer with Sources 1](docs/screenshots/answer_with_sources_1.png)
-  ![Answer with Sources 2](docs/screenshots/answer_with_sources_2.png)
-  ![Answer with Sources 3](docs/screenshots/answer_with_sources_3.png)
-- **Diagnostics Panel**: Runtime metadata such as `top_k`, retrieval mode, generation mode, model name, and response time.
-  ![Diagnostics Panel 2](docs/screenshots/diagnostics_panel_2.png)
+**Answer ↔ context.** Every citation in the answer links to the exact chunk that was sent to the LLM.
+The context panel lists all chunks in prompt order — retrieved by semantic search or added as ±1 neighbors —
+with their raw retrieval score; the bottom strip shows retrieval/generation mode, citation coverage and latency.
+
+![Grounded answer with the cited chunk highlighted](docs/screenshots/answer_dark.png)
+
+![Light theme, multi-step answer citing three chunks](docs/screenshots/answer_light.png)
+
+<details>
+<summary>Start screen and mobile layout</summary>
+
+![Start screen](docs/screenshots/app_home.png)
+
+<img src="docs/screenshots/mobile.png" alt="Mobile layout" width="320">
+
+</details>
 
 ---
 
@@ -43,8 +51,8 @@ This repository contains a working local MVP:
 - FastAPI backend with `/ask`, `/search`, `/ingest`, `/ingest/batch`, and `/health`
 - persistent ChromaDB vector store
 - local Ollama generation with `llama3.2:3b`
-- static browser frontend with clickable source citations
-- diagnostics panel and backend connection indicator
+- static browser frontend linking each citation to its source chunk
+- answer status (grounded / refused / no citation), run statistics and backend status
 - smoke test for the Stage 4 application layer
 - retrieval, answer-quality, and validation evaluation artifacts
 
@@ -86,7 +94,7 @@ flowchart LR
 | Vector store | ChromaDB (persistent, per-file upsert/delete)                                    |
 | Retrieval    | Semantic (Chroma) with TF-IDF fallback + 1-hop neighbor context expansion        |
 | Generation   | Ollama (local model `llama3.2:3b`), `temperature = 0.0`, strict grounding prompt |
-| Frontend     | Vanilla HTML/CSS/JS with clickable citations and a diagnostics panel             |
+| Frontend     | Vanilla HTML/CSS/JS: answer ↔ context linking, run statistics, light/dark theme  |
 
 ---
 
@@ -138,7 +146,7 @@ python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 
 ### 6. Open the App
 
-Navigate to **http://localhost:8000/** in your browser. The root URL automatically redirects to the static frontend. Verify the **"Backend connected"** status indicator in the header (green dot).
+Navigate to **http://localhost:8000/** in your browser. The root URL automatically redirects to the static frontend. The status pill in the top bar shows the active model (green dot) or `backend offline`.
 
 ### 7. Run the Smoke Test
 
@@ -176,8 +184,8 @@ All smoke tests PASSED!
 > **A:** Dijkstra's algorithm jest używany do optymalizacji ścieżek w grafach, czyli do znalezienia
 > najkrótszej drogi między dwoma wierzchołkami. **[Source 1]**
 
-The UI renders each retrieved chunk as a source card; clicking a `[Source N]` badge scrolls to and
-highlights the matching note.
+The UI renders citations as numbered markers; hovering or clicking one highlights and opens the matching
+chunk in the context panel.
 
 **Out-of-scope question — refused instead of guessed:**
 
