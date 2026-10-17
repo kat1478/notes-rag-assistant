@@ -8,6 +8,13 @@ const TOP_K_MAX = 10;
 // Served by FastAPI → same origin; opened as a file → assume the default local server.
 const API_BASE = window.location.protocol === 'file:' ? 'http://127.0.0.1:8000' : '';
 
+const MODEL_KEY = 'notes-rag.model';  // shared with models.html
+
+const store = {
+    get() { try { return localStorage.getItem(MODEL_KEY); } catch { return null; } },
+    set(v) { try { localStorage.setItem(MODEL_KEY, v); } catch { /* private mode: selection lasts this page only */ } },
+};
+
 const $ = (id) => document.getElementById(id);
 
 const el = {
@@ -15,6 +22,8 @@ const el = {
     input: $('question-input'),
     submit: $('submit-btn'),
     topk: $('topk-value'),
+    model: $('model-select'),
+    loadingNote: $('loading-note'),
     status: $('backend-status'),
     statusLabel: document.querySelector('.backend-label'),
     answerStatus: $('answer-status'),
@@ -37,6 +46,7 @@ const el = {
         topk: $('stat-topk'),
         chunks: $('stat-chunks'),
         cited: $('stat-cited'),
+        tokens: $('stat-tokens'),
         latency: $('stat-latency'),
     },
 };
@@ -44,6 +54,8 @@ const el = {
 const state = {
     topK: 3,
     lastQuestion: '',
+    models: [],
+    defaultModel: null,
     pinned: null,   // source number kept highlighted after a click
     timer: null,
 };
@@ -60,10 +72,8 @@ async function checkHealth() {
         const res = await fetch(`${API_BASE}/health`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        // `provider`/`model` are planned (Stage 5A); fall back to the current Ollama-only field.
-        const provider = data.provider || 'ollama';
-        const model = data.model || data.ollama_model || 'unknown model';
-        setBackend('up', `${provider} · ${model}`);
+        state.defaultModel = data.default_model_id || `ollama:${data.ollama_model}`;
+        setBackend('up', 'backend ready');
         if (Number.isInteger(data.top_k_default) && !state.lastQuestion) setTopK(data.top_k_default);
         return true;
     } catch {
@@ -119,6 +129,9 @@ async function ask(question) {
     state.lastQuestion = question;
 
     resetResult();
+    el.loadingNote.textContent = isLocal(el.model.value)
+        ? 'Local CPU inference takes ~30–45 s. The first request after startup is slower while the model loads.'
+        : 'Hosted model via OpenRouter — usually a few seconds.';
     show('loading');
     el.submit.disabled = true;
     startTimer();
@@ -127,7 +140,7 @@ async function ask(question) {
         const res = await fetch(`${API_BASE}/ask`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query: question, top_k: state.topK }),
+            body: JSON.stringify({ query: question, top_k: state.topK, model: el.model.value || undefined }),
         });
         if (!res.ok) {
             const detail = await res.text().catch(() => '');
@@ -141,7 +154,7 @@ async function ask(question) {
         console.error('Ask failed:', err);
         const up = await checkHealth();
         el.errorDetail.textContent = up
-            ? `The backend is up but the request failed: ${err.message}. Is Ollama running?`
+            ? `The backend is up but the request failed: ${err.message}`
             : `No response from ${API_BASE || window.location.origin}. (${err.message})`;
         el.sources.innerHTML = '<li class="sources-empty">No context — the request did not complete.</li>';
         show('error');
@@ -182,7 +195,8 @@ function renderAnswer(text, sourceCount) {
     return { cited, missing };
 }
 
-function classify(text, citedCount) {
+function classify(text, citedCount, error) {
+    if (error) return { kind: 'failed', label: 'generation failed', hint: error };
     if (citedCount > 0) return { kind: 'grounded', label: 'grounded' };
     if (REFUSAL_RE.test(text)) return { kind: 'refused', label: 'refused · out of scope' };
     return {
@@ -228,6 +242,7 @@ function renderStats(meta, sources, cited, missing) {
     el.stats.topk.textContent = meta?.top_k_used ?? state.topK;
     el.stats.chunks.textContent = `${sources.length} (${retrievedCount} retrieved + ${neighbors} neighbors)`;
     el.stats.cited.textContent = `${cited.size} / ${sources.length}${missing ? ` · ${missing} invalid` : ''}`;
+    el.stats.tokens.textContent = meta?.prompt_tokens ? `${meta.prompt_tokens} in · ${meta.completion_tokens ?? '?'} out` : '—';
     el.stats.latency.textContent = ms !== undefined ? `${(ms / 1000).toFixed(1)} s` : '—';
     el.answerTime.textContent = ms !== undefined ? `${(ms / 1000).toFixed(1)} s` : '';
 }
@@ -241,7 +256,7 @@ function renderResult(question, data) {
     renderSources(sources, cited);
     renderStats(data.metadata, sources, cited, missing);
 
-    const status = classify(answer, cited.size);
+    const status = classify(answer, cited.size, data.metadata?.generation_error);
     el.answerStatus.dataset.kind = status.kind;
     el.answerStatus.textContent = status.label;
     el.answerStatus.title = status.hint || '';
@@ -301,6 +316,37 @@ document.addEventListener('keydown', (e) => {
     if (e.key === '/' && document.activeElement !== el.input) { e.preventDefault(); el.input.focus(); }
 });
 
+// ── Model picker ───────────────────────────────────────────
+
+const isLocal = (modelId) => (modelId || state.defaultModel || '').startsWith('ollama:');
+
+function modelLabel(m) {
+    const name = m.model.includes('/') ? m.model.split('/').pop() : m.model;
+    return `${name}${m.local ? ' · local' : ''}${m.available ? '' : ' (needs API key)'}`;
+}
+
+async function loadModels() {
+    try {
+        const res = await fetch(`${API_BASE}/models`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        state.models = await res.json();
+    } catch {
+        return;  // keep the picker empty → backend default model is used
+    }
+    el.model.replaceChildren(...state.models.map((m) => {
+        const opt = document.createElement('option');
+        opt.value = m.id;
+        opt.textContent = modelLabel(m);
+        opt.disabled = !m.available;
+        return opt;
+    }));
+    const saved = store.get();
+    const usable = (id) => state.models.some((m) => m.id === id && m.available);
+    el.model.value = usable(saved) ? saved : (usable(state.defaultModel) ? state.defaultModel : state.models[0]?.id);
+}
+
+el.model.addEventListener('change', () => store.set(el.model.value));
+
 // ── Wiring ─────────────────────────────────────────────────
 
 el.form.addEventListener('submit', (e) => {
@@ -321,4 +367,4 @@ $('retry-btn').addEventListener('click', () => {
 });
 
 el.sources.innerHTML = '<li class="sources-empty">No query yet. Retrieved chunks will appear here.</li>';
-checkHealth();
+checkHealth().then(loadModels);
