@@ -44,17 +44,18 @@ Answer:"""
 
 
 def generate_answer_with_meta(
-    query: str, sources: List[ChunkResponse], model_id: Optional[str] = None
+    query: str, sources: List[ChunkResponse], model_id: Optional[str] = None,
+    temperature: Optional[float] = None,
 ) -> Generation:
     """Generates a grounded answer with the selected model; keeps token usage for cost tracking.
-    Raises ValueError for a model id outside the allowlist."""
+    Raises ValueError for a model id outside the allowlist or a temperature out of range."""
     model_id = model_id or DEFAULT_MODEL_ID
     if not sources:
         return Generation(text=NO_SOURCES_ANSWER, model_id=model_id)
 
     prompt, context_block = build_prompt(query, sources)
     try:
-        return generate(prompt, model_id)
+        return generate(prompt, model_id, temperature)
     except ValueError:
         raise
     except Exception as e:

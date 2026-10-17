@@ -4,6 +4,8 @@
 const REFUSAL_RE = /don['’]t have enough information/i;
 const TOP_K_MIN = 1;
 const TOP_K_MAX = 10;
+const TEMP_MAX = 1.0;   // matches backend TEMPERATURE_MAX
+const TEMP_STEP = 0.1;
 
 // Served by FastAPI → same origin; opened as a file → assume the default local server.
 const API_BASE = window.location.protocol === 'file:' ? 'http://127.0.0.1:8000' : '';
@@ -23,6 +25,8 @@ const el = {
     submit: $('submit-btn'),
     topk: $('topk-value'),
     model: $('model-select'),
+    temp: $('temp-value'),
+    tempBox: $('temp-box'),
     loadingNote: $('loading-note'),
     status: $('backend-status'),
     statusLabel: document.querySelector('.backend-label'),
@@ -44,6 +48,7 @@ const el = {
         retrieval: $('stat-retrieval'),
         generation: $('stat-generation'),
         topk: $('stat-topk'),
+        temp: $('stat-temp'),
         chunks: $('stat-chunks'),
         cited: $('stat-cited'),
         tokens: $('stat-tokens'),
@@ -53,6 +58,7 @@ const el = {
 
 const state = {
     topK: 3,
+    temperature: 0,
     lastQuestion: '',
     models: [],
     defaultModel: null,
@@ -75,6 +81,7 @@ async function checkHealth() {
         state.defaultModel = data.default_model_id || `ollama:${data.ollama_model}`;
         setBackend('up', 'backend ready');
         if (Number.isInteger(data.top_k_default) && !state.lastQuestion) setTopK(data.top_k_default);
+        if (typeof data.temperature_default === 'number' && !state.lastQuestion) setTemperature(data.temperature_default);
         return true;
     } catch {
         setBackend('down', 'backend offline');
@@ -91,6 +98,19 @@ function setTopK(value) {
 
 document.querySelectorAll('.topk-btn').forEach((btn) => {
     btn.addEventListener('click', () => setTopK(state.topK + Number(btn.dataset.step)));
+});
+
+// ── temperature stepper ────────────────────────────────────
+
+function setTemperature(value) {
+    // Work in tenths to avoid 0.30000000000000004.
+    const tenths = Math.round(value / TEMP_STEP);
+    state.temperature = Math.min(TEMP_MAX / TEMP_STEP, Math.max(0, tenths)) / 10;
+    el.temp.textContent = state.temperature.toFixed(1);
+}
+
+document.querySelectorAll('.temp-btn').forEach((btn) => {
+    btn.addEventListener('click', () => setTemperature(state.temperature + Number(btn.dataset.step) * TEMP_STEP));
 });
 
 // ── View switching ─────────────────────────────────────────
@@ -140,7 +160,12 @@ async function ask(question) {
         const res = await fetch(`${API_BASE}/ask`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query: question, top_k: state.topK, model: el.model.value || undefined }),
+            body: JSON.stringify({
+                query: question,
+                top_k: state.topK,
+                temperature: state.temperature,
+                model: el.model.value || undefined,
+            }),
         });
         if (!res.ok) {
             const detail = await res.text().catch(() => '');
@@ -240,6 +265,7 @@ function renderStats(meta, sources, cited, missing) {
     el.stats.retrieval.textContent = meta?.retrieval_mode ?? '—';
     el.stats.generation.textContent = meta?.generation_mode ?? '—';
     el.stats.topk.textContent = meta?.top_k_used ?? state.topK;
+    el.stats.temp.textContent = typeof meta?.temperature === 'number' ? meta.temperature.toFixed(1) : 'n/a (model ignores it)';
     el.stats.chunks.textContent = `${sources.length} (${retrievedCount} retrieved + ${neighbors} neighbors)`;
     el.stats.cited.textContent = `${cited.size} / ${sources.length}${missing ? ` · ${missing} invalid` : ''}`;
     el.stats.tokens.textContent = meta?.prompt_tokens ? `${meta.prompt_tokens} in · ${meta.completion_tokens ?? '?'} out` : '—';
@@ -343,9 +369,24 @@ async function loadModels() {
     const saved = store.get();
     const usable = (id) => state.models.some((m) => m.id === id && m.available);
     el.model.value = usable(saved) ? saved : (usable(state.defaultModel) ? state.defaultModel : state.models[0]?.id);
+    syncTemperatureSupport();
 }
 
-el.model.addEventListener('change', () => store.set(el.model.value));
+// Reasoning models (e.g. Claude 4.5+, GPT-5.x) don't accept temperature — show that instead of a dead control.
+function syncTemperatureSupport() {
+    const m = state.models.find((x) => x.id === el.model.value);
+    const off = m?.supports_temperature === false;
+    el.tempBox.classList.toggle('is-off', off);
+    el.tempBox.querySelectorAll('button').forEach((b) => { b.disabled = off; });
+    el.tempBox.title = off
+        ? `${m.model} does not accept temperature (reasoning model) — the setting is ignored`
+        : 'Sampling temperature: 0 = deterministic (used for benchmarks), higher = more varied wording';
+}
+
+el.model.addEventListener('change', () => {
+    store.set(el.model.value);
+    syncTemperatureSupport();
+});
 
 // ── Wiring ─────────────────────────────────────────────────
 

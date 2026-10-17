@@ -4,9 +4,9 @@ from typing import Optional
 from .provider import Generation, get_provider
 
 
-def generate(prompt: str, model_id: Optional[str] = None) -> Generation:
+def generate(prompt: str, model_id: Optional[str] = None, temperature: Optional[float] = None) -> Generation:
     """Generates a completion with the selected (or default) allowlisted model."""
-    return get_provider(model_id).generate(prompt)
+    return get_provider(model_id).generate(prompt, temperature)
 
 
 def generate_from_ollama(prompt: str) -> str:

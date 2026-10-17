@@ -41,8 +41,10 @@ CHROMA_DIR.mkdir(parents=True, exist_ok=True)
 # Embedding settings
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 
-# Generation settings — deterministic for every provider so eval runs stay comparable
-TEMPERATURE = 0.0
+# Generation settings. The default 0.0 (deterministic) keeps eval runs comparable; a request or a benchmark
+# run may override it within [TEMPERATURE_MIN, TEMPERATURE_MAX] — 1.0 is the highest value every provider accepts.
+TEMPERATURE = float(os.getenv("TEMPERATURE", "0.0"))
+TEMPERATURE_MIN, TEMPERATURE_MAX = 0.0, 1.0
 
 # Ollama settings (local default, no API key needed)
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")

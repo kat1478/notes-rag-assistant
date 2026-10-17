@@ -42,7 +42,8 @@ const state = { rows: [], selected: store.get() };
 
 function shortName(r) {
     const name = r.model.includes('/') ? r.model.split('/').pop() : r.model;
-    return r.provider === 'ollama' ? `${name} · local` : name;
+    const temp = r.temperature_requested ? ` · t=${r.temperature_requested}` : '';
+    return `${name}${r.provider === 'ollama' ? ' · local' : ''}${temp}`;
 }
 
 // 0 + "nice" steps (1, 2, 2.5, 5 × 10^k) covering max, 3–5 ticks.

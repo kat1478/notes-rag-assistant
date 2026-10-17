@@ -50,6 +50,12 @@
                 <output id="topk-value" class="topk-value" aria-live="polite">3</output>
                 <button type="button" class="topk-btn" data-step="1" aria-label="Increase top_k">+</button>
             </div>
+            <div class="topk temp" id="temp-box" title="Sampling temperature: 0 = deterministic (used for benchmarks), higher = more varied wording">
+                <span class="topk-label">temp</span>
+                <button type="button" class="temp-btn" data-step="-1" aria-label="Decrease temperature">−</button>
+                <output id="temp-value" class="topk-value" aria-live="polite">0.0</output>
+                <button type="button" class="temp-btn" data-step="1" aria-label="Increase temperature">+</button>
+            </div>
             <button type="submit" id="submit-btn" class="ask-btn">
                 Ask <kbd>⏎</kbd>
             </button>
@@ -117,6 +123,7 @@
         <div class="stat"><span class="stat-k">retrieval</span><span class="stat-v" id="stat-retrieval">—</span></div>
         <div class="stat"><span class="stat-k">generation</span><span class="stat-v" id="stat-generation">—</span></div>
         <div class="stat"><span class="stat-k">top_k</span><span class="stat-v" id="stat-topk">—</span></div>
+        <div class="stat"><span class="stat-k">temp</span><span class="stat-v" id="stat-temp">—</span></div>
         <div class="stat"><span class="stat-k">chunks</span><span class="stat-v" id="stat-chunks">—</span></div>
         <div class="stat"><span class="stat-k">cited</span><span class="stat-v" id="stat-cited">—</span></div>
         <div class="stat"><span class="stat-k">tokens</span><span class="stat-v" id="stat-tokens">—</span></div>

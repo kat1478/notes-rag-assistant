@@ -14,7 +14,7 @@ from .schemas import (
 from .ingestion import process_upload
 from .retrieval import perform_search
 from .answering import generate_answer_with_meta
-from .config import TOP_K, OLLAMA_MODEL, DEFAULT_MODEL_ID, DATA_DIR
+from .config import TOP_K, OLLAMA_MODEL, DEFAULT_MODEL_ID, DATA_DIR, TEMPERATURE
 from .provider import list_models
 
 app = FastAPI(
@@ -57,7 +57,8 @@ def health_check():
         "model": DEFAULT_MODEL_ID.split(":", 1)[1],
         "default_model_id": DEFAULT_MODEL_ID,
         "ollama_model": OLLAMA_MODEL,  # kept for older clients / smoke test
-        "top_k_default": TOP_K
+        "top_k_default": TOP_K,
+        "temperature_default": TEMPERATURE,
     }
 
 @app.get("/models", response_model=List[ModelInfo])
@@ -148,7 +149,7 @@ def ask(request: AskRequest):
     top_k = request.top_k if request.top_k is not None else TOP_K
     results = perform_search(request.query, top_k)
     try:
-        generation = generate_answer_with_meta(request.query, results, request.model)
+        generation = generate_answer_with_meta(request.query, results, request.model, request.temperature)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     elapsed_ms = (time.time() - start_time) * 1000
@@ -167,6 +168,7 @@ def ask(request: AskRequest):
             prompt_tokens=generation.prompt_tokens,
             completion_tokens=generation.completion_tokens,
             generation_error=generation.error,
+            temperature=generation.temperature,
         )
     )
 

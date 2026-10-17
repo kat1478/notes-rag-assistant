@@ -2,6 +2,7 @@
 #   python -m app.run_model_benchmark                       # every available model
 #   python -m app.run_model_benchmark --models ollama:llama3.2:3b openrouter:anthropic/claude-haiku-5.5
 #   python -m app.run_model_benchmark --limit 3             # quick smoke run
+#   python -m app.run_model_benchmark --temperature 0.7     # saved as a separate run "<model>@t0.7"
 #
 # Retrieval runs once per question; every model then answers from the *same* context,
 # so differences come from generation only. Results: data/eval/models/<model>.csv + summary.json.
@@ -22,7 +23,7 @@ from typing import Dict, List, Optional
 import httpx
 
 from .answering import FALLBACK_PREFIX, generate_answer_with_meta
-from .config import DATA_DIR, OPENROUTER_BASE_URL
+from .config import DATA_DIR, OPENROUTER_BASE_URL, TEMPERATURE
 from .evaluation import is_refusal_response, load_evaluation_dataset
 from .provider import get_provider, list_models
 from .retrieval import perform_search
@@ -85,13 +86,19 @@ def warm_up(model_id: str) -> None:
             logger.warning(f"Warm-up failed: {e}")
 
 
-def run_model(model_id: str, items: List[dict], contexts: Dict[str, list], prices) -> List[dict]:
+def run_key(model_id: str, temperature: float) -> str:
+    """Summary key: the plain model id for the default temperature, '<model>@t<T>' otherwise."""
+    return model_id if temperature == TEMPERATURE else f"{model_id}@t{temperature:g}"
+
+
+def run_model(model_id: str, items: List[dict], contexts: Dict[str, list], prices,
+              temperature: float) -> List[dict]:
     warm_up(model_id)
     rows = []
     for i, item in enumerate(items, 1):
         sources = contexts[item["id"]]
         t0 = time.perf_counter()
-        gen = generate_answer_with_meta(item["question"], sources, model_id)
+        gen = generate_answer_with_meta(item["question"], sources, model_id, temperature)
         latency_ms = (time.perf_counter() - t0) * 1000
 
         failed = gen.error is not None or gen.text.startswith(FALLBACK_PREFIX)
@@ -111,6 +118,7 @@ def run_model(model_id: str, items: List[dict], contexts: Dict[str, list], price
             "prompt_tokens": gen.prompt_tokens,
             "completion_tokens": gen.completion_tokens,
             "cost_usd": query_cost(model_id, gen.prompt_tokens, gen.completion_tokens, prices),
+            "temperature": gen.temperature,
             "answer_text": gen.text.replace("\n", " ").replace("\r", " "),
             "error": gen.error or "",
         })
@@ -119,7 +127,7 @@ def run_model(model_id: str, items: List[dict], contexts: Dict[str, list], price
     return rows
 
 
-def summarize(model_id: str, rows: List[dict]) -> dict:
+def summarize(model_id: str, rows: List[dict], temperature_requested: float = TEMPERATURE) -> dict:
     in_scope = [r for r in rows if r["should_answer"]]
     oos = [r for r in rows if not r["should_answer"]]
     answered = [r for r in rows if r["answered"]]
@@ -135,6 +143,9 @@ def summarize(model_id: str, rows: List[dict]) -> dict:
         "model_id": model_id,
         "provider": provider,
         "model": model,
+        # applied = what the model actually received; None when it ignores temperature (reasoning models)
+        "temperature_requested": temperature_requested,
+        "temperature_applied": next((r["temperature"] for r in rows if r.get("temperature") is not None), None),
         "n_questions": len(rows),
         "n_in_scope": len(in_scope),
         "n_out_of_scope": len(oos),
@@ -175,6 +186,8 @@ def main():
     parser.add_argument("--top-k", type=int, default=3)
     parser.add_argument("--limit", type=int, help="Only the first N questions (quick check; not saved to summary).")
     parser.add_argument("--out-dir", default=str(OUT_DIR))
+    parser.add_argument("--temperature", type=float, default=TEMPERATURE,
+                        help=f"Sampling temperature 0–1 (default {TEMPERATURE}). Models without temperature support ignore it.")
     args = parser.parse_args()
 
     available = {m["id"]: m for m in list_models()}
@@ -199,21 +212,22 @@ def main():
 
     for model_id in model_ids:
         logger.info(f"=== {model_id} ===")
-        rows = run_model(model_id, items, contexts, prices)
-        result = summarize(model_id, rows)
+        rows = run_model(model_id, items, contexts, prices, args.temperature)
+        result = summarize(model_id, rows, args.temperature)
+        key = run_key(model_id, args.temperature)
         print(json.dumps(result, indent=2))
         if args.limit:
             continue  # partial runs are not comparable — keep them out of the summary
-        write_csv(out_dir / f"{slug(model_id)}.csv", rows)
+        write_csv(out_dir / f"{slug(key)}.csv", rows)
         result.update({
             "dataset": Path(args.dataset_path).name,
             "top_k": args.top_k,
             "run_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "git_commit": git_commit(),
         })
-        summary["runs"][model_id] = result
+        summary["runs"][key] = result
         summary_path.write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-        logger.info(f"Saved {model_id} → {summary_path}")
+        logger.info(f"Saved {key} → {summary_path}")
 
 
 if __name__ == "__main__":

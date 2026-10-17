@@ -5,6 +5,7 @@ Model ids are "<provider>:<model>" (split on the first colon), e.g. "ollama:llam
 """
 import logging
 from dataclasses import dataclass
+from functools import lru_cache
 from typing import Dict, List, Optional
 
 import httpx
@@ -17,6 +18,8 @@ from .config import (
     OPENROUTER_BASE_URL,
     OPENROUTER_MODELS,
     TEMPERATURE,
+    TEMPERATURE_MAX,
+    TEMPERATURE_MIN,
 )
 
 logger = logging.getLogger(__name__)
@@ -34,6 +37,7 @@ class Generation:
     prompt_tokens: Optional[int] = None
     completion_tokens: Optional[int] = None
     error: Optional[str] = None   # set when generation failed and the extractive fallback was returned
+    temperature: Optional[float] = None  # value actually sent; None = the model does not accept temperature
 
 
 class LLMProvider:
@@ -46,20 +50,32 @@ class LLMProvider:
     def model_id(self) -> str:
         return f"{self.name}:{self.model}"
 
-    def generate(self, prompt: str) -> Generation:
+    @property
+    def supports_temperature(self) -> Optional[bool]:
+        return True
+
+    def resolve_temperature(self, temperature: Optional[float]) -> Optional[float]:
+        """Requested (or default) temperature, or None when the model would ignore it anyway."""
+        t = TEMPERATURE if temperature is None else float(temperature)
+        if not TEMPERATURE_MIN <= t <= TEMPERATURE_MAX:
+            raise ValueError(f"temperature must be between {TEMPERATURE_MIN} and {TEMPERATURE_MAX}, got {t}")
+        return None if self.supports_temperature is False else t
+
+    def generate(self, prompt: str, temperature: Optional[float] = None) -> Generation:
         raise NotImplementedError
 
 
 class OllamaProvider(LLMProvider):
     name = "ollama"
 
-    def generate(self, prompt: str) -> Generation:
+    def generate(self, prompt: str, temperature: Optional[float] = None) -> Generation:
+        temperature = self.resolve_temperature(temperature)
         url = f"{OLLAMA_BASE_URL}/api/generate"
         payload = {
             "model": self.model,
             "prompt": prompt,
             "stream": False,
-            "options": {"temperature": TEMPERATURE},
+            "options": {"temperature": temperature},
         }
         logger.info(f"Sending request to Ollama ({self.model}) at {url}, timeout={OLLAMA_TIMEOUT}s")
 
@@ -98,13 +114,20 @@ class OllamaProvider(LLMProvider):
             model_id=self.model_id,
             prompt_tokens=data.get("prompt_eval_count"),
             completion_tokens=data.get("eval_count"),
+            temperature=temperature,
         )
 
 
 class OpenRouterProvider(LLMProvider):
     name = "openrouter"
 
-    def generate(self, prompt: str) -> Generation:
+    @property
+    def supports_temperature(self) -> Optional[bool]:
+        params = _openrouter_supported_params().get(self.model)
+        return None if params is None else "temperature" in params
+
+    def generate(self, prompt: str, temperature: Optional[float] = None) -> Generation:
+        temperature = self.resolve_temperature(temperature)
         if not OPENROUTER_API_KEY:
             raise RuntimeError(
                 "OPENROUTER_API_KEY is not set. Add it to backend/.env or the environment, "
@@ -120,8 +143,11 @@ class OpenRouterProvider(LLMProvider):
         payload = {
             "model": self.model,
             "messages": [{"role": "user", "content": prompt}],
-            "temperature": TEMPERATURE,
         }
+        # Reasoning models (GPT-5.x, Claude 4.5+) don't accept temperature; OpenRouter would drop it silently,
+        # so we don't send it and report temperature=None instead of claiming a value that wasn't applied.
+        if temperature is not None:
+            payload["temperature"] = temperature
         logger.info(f"Sending request to OpenRouter ({self.model}), timeout={OPENROUTER_TIMEOUT}s")
 
         try:
@@ -156,26 +182,48 @@ class OpenRouterProvider(LLMProvider):
             model_id=self.model_id,
             prompt_tokens=usage.get("prompt_tokens"),
             completion_tokens=usage.get("completion_tokens"),
+            temperature=temperature,
         )
+
+
+@lru_cache(maxsize=1)
+def _openrouter_supported_params() -> Dict[str, List[str]]:
+    """supported_parameters per OpenRouter model (public endpoint, fetched once per process)."""
+    try:
+        data = httpx.get(f"{OPENROUTER_BASE_URL}/models", timeout=15).json()["data"]
+    except Exception as e:
+        logger.warning(f"Could not fetch OpenRouter model capabilities; temperature support unknown: {e}")
+        return {}
+    return {m["id"]: m.get("supported_parameters") or [] for m in data}
 
 
 _PROVIDERS = {cls.name: cls for cls in (OllamaProvider, OpenRouterProvider)}
 
 
+def _allowed_ids() -> List[str]:
+    return [f"ollama:{OLLAMA_MODEL}"] + [f"openrouter:{name}" for name in OPENROUTER_MODELS]
+
+
 def list_models() -> List[Dict]:
     """Selectable models; hosted ones are marked unavailable when no API key is configured."""
-    models = [{"id": f"ollama:{OLLAMA_MODEL}", "provider": "ollama", "model": OLLAMA_MODEL,
-               "local": True, "available": True}]
-    for name in OPENROUTER_MODELS:
-        models.append({"id": f"openrouter:{name}", "provider": "openrouter", "model": name,
-                       "local": False, "available": bool(OPENROUTER_API_KEY)})
+    models = []
+    for model_id in _allowed_ids():
+        provider = get_provider(model_id)
+        models.append({
+            "id": model_id,
+            "provider": provider.name,
+            "model": provider.model,
+            "local": provider.name == "ollama",
+            "available": provider.name == "ollama" or bool(OPENROUTER_API_KEY),
+            "supports_temperature": provider.supports_temperature,
+        })
     return models
 
 
 def get_provider(model_id: Optional[str] = None) -> LLMProvider:
     """Resolves an allowlisted model id to a provider instance (default: DEFAULT_MODEL_ID)."""
     model_id = model_id or DEFAULT_MODEL_ID
-    allowed = {m["id"] for m in list_models()}
+    allowed = set(_allowed_ids())
     if model_id not in allowed:
         raise ValueError(f"Model '{model_id}' is not in the allowlist. Allowed: {sorted(allowed)}")
     provider_name, model = model_id.split(":", 1)
