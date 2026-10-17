@@ -22,12 +22,25 @@ class SearchResponse(BaseModel):
 class AskRequest(BaseModel):
     query: str
     top_k: Optional[int] = None
+    model: Optional[str] = None  # "<provider>:<model>" from GET /models; default model when omitted
 
 class AskResponseMetadata(BaseModel):
     top_k_used: int
     retrieval_mode: str
     generation_mode: str
     response_time_ms: float
+    model: Optional[str] = None
+    provider: Optional[str] = None
+    prompt_tokens: Optional[int] = None
+    completion_tokens: Optional[int] = None
+    generation_error: Optional[str] = None
+
+class ModelInfo(BaseModel):
+    id: str
+    provider: str
+    model: str
+    local: bool
+    available: bool
 
 class AskResponse(BaseModel):
     answer: str
