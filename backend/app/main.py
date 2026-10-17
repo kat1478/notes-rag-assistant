@@ -2,7 +2,7 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from typing import List
+from typing import List, Optional
 from pathlib import Path
 import json
 import time
@@ -66,13 +66,21 @@ def models():
     """Allowlisted models selectable per request; hosted ones need OPENROUTER_API_KEY."""
     return list_models()
 
+BENCHMARK_SUMMARIES = {
+    "v2": DATA_DIR / "eval" / "v2" / "models" / "summary.json",
+    "v1": DATA_DIR / "eval" / "models" / "summary.json",
+}
+
 @app.get("/benchmark")
-def benchmark():
-    """Model comparison results produced by `python -m app.run_model_benchmark`."""
-    summary_path = DATA_DIR / "eval" / "models" / "summary.json"
-    if not summary_path.exists():
-        raise HTTPException(status_code=404, detail="No benchmark yet. Run: python -m app.run_model_benchmark")
-    return json.loads(summary_path.read_text(encoding="utf-8"))
+def benchmark(corpus: Optional[str] = None):
+    """Model comparison results produced by `python -m app.run_model_benchmark` (default: newest corpus with results)."""
+    if corpus is not None and corpus not in BENCHMARK_SUMMARIES:
+        raise HTTPException(status_code=400, detail=f"Unknown corpus '{corpus}'. Use one of {list(BENCHMARK_SUMMARIES)}")
+    for name in [corpus] if corpus else list(BENCHMARK_SUMMARIES):
+        path = BENCHMARK_SUMMARIES[name]
+        if path.exists():
+            return {"corpus": name, **json.loads(path.read_text(encoding="utf-8"))}
+    raise HTTPException(status_code=404, detail="No benchmark yet. Run: python -m app.run_model_benchmark --corpus v2")
 
 @app.post("/ingest", response_model=IngestResponse)
 async def ingest_document(file: UploadFile = File(...)):

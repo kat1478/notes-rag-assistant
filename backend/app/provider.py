@@ -17,6 +17,7 @@ from .config import (
     OPENROUTER_API_KEY,
     OPENROUTER_BASE_URL,
     OPENROUTER_MODELS,
+    REASONING,
     TEMPERATURE,
     TEMPERATURE_MAX,
     TEMPERATURE_MIN,
@@ -38,6 +39,8 @@ class Generation:
     completion_tokens: Optional[int] = None
     error: Optional[str] = None   # set when generation failed and the extractive fallback was returned
     temperature: Optional[float] = None  # value actually sent; None = the model does not accept temperature
+    reasoning_tokens: Optional[int] = None  # hidden reasoning tokens (billed as output), when reported
+    reasoning: Optional[str] = None  # reasoning setting actually sent, e.g. 'effort=none'
 
 
 class LLMProvider:
@@ -148,8 +151,47 @@ class OpenRouterProvider(LLMProvider):
         # so we don't send it and report temperature=None instead of claiming a value that wasn't applied.
         if temperature is not None:
             payload["temperature"] = temperature
+        reasoning = self.reasoning_off_payload()
+        if reasoning:
+            payload["reasoning"] = reasoning
         logger.info(f"Sending request to OpenRouter ({self.model}), timeout={OPENROUTER_TIMEOUT}s")
 
+        try:
+            data = self._post(url, payload, headers)
+        except RuntimeError as e:
+            # Models with mandatory reasoning reject effort "none" (a rejected request is not billed):
+            # retry once with the lowest effort they accept.
+            if reasoning != {"effort": "none"} or "400" not in str(e):
+                raise
+            logger.warning(f"{self.model} rejected reasoning effort 'none'; retrying with 'minimal'")
+            payload["reasoning"] = {"effort": "minimal"}
+            data = self._post(url, payload, headers)
+
+        text = data["choices"][0]["message"].get("content") or ""
+        usage = data.get("usage") or {}
+        logger.info(f"OpenRouter responded successfully ({len(text)} chars)")
+        return Generation(
+            text=text,
+            model_id=self.model_id,
+            prompt_tokens=usage.get("prompt_tokens"),
+            completion_tokens=usage.get("completion_tokens"),
+            temperature=temperature,
+            reasoning_tokens=(usage.get("completion_tokens_details") or {}).get("reasoning_tokens"),
+            reasoning=",".join(f"{k}={v}" for k, v in payload.get("reasoning", {}).items()) or None,
+        )
+
+    def reasoning_off_payload(self) -> Optional[Dict]:
+        """Disables hidden reasoning for models that support it (REASONING=off, the default):
+        grounded answering doesn't need it and it would dominate cost and latency.
+        OpenAI-style models take effort "none"; Anthropic and others take enabled=false."""
+        if REASONING != "off":
+            return None
+        params = _openrouter_supported_params().get(self.model) or []
+        if "reasoning" not in params:
+            return None
+        return {"effort": "none"} if self.model.startswith("openai/") else {"enabled": False}
+
+    def _post(self, url: str, payload: Dict, headers: Dict) -> Dict:
         try:
             with httpx.Client(timeout=OPENROUTER_TIMEOUT) as client:
                 response = client.post(url, json=payload, headers=headers)
@@ -173,17 +215,7 @@ class OpenRouterProvider(LLMProvider):
 
         if "error" in data:
             raise RuntimeError(f"OpenRouter error: {data['error'].get('message', data['error'])}")
-
-        text = data["choices"][0]["message"].get("content") or ""
-        usage = data.get("usage") or {}
-        logger.info(f"OpenRouter responded successfully ({len(text)} chars)")
-        return Generation(
-            text=text,
-            model_id=self.model_id,
-            prompt_tokens=usage.get("prompt_tokens"),
-            completion_tokens=usage.get("completion_tokens"),
-            temperature=temperature,
-        )
+        return data
 
 
 @lru_cache(maxsize=1)

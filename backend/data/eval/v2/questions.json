@@ -1,0 +1,1465 @@
+[
+  {
+    "id": "q001",
+    "question": "What is gradient descent used for?",
+    "category": "direct_fact",
+    "expected_file": "notatka_studenta_01_gradient.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "optimization algorithm",
+      "minimizes a cost function",
+      "iteratively moves toward a minimum"
+    ],
+    "notes": "",
+    "source": "v1",
+    "expected_files": [
+      "notatka_studenta_01_gradient.txt"
+    ]
+  },
+  {
+    "id": "q002",
+    "question": "What does the gradient represent in gradient descent?",
+    "category": "direct_fact",
+    "expected_file": "notatka_studenta_01_gradient.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "vector of partial derivatives",
+      "direction of steepest increase"
+    ],
+    "notes": "",
+    "source": "v1",
+    "expected_files": [
+      "notatka_studenta_01_gradient.txt"
+    ]
+  },
+  {
+    "id": "q003",
+    "question": "What happens if the learning rate is too large in gradient descent?",
+    "category": "explanation",
+    "expected_file": "notatka_studenta_01_gradient.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "can overshoot the minimum",
+      "may fail to converge"
+    ],
+    "notes": "",
+    "source": "v1",
+    "expected_files": [
+      "notatka_studenta_01_gradient.txt"
+    ]
+  },
+  {
+    "id": "q004",
+    "question": "How does SGD differ from batch gradient descent?",
+    "category": "comparison",
+    "expected_file": "notatka_studenta_01_gradient.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "SGD updates after each example",
+      "batch uses the whole dataset",
+      "SGD introduces noise",
+      "SGD can escape local minima more easily"
+    ],
+    "notes": "",
+    "source": "v1",
+    "expected_files": [
+      "notatka_studenta_01_gradient.txt"
+    ]
+  },
+  {
+    "id": "q005",
+    "question": "What does TF-IDF stand for?",
+    "category": "direct_fact",
+    "expected_file": "student_note_02_tfidf.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "Term Frequency-Inverse Document Frequency"
+    ],
+    "notes": "",
+    "source": "v1",
+    "expected_files": [
+      "student_note_02_tfidf.txt"
+    ]
+  },
+  {
+    "id": "q006",
+    "question": "Why is IDF needed in TF-IDF?",
+    "category": "explanation",
+    "expected_file": "student_note_02_tfidf.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "common words appear everywhere",
+      "IDF downweights common terms",
+      "helps identify important words"
+    ],
+    "notes": "",
+    "source": "v1",
+    "expected_files": [
+      "student_note_02_tfidf.txt"
+    ]
+  },
+  {
+    "id": "q007",
+    "question": "How is IDF calculated in the notes?",
+    "category": "direct_fact",
+    "expected_file": "student_note_02_tfidf.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "logarithm of total number of documents divided by the number of documents containing the term"
+    ],
+    "notes": "",
+    "source": "v1",
+    "expected_files": [
+      "student_note_02_tfidf.txt"
+    ]
+  },
+  {
+    "id": "q008",
+    "question": "Why is TF-IDF better than a simple Bag of Words count?",
+    "category": "comparison",
+    "expected_file": "student_note_02_tfidf.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "Bag of Words ignores word importance",
+      "TF-IDF considers frequency and rarity",
+      "high score means frequent in one document and rare in the collection"
+    ],
+    "notes": "",
+    "source": "v1",
+    "expected_files": [
+      "student_note_02_tfidf.txt"
+    ]
+  },
+  {
+    "id": "q009",
+    "question": "What is Dijkstra’s algorithm used for?",
+    "category": "direct_fact",
+    "expected_file": "notatka_studenta_03_dijkstra.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "find the shortest path in a graph"
+    ],
+    "notes": "",
+    "source": "v1",
+    "expected_files": [
+      "notatka_studenta_03_dijkstra.txt"
+    ]
+  },
+  {
+    "id": "q010",
+    "question": "What is edge relaxation in Dijkstra’s algorithm?",
+    "category": "direct_fact",
+    "expected_file": "notatka_studenta_03_dijkstra.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "if a shorter path to a vertex is found through another vertex",
+      "update the stored distance"
+    ],
+    "notes": "",
+    "source": "v1",
+    "expected_files": [
+      "notatka_studenta_03_dijkstra.txt"
+    ]
+  },
+  {
+    "id": "q011",
+    "question": "Why does Dijkstra’s algorithm require non-negative edge weights?",
+    "category": "explanation",
+    "expected_file": "notatka_studenta_03_dijkstra.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "negative weights can break correctness",
+      "algorithm may fail to find the optimal path",
+      "Bellman-Ford is better for negative weights"
+    ],
+    "notes": "",
+    "source": "v1",
+    "expected_files": [
+      "notatka_studenta_03_dijkstra.txt"
+    ]
+  },
+  {
+    "id": "q012",
+    "question": "How is Dijkstra different from A*?",
+    "category": "comparison",
+    "expected_file": "notatka_studenta_03_dijkstra.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "Dijkstra does not use a heuristic",
+      "A* uses a heuristic"
+    ],
+    "notes": "",
+    "source": "v1",
+    "expected_files": [
+      "notatka_studenta_03_dijkstra.txt",
+      "syn_02_a_star.txt"
+    ]
+  },
+  {
+    "id": "q013",
+    "question": "How does binary search work on a sorted array?",
+    "category": "direct_fact",
+    "expected_file": "student_note_04_binary_search.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "check the middle element",
+      "discard half of the array each step",
+      "repeat on left or right half depending on comparison"
+    ],
+    "notes": "",
+    "source": "v1",
+    "expected_files": [
+      "student_note_04_binary_search.txt"
+    ]
+  },
+  {
+    "id": "q014",
+    "question": "What is the time complexity of binary search?",
+    "category": "direct_fact",
+    "expected_file": "student_note_04_binary_search.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "O(log n)"
+    ],
+    "notes": "",
+    "source": "v1",
+    "expected_files": [
+      "student_note_04_binary_search.txt"
+    ]
+  },
+  {
+    "id": "q015",
+    "question": "Why is 'low + (high - low) / 2' preferred when calculating the midpoint?",
+    "category": "explanation",
+    "expected_file": "student_note_04_binary_search.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "avoids integer overflow",
+      "important for very large arrays"
+    ],
+    "notes": "",
+    "source": "v1",
+    "expected_files": [
+      "student_note_04_binary_search.txt"
+    ]
+  },
+  {
+    "id": "q016",
+    "question": "In the notes’ example, how many steps does binary search need to find 7 in [1, 3, 5, 7, 9]?",
+    "category": "example",
+    "expected_file": "student_note_04_binary_search.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "two steps"
+    ],
+    "notes": "",
+    "source": "v1",
+    "expected_files": [
+      "student_note_04_binary_search.txt"
+    ]
+  },
+  {
+    "id": "q017",
+    "question": "What is entropy in decision trees?",
+    "category": "direct_fact",
+    "expected_file": "notatka_studenta_05_drzewa.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "measure of disorder or impurity in the data"
+    ],
+    "notes": "",
+    "source": "v1",
+    "expected_files": [
+      "notatka_studenta_05_drzewa.txt"
+    ]
+  },
+  {
+    "id": "q018",
+    "question": "What is information gain in decision trees?",
+    "category": "direct_fact",
+    "expected_file": "notatka_studenta_05_drzewa.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "reduction in entropy after a split",
+      "choose the split with the largest information gain"
+    ],
+    "notes": "",
+    "source": "v1",
+    "expected_files": [
+      "notatka_studenta_05_drzewa.txt"
+    ]
+  },
+  {
+    "id": "q019",
+    "question": "Why are random forests usually more stable than a single decision tree?",
+    "category": "comparison",
+    "expected_file": "notatka_studenta_05_drzewa.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "many trees are combined",
+      "average or vote across trees",
+      "more resistant to errors of a single tree",
+      "less prone to overfitting"
+    ],
+    "notes": "",
+    "source": "v1",
+    "expected_files": [
+      "notatka_studenta_05_drzewa.txt",
+      "syn_07_las_losowy.txt"
+    ]
+  },
+  {
+    "id": "q020",
+    "question": "Why can a single decision tree overfit?",
+    "category": "explanation",
+    "expected_file": "notatka_studenta_05_drzewa.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "can memorize the training data",
+      "tends to overfit"
+    ],
+    "notes": "",
+    "source": "v1",
+    "expected_files": [
+      "notatka_studenta_05_drzewa.txt"
+    ]
+  },
+  {
+    "id": "q021",
+    "question": "What is the formula of the ReLU activation function?",
+    "category": "direct_fact",
+    "expected_file": "student_note_06_relu.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "f(x) = max(0, x)"
+    ],
+    "notes": "",
+    "source": "v1",
+    "expected_files": [
+      "student_note_06_relu.txt"
+    ]
+  },
+  {
+    "id": "q022",
+    "question": "Why is ReLU computationally efficient compared to Sigmoid or Tanh?",
+    "category": "comparison",
+    "expected_file": "student_note_06_relu.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "simple max comparison",
+      "does not require expensive exponential calculations"
+    ],
+    "notes": "",
+    "source": "v1",
+    "expected_files": [
+      "student_note_06_relu.txt"
+    ]
+  },
+  {
+    "id": "q023",
+    "question": "What is the dying ReLU problem?",
+    "category": "direct_fact",
+    "expected_file": "student_note_06_relu.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "neurons get stuck at zero",
+      "stop learning because the gradient is zero"
+    ],
+    "notes": "",
+    "source": "v1",
+    "expected_files": [
+      "student_note_06_relu.txt",
+      "syn_04_leaky_relu.txt"
+    ]
+  },
+  {
+    "id": "q024",
+    "question": "If the input to ReLU is -5, what is the output?",
+    "category": "example",
+    "expected_file": "student_note_06_relu.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "0"
+    ],
+    "notes": "",
+    "source": "v1",
+    "expected_files": [
+      "student_note_06_relu.txt"
+    ]
+  },
+  {
+    "id": "q025",
+    "question": "Which optimization algorithm iteratively moves in the opposite direction of the gradient?",
+    "category": "paraphrase",
+    "expected_file": "notatka_studenta_01_gradient.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "gradient descent"
+    ],
+    "notes": "",
+    "source": "v1",
+    "expected_files": [
+      "notatka_studenta_01_gradient.txt"
+    ]
+  },
+  {
+    "id": "q026",
+    "question": "Which text representation method downweights words that appear in many documents?",
+    "category": "paraphrase",
+    "expected_file": "student_note_02_tfidf.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "TF-IDF"
+    ],
+    "notes": "",
+    "source": "v1",
+    "expected_files": [
+      "student_note_02_tfidf.txt"
+    ]
+  },
+  {
+    "id": "q027",
+    "question": "Which search algorithm repeatedly halves the search space?",
+    "category": "paraphrase",
+    "expected_file": "student_note_04_binary_search.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "binary search"
+    ],
+    "notes": "",
+    "source": "v1",
+    "expected_files": [
+      "student_note_04_binary_search.txt"
+    ]
+  },
+  {
+    "id": "q028",
+    "question": "Compare batch gradient descent and SGD based on the notes.",
+    "category": "comparison",
+    "expected_file": "notatka_studenta_01_gradient.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "batch uses all data",
+      "SGD updates after each example",
+      "SGD is noisier",
+      "SGD can escape local minima more easily"
+    ],
+    "notes": "",
+    "source": "v1",
+    "expected_files": [
+      "notatka_studenta_01_gradient.txt"
+    ]
+  },
+  {
+    "id": "q029",
+    "question": "What is the capital of France?",
+    "category": "out_of_scope",
+    "expected_file": "",
+    "should_answer": false,
+    "expected_key_points": [
+      "should refuse or say there is not enough information in the notes"
+    ],
+    "notes": "",
+    "source": "v1",
+    "expected_files": []
+  },
+  {
+    "id": "q030",
+    "question": "What is Bellman-Ford used for?",
+    "category": "direct_fact",
+    "expected_file": "syn_01_bellman_ford.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "single-source shortest paths",
+      "works with negative edge weights",
+      "detects negative cycles"
+    ],
+    "notes": "relabelled in v2: out_of_scope in v1, syn_01 now covers it",
+    "source": "v1",
+    "expected_files": [
+      "syn_01_bellman_ford.txt",
+      "notatka_studenta_03_dijkstra.txt"
+    ]
+  },
+  {
+    "id": "q031",
+    "question": "Is the weather in Warsaw relevant to gradient descent?",
+    "category": "distraction_resistance",
+    "expected_file": "notatka_studenta_01_gradient.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "no",
+      "weather is irrelevant",
+      "the note explicitly says it has nothing to do with the algorithm"
+    ],
+    "notes": "",
+    "source": "v1",
+    "expected_files": [
+      "notatka_studenta_01_gradient.txt"
+    ]
+  },
+  {
+    "id": "q032",
+    "question": "Did Adam Mickiewicz use decision trees to write Pan Tadeusz?",
+    "category": "distraction_resistance",
+    "expected_file": "notatka_studenta_05_drzewa.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "no",
+      "the sentence is a humorous distraction",
+      "not part of decision tree logic"
+    ],
+    "notes": "",
+    "source": "v1",
+    "expected_files": [
+      "notatka_studenta_05_drzewa.txt"
+    ]
+  },
+  {
+    "id": "val001",
+    "question": "What is the goal of inductive learning?",
+    "category": "direct_fact",
+    "expected_file": "notatka_11_indukcja.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "pozyskanie wiedzy lub umiejętności na podstawie zewnętrznej informacji trenującej",
+      "autonomiczna poprawa jakości wykonywania zadania"
+    ],
+    "notes": "",
+    "source": "v1-validation",
+    "expected_files": [
+      "notatka_11_indukcja.txt"
+    ]
+  },
+  {
+    "id": "val002",
+    "question": "What is the difference between representation bias and preference bias?",
+    "category": "comparison",
+    "expected_file": "notatka_11_indukcja.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "obciążenie reprezentacji zawęża przestrzeń modeli",
+      "obciążenie preferencji wprowadza kryteria wyboru, np. prostotę"
+    ],
+    "notes": "",
+    "source": "v1-validation",
+    "expected_files": [
+      "notatka_11_indukcja.txt"
+    ]
+  },
+  {
+    "id": "val003",
+    "question": "How large is the hypothesis space for Boolean conjunctions with n attributes?",
+    "category": "direct_fact",
+    "expected_file": "notatka_11_indukcja.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "|H| = 3^n + 1"
+    ],
+    "notes": "",
+    "source": "v1-validation",
+    "expected_files": [
+      "notatka_11_indukcja.txt"
+    ]
+  },
+  {
+    "id": "val004",
+    "question": "How does holdout help estimate model quality?",
+    "category": "explanation",
+    "expected_file": "notatka_12_jakosc.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "losowy podział danych na rozłączne zbiory trenujący i testowy",
+      "błąd na zbiorze testowym służy jako estymator błędu rzeczywistego"
+    ],
+    "notes": "",
+    "source": "v1-validation",
+    "expected_files": [
+      "notatka_12_jakosc.txt"
+    ]
+  },
+  {
+    "id": "val005",
+    "question": "What is the difference between k-fold cross-validation and holdout?",
+    "category": "comparison",
+    "expected_file": "notatka_12_jakosc.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "holdout dzieli dane raz na zbiór trenujący i testowy",
+      "k-krotna walidacja krzyżowa dzieli dane na k części i powtarza proces k razy"
+    ],
+    "notes": "",
+    "source": "v1-validation",
+    "expected_files": [
+      "notatka_12_jakosc.txt"
+    ]
+  },
+  {
+    "id": "val006",
+    "question": "Why does MSE penalize large errors more strongly than MAE?",
+    "category": "explanation",
+    "expected_file": "notatka_12_jakosc.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "MSE podnosi różnice do kwadratu",
+      "MAE traktuje błędy liniowo"
+    ],
+    "notes": "",
+    "source": "v1-validation",
+    "expected_files": [
+      "notatka_12_jakosc.txt"
+    ]
+  },
+  {
+    "id": "val007",
+    "question": "What is the core assumption behind the naive Bayes classifier?",
+    "category": "direct_fact",
+    "expected_file": "notatka_13_bayes.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "naiwne założenie o niezależności atrybutów warunkowanej klasą"
+    ],
+    "notes": "",
+    "source": "v1-validation",
+    "expected_files": [
+      "notatka_13_bayes.txt"
+    ]
+  },
+  {
+    "id": "val008",
+    "question": "How does naive Bayes handle missing attribute values?",
+    "category": "direct_fact",
+    "expected_file": "notatka_13_bayes.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "pomija te atrybuty podczas obliczania iloczynu prawdopodobieństw"
+    ],
+    "notes": "",
+    "source": "v1-validation",
+    "expected_files": [
+      "notatka_13_bayes.txt"
+    ]
+  },
+  {
+    "id": "val009",
+    "question": "Compare naive Bayes with decision trees.",
+    "category": "comparison",
+    "expected_file": "notatka_13_bayes.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "bayes buduje globalny model statystyczny",
+      "drzewa decyzyjne dokonują sekwencyjnego, lokalnego podziału przestrzeni cech"
+    ],
+    "notes": "",
+    "source": "v1-validation",
+    "expected_files": [
+      "notatka_13_bayes.txt"
+    ]
+  },
+  {
+    "id": "val010",
+    "question": "What is a Markov Decision Process in reinforcement learning?",
+    "category": "direct_fact",
+    "expected_file": "notatka_14_wzmacnianie.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "skończony zbiór stanów, akcji, funkcja przejść i funkcja nagród"
+    ],
+    "notes": "",
+    "source": "v1-validation",
+    "expected_files": [
+      "notatka_14_wzmacnianie.txt"
+    ]
+  },
+  {
+    "id": "val011",
+    "question": "What is the Markov property?",
+    "category": "direct_fact",
+    "expected_file": "notatka_14_wzmacnianie.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "prawdopodobieństwa przejść i nagrody zależą wyłącznie od aktualnego stanu i akcji, a nie od historii"
+    ],
+    "notes": "",
+    "source": "v1-validation",
+    "expected_files": [
+      "notatka_14_wzmacnianie.txt"
+    ]
+  },
+  {
+    "id": "val012",
+    "question": "What is the difference between episodic tasks “to success” and “to failure”?",
+    "category": "comparison",
+    "expected_file": "notatka_14_wzmacnianie.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "do-sukcesu dąży do jak najszybszego zakończenia z dodatnią nagrodą na końcu",
+      "do-porażki stara się opóźnić koniec najdłużej, bo koniec wiąże się z karą"
+    ],
+    "notes": "",
+    "source": "v1-validation",
+    "expected_files": [
+      "notatka_14_wzmacnianie.txt"
+    ]
+  },
+  {
+    "id": "val013",
+    "question": "What makes Q-Learning an off-policy algorithm?",
+    "category": "explanation",
+    "expected_file": "notatka_15_qlearning.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "w formule aktualizacji zakłada wybór akcji maksymalizującej Q w kolejnym stanie, niezależnie od strategii"
+    ],
+    "notes": "",
+    "source": "v1-validation",
+    "expected_files": [
+      "notatka_15_qlearning.txt"
+    ]
+  },
+  {
+    "id": "val014",
+    "question": "Compare Q-Learning with Sarsa.",
+    "category": "comparison",
+    "expected_file": "notatka_15_qlearning.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "Q-Learning jest off-policy (zakłada wybór akcji maksymalizującej Q)",
+      "Sarsa jest on-policy (czeka na rzeczywisty wybór kolejnej akcji)"
+    ],
+    "notes": "",
+    "source": "v1-validation",
+    "expected_files": [
+      "notatka_15_qlearning.txt",
+      "syn_06_sarsa.txt"
+    ]
+  },
+  {
+    "id": "val015",
+    "question": "What problem is solved by epsilon-greedy in Q-Learning?",
+    "category": "explanation",
+    "expected_file": "notatka_15_qlearning.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "dylemat eksploracji kontra eksploatacji"
+    ],
+    "notes": "",
+    "source": "v1-validation",
+    "expected_files": [
+      "notatka_15_qlearning.txt"
+    ]
+  },
+  {
+    "id": "val016",
+    "question": "Who wrote “Pan Tadeusz”?",
+    "category": "distraction_resistance",
+    "expected_file": "notatka_11_indukcja.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "Adam Mickiewicz wrote Pan Tadeusz",
+      "lies completely outside the thematic scope of inductive learning"
+    ],
+    "notes": "",
+    "source": "v1-validation",
+    "expected_files": [
+      "notatka_11_indukcja.txt"
+    ]
+  },
+  {
+    "id": "val017",
+    "question": "How much is a reduced cinema ticket?",
+    "category": "out_of_scope",
+    "expected_file": "",
+    "should_answer": false,
+    "expected_key_points": [
+      "should refuse to answer",
+      "information not present in the notes"
+    ],
+    "notes": "",
+    "source": "v1-validation",
+    "expected_files": []
+  },
+  {
+    "id": "n001",
+    "question": "Why does Bellman-Ford run V-1 iterations?",
+    "category": "explanation",
+    "should_answer": true,
+    "expected_file": "syn_01_bellman_ford.txt",
+    "expected_files": [
+      "syn_01_bellman_ford.txt"
+    ],
+    "expected_key_points": [
+      "a shortest path without cycles has at most V-1 edges",
+      "after V-1 passes all distances are correct"
+    ],
+    "notes": "",
+    "source": "v2-new"
+  },
+  {
+    "id": "n002",
+    "question": "How does Bellman-Ford detect a negative cycle?",
+    "category": "explanation",
+    "should_answer": true,
+    "expected_file": "syn_01_bellman_ford.txt",
+    "expected_files": [
+      "syn_01_bellman_ford.txt"
+    ],
+    "expected_key_points": [
+      "one extra (V-th) pass",
+      "if a distance can still decrease there is a negative cycle"
+    ],
+    "notes": "",
+    "source": "v2-new"
+  },
+  {
+    "id": "n003",
+    "question": "Co oznacza, że heurystyka w A* jest dopuszczalna?",
+    "category": "direct_fact",
+    "should_answer": true,
+    "expected_file": "syn_02_a_star.txt",
+    "expected_files": [
+      "syn_02_a_star.txt"
+    ],
+    "expected_key_points": [
+      "never overestimates the remaining cost",
+      "guarantees an optimal path"
+    ],
+    "notes": "cross-lingual: PL question, EN note",
+    "source": "v2-new"
+  },
+  {
+    "id": "n004",
+    "question": "What happens to A* if the heuristic is zero for every node?",
+    "category": "explanation",
+    "should_answer": true,
+    "expected_file": "syn_02_a_star.txt",
+    "expected_files": [
+      "syn_02_a_star.txt"
+    ],
+    "expected_key_points": [
+      "it behaves like Dijkstra's algorithm"
+    ],
+    "notes": "",
+    "source": "v2-new"
+  },
+  {
+    "id": "n005",
+    "question": "What are the default beta1 and beta2 values in Adam?",
+    "category": "direct_fact",
+    "should_answer": true,
+    "expected_file": "syn_03_momentum_adam.txt",
+    "expected_files": [
+      "syn_03_momentum_adam.txt"
+    ],
+    "expected_key_points": [
+      "beta1 = 0.9",
+      "beta2 = 0.999"
+    ],
+    "notes": "cross-lingual: EN question, PL note",
+    "source": "v2-new"
+  },
+  {
+    "id": "n006",
+    "question": "Why does Adam need bias correction?",
+    "category": "explanation",
+    "should_answer": true,
+    "expected_file": "syn_03_momentum_adam.txt",
+    "expected_files": [
+      "syn_03_momentum_adam.txt"
+    ],
+    "expected_key_points": [
+      "m and v are initialised with zeros",
+      "so they are biased low at the start",
+      "divide by 1 - beta^t"
+    ],
+    "notes": "",
+    "source": "v2-new"
+  },
+  {
+    "id": "n007",
+    "question": "How does Leaky ReLU fix the dying ReLU problem?",
+    "category": "explanation",
+    "should_answer": true,
+    "expected_file": "syn_04_leaky_relu.txt",
+    "expected_files": [
+      "syn_04_leaky_relu.txt"
+    ],
+    "expected_key_points": [
+      "small slope alpha (0.01) for negative inputs",
+      "gradient is not zero so the neuron can recover"
+    ],
+    "notes": "",
+    "source": "v2-new"
+  },
+  {
+    "id": "n008",
+    "question": "With alpha = 0.01, what does Leaky ReLU return for an input of -5?",
+    "category": "example",
+    "should_answer": true,
+    "expected_file": "syn_04_leaky_relu.txt",
+    "expected_files": [
+      "syn_04_leaky_relu.txt"
+    ],
+    "expected_key_points": [
+      "-0.05"
+    ],
+    "notes": "",
+    "source": "v2-new"
+  },
+  {
+    "id": "n009",
+    "question": "What does the parameter b control in BM25?",
+    "category": "direct_fact",
+    "should_answer": true,
+    "expected_file": "syn_05_bm25.txt",
+    "expected_files": [
+      "syn_05_bm25.txt"
+    ],
+    "expected_key_points": [
+      "document length normalization",
+      "0.75 default",
+      "b = 0 turns it off"
+    ],
+    "notes": "",
+    "source": "v2-new"
+  },
+  {
+    "id": "n010",
+    "question": "Jakie typowe wartości ma parametr k1 w BM25?",
+    "category": "direct_fact",
+    "should_answer": true,
+    "expected_file": "syn_05_bm25.txt",
+    "expected_files": [
+      "syn_05_bm25.txt"
+    ],
+    "expected_key_points": [
+      "between 1.2 and 2.0",
+      "controls term frequency saturation"
+    ],
+    "notes": "cross-lingual: PL question, EN note",
+    "source": "v2-new"
+  },
+  {
+    "id": "n011",
+    "question": "In the cliff walking example, which path does Sarsa learn and why?",
+    "category": "example",
+    "should_answer": true,
+    "expected_file": "syn_06_sarsa.txt",
+    "expected_files": [
+      "syn_06_sarsa.txt"
+    ],
+    "expected_key_points": [
+      "the safer path further from the cliff",
+      "on-policy: accounts for its own exploratory moves"
+    ],
+    "notes": "",
+    "source": "v2-new"
+  },
+  {
+    "id": "n012",
+    "question": "What is the out-of-bag error in a random forest?",
+    "category": "direct_fact",
+    "should_answer": true,
+    "expected_file": "syn_07_las_losowy.txt",
+    "expected_files": [
+      "syn_07_las_losowy.txt"
+    ],
+    "expected_key_points": [
+      "each bootstrap sample leaves out about 37% of examples",
+      "error estimated on them without a separate validation set"
+    ],
+    "notes": "",
+    "source": "v2-new"
+  },
+  {
+    "id": "n013",
+    "question": "How many features does a random forest consider at each split in classification?",
+    "category": "direct_fact",
+    "should_answer": true,
+    "expected_file": "syn_07_las_losowy.txt",
+    "expected_files": [
+      "syn_07_las_losowy.txt"
+    ],
+    "expected_key_points": [
+      "a random subset",
+      "typically the square root of the number of features"
+    ],
+    "notes": "",
+    "source": "v2-new"
+  },
+  {
+    "id": "n014",
+    "question": "What is the formula for recall?",
+    "category": "direct_fact",
+    "should_answer": true,
+    "expected_file": "syn_08_precision_recall.txt",
+    "expected_files": [
+      "syn_08_precision_recall.txt"
+    ],
+    "expected_key_points": [
+      "TP / (TP + FN)",
+      "also called sensitivity"
+    ],
+    "notes": "",
+    "source": "v2-new"
+  },
+  {
+    "id": "n015",
+    "question": "Why is precision more important than recall for a spam filter?",
+    "category": "explanation",
+    "should_answer": true,
+    "expected_file": "syn_08_precision_recall.txt",
+    "expected_files": [
+      "syn_08_precision_recall.txt"
+    ],
+    "expected_key_points": [
+      "a false positive hides a real email"
+    ],
+    "notes": "",
+    "source": "v2-new"
+  },
+  {
+    "id": "n016",
+    "question": "Why should features be scaled before using k-NN?",
+    "category": "explanation",
+    "should_answer": true,
+    "expected_file": "syn_09_knn.txt",
+    "expected_files": [
+      "syn_09_knn.txt"
+    ],
+    "expected_key_points": [
+      "features with a large range dominate the distance",
+      "example: salary vs age"
+    ],
+    "notes": "",
+    "source": "v2-new"
+  },
+  {
+    "id": "n017",
+    "question": "Dlaczego w klasyfikacji binarnej k-NN wybiera się nieparzyste k?",
+    "category": "direct_fact",
+    "should_answer": true,
+    "expected_file": "syn_09_knn.txt",
+    "expected_files": [
+      "syn_09_knn.txt"
+    ],
+    "expected_key_points": [
+      "to avoid ties in the majority vote"
+    ],
+    "notes": "",
+    "source": "v2-new"
+  },
+  {
+    "id": "n018",
+    "question": "Which data structure does BFS use?",
+    "category": "direct_fact",
+    "should_answer": true,
+    "expected_file": "syn_10_bfs_dfs.txt",
+    "expected_files": [
+      "syn_10_bfs_dfs.txt"
+    ],
+    "expected_key_points": [
+      "a queue (FIFO)"
+    ],
+    "notes": "",
+    "source": "v2-new"
+  },
+  {
+    "id": "n019",
+    "question": "How can DFS be used for topological sorting?",
+    "category": "explanation",
+    "should_answer": true,
+    "expected_file": "syn_10_bfs_dfs.txt",
+    "expected_files": [
+      "syn_10_bfs_dfs.txt"
+    ],
+    "expected_key_points": [
+      "in a DAG",
+      "order nodes by decreasing DFS finish time"
+    ],
+    "notes": "",
+    "source": "v2-new"
+  },
+  {
+    "id": "n020",
+    "question": "What happens to the softmax distribution when the temperature is below 1?",
+    "category": "explanation",
+    "should_answer": true,
+    "expected_file": "syn_11_softmax.txt",
+    "expected_files": [
+      "syn_11_softmax.txt"
+    ],
+    "expected_key_points": [
+      "it becomes sharper",
+      "most probability mass goes to the largest logit"
+    ],
+    "notes": "cross-lingual: EN question, PL note",
+    "source": "v2-new"
+  },
+  {
+    "id": "n021",
+    "question": "Why is the maximum logit subtracted before computing softmax?",
+    "category": "explanation",
+    "should_answer": true,
+    "expected_file": "syn_11_softmax.txt",
+    "expected_files": [
+      "syn_11_softmax.txt"
+    ],
+    "expected_key_points": [
+      "numerical stability / avoids overflow of e^z",
+      "does not change the result"
+    ],
+    "notes": "",
+    "source": "v2-new"
+  },
+  {
+    "id": "n022",
+    "question": "What is the difference between L1 and L2 regularization?",
+    "category": "comparison",
+    "should_answer": true,
+    "expected_file": "syn_12_regularization.txt",
+    "expected_files": [
+      "syn_12_regularization.txt"
+    ],
+    "expected_key_points": [
+      "L2: squared weights, small but rarely exactly zero",
+      "L1: absolute weights, drives many to exactly zero",
+      "L1 works as feature selection"
+    ],
+    "notes": "",
+    "source": "v2-new"
+  },
+  {
+    "id": "n023",
+    "question": "How does early stopping work?",
+    "category": "direct_fact",
+    "should_answer": true,
+    "expected_file": "syn_12_regularization.txt",
+    "expected_files": [
+      "syn_12_regularization.txt"
+    ],
+    "expected_key_points": [
+      "monitor validation loss",
+      "stop when it stops improving for some epochs (patience)",
+      "keep the best weights"
+    ],
+    "notes": "",
+    "source": "v2-new"
+  },
+  {
+    "id": "n024",
+    "question": "When should you use Bellman-Ford instead of Dijkstra?",
+    "category": "multi_note",
+    "should_answer": true,
+    "expected_file": "syn_01_bellman_ford.txt",
+    "expected_files": [
+      "syn_01_bellman_ford.txt",
+      "notatka_studenta_03_dijkstra.txt"
+    ],
+    "expected_key_points": [
+      "when there are negative edge weights",
+      "Dijkstra requires non-negative weights",
+      "Bellman-Ford is slower, O(V*E)"
+    ],
+    "notes": "",
+    "source": "v2-new"
+  },
+  {
+    "id": "n025",
+    "question": "How does BM25 improve on TF-IDF?",
+    "category": "multi_note",
+    "should_answer": true,
+    "expected_file": "syn_05_bm25.txt",
+    "expected_files": [
+      "syn_05_bm25.txt",
+      "student_note_02_tfidf.txt"
+    ],
+    "expected_key_points": [
+      "term frequency saturation (k1)",
+      "document length normalization (b)"
+    ],
+    "notes": "",
+    "source": "v2-new"
+  },
+  {
+    "id": "n026",
+    "question": "Compare Sarsa and Q-Learning in the cliff walking example.",
+    "category": "multi_note",
+    "should_answer": true,
+    "expected_file": "syn_06_sarsa.txt",
+    "expected_files": [
+      "syn_06_sarsa.txt",
+      "notatka_15_qlearning.txt"
+    ],
+    "expected_key_points": [
+      "Sarsa learns the safer path, Q-Learning the optimal path near the edge",
+      "Sarsa on-policy, Q-Learning off-policy"
+    ],
+    "notes": "",
+    "source": "v2-new"
+  },
+  {
+    "id": "n027",
+    "question": "How do ReLU and Leaky ReLU differ for negative inputs?",
+    "category": "multi_note",
+    "should_answer": true,
+    "expected_file": "student_note_06_relu.txt",
+    "expected_files": [
+      "student_note_06_relu.txt",
+      "syn_04_leaky_relu.txt"
+    ],
+    "expected_key_points": [
+      "ReLU outputs 0",
+      "Leaky ReLU outputs alpha * x",
+      "Leaky ReLU avoids dying neurons"
+    ],
+    "notes": "",
+    "source": "v2-new"
+  },
+  {
+    "id": "n028",
+    "question": "How does momentum change the plain gradient descent update?",
+    "category": "multi_note",
+    "should_answer": true,
+    "expected_file": "syn_03_momentum_adam.txt",
+    "expected_files": [
+      "syn_03_momentum_adam.txt",
+      "notatka_studenta_01_gradient.txt"
+    ],
+    "expected_key_points": [
+      "uses an exponentially weighted average of past gradients",
+      "beta typically 0.9",
+      "damps oscillations"
+    ],
+    "notes": "",
+    "source": "v2-new"
+  },
+  {
+    "id": "n029",
+    "question": "Czym różni się BFS od algorytmu Dijkstry przy szukaniu najkrótszej ścieżki?",
+    "category": "multi_note",
+    "should_answer": true,
+    "expected_file": "syn_10_bfs_dfs.txt",
+    "expected_files": [
+      "syn_10_bfs_dfs.txt",
+      "notatka_studenta_03_dijkstra.txt"
+    ],
+    "expected_key_points": [
+      "BFS: shortest path in unweighted graphs, queue",
+      "Dijkstra: weighted graphs with non-negative weights, priority queue"
+    ],
+    "notes": "cross-lingual: PL question, EN + PL notes",
+    "source": "v2-new"
+  },
+  {
+    "id": "n030",
+    "question": "What does a ROC curve plot, and what is AUC?",
+    "category": "direct_fact",
+    "should_answer": true,
+    "expected_file": "notatka_12_jakosc.txt",
+    "expected_files": [
+      "notatka_12_jakosc.txt"
+    ],
+    "expected_key_points": [
+      "true positive rate vs false positive rate",
+      "AUC = area under the curve, an aggregate score"
+    ],
+    "notes": "cross-lingual: EN question, PL note; near syn_08 (precision/recall) as a distractor",
+    "source": "v2-new"
+  },
+  {
+    "id": "t001",
+    "question": "What is the time complexity of the Floyd-Warshall algorithm?",
+    "category": "out_of_scope_trap",
+    "should_answer": false,
+    "expected_file": "",
+    "expected_files": [],
+    "expected_key_points": [
+      "should refuse: the notes do not contain this"
+    ],
+    "notes": "near-topic trap: adjacent note exists, asked fact is absent (syn_01_bellman_ford.txt)",
+    "source": "v2-new"
+  },
+  {
+    "id": "t002",
+    "question": "Who invented the A* algorithm?",
+    "category": "out_of_scope_trap",
+    "should_answer": false,
+    "expected_file": "",
+    "expected_files": [],
+    "expected_key_points": [
+      "should refuse: the notes do not contain this"
+    ],
+    "notes": "near-topic trap: adjacent note exists, asked fact is absent (syn_02_a_star.txt)",
+    "source": "v2-new"
+  },
+  {
+    "id": "t003",
+    "question": "How does AdamW differ from Adam?",
+    "category": "out_of_scope_trap",
+    "should_answer": false,
+    "expected_file": "",
+    "expected_files": [],
+    "expected_key_points": [
+      "should refuse: the notes do not contain this"
+    ],
+    "notes": "near-topic trap: adjacent note exists, asked fact is absent (syn_03_momentum_adam.txt)",
+    "source": "v2-new"
+  },
+  {
+    "id": "t004",
+    "question": "What is the formula of the Swish activation function?",
+    "category": "out_of_scope_trap",
+    "should_answer": false,
+    "expected_file": "",
+    "expected_files": [],
+    "expected_key_points": [
+      "should refuse: the notes do not contain this"
+    ],
+    "notes": "near-topic trap: adjacent note exists, asked fact is absent (syn_04_leaky_relu.txt)",
+    "source": "v2-new"
+  },
+  {
+    "id": "t005",
+    "question": "What is BM25F and how does it handle document fields?",
+    "category": "out_of_scope_trap",
+    "should_answer": false,
+    "expected_file": "",
+    "expected_files": [],
+    "expected_key_points": [
+      "should refuse: the notes do not contain this"
+    ],
+    "notes": "near-topic trap: adjacent note exists, asked fact is absent (syn_05_bm25.txt)",
+    "source": "v2-new"
+  },
+  {
+    "id": "t006",
+    "question": "What is Expected Sarsa?",
+    "category": "out_of_scope_trap",
+    "should_answer": false,
+    "expected_file": "",
+    "expected_files": [],
+    "expected_key_points": [
+      "should refuse: the notes do not contain this"
+    ],
+    "notes": "near-topic trap: adjacent note exists, asked fact is absent (syn_06_sarsa.txt)",
+    "source": "v2-new"
+  },
+  {
+    "id": "t007",
+    "question": "What does the eta parameter control in XGBoost?",
+    "category": "out_of_scope_trap",
+    "should_answer": false,
+    "expected_file": "",
+    "expected_files": [],
+    "expected_key_points": [
+      "should refuse: the notes do not contain this"
+    ],
+    "notes": "near-topic trap: adjacent note exists, asked fact is absent (syn_07_las_losowy.txt)",
+    "source": "v2-new"
+  },
+  {
+    "id": "t008",
+    "question": "What is the Matthews correlation coefficient and when is it used?",
+    "category": "out_of_scope_trap",
+    "should_answer": false,
+    "expected_file": "",
+    "expected_files": [],
+    "expected_key_points": [
+      "should refuse: the notes do not contain this"
+    ],
+    "notes": "near-topic trap: adjacent note exists, asked fact is absent (syn_08_precision_recall.txt); replaced 'How is the ROC AUC computed?' — notatka_12 covers ROC/AUC",
+    "source": "v2-new"
+  },
+  {
+    "id": "t009",
+    "question": "How is a KD-tree built to speed up k-NN search?",
+    "category": "out_of_scope_trap",
+    "should_answer": false,
+    "expected_file": "",
+    "expected_files": [],
+    "expected_key_points": [
+      "should refuse: the notes do not contain this"
+    ],
+    "notes": "near-topic trap: adjacent note exists, asked fact is absent (syn_09_knn.txt)",
+    "source": "v2-new"
+  },
+  {
+    "id": "t010",
+    "question": "What is iterative deepening depth-first search?",
+    "category": "out_of_scope_trap",
+    "should_answer": false,
+    "expected_file": "",
+    "expected_files": [],
+    "expected_key_points": [
+      "should refuse: the notes do not contain this"
+    ],
+    "notes": "near-topic trap: adjacent note exists, asked fact is absent (syn_10_bfs_dfs.txt)",
+    "source": "v2-new"
+  },
+  {
+    "id": "t011",
+    "question": "What is label smoothing in cross-entropy loss?",
+    "category": "out_of_scope_trap",
+    "should_answer": false,
+    "expected_file": "",
+    "expected_files": [],
+    "expected_key_points": [
+      "should refuse: the notes do not contain this"
+    ],
+    "notes": "near-topic trap: adjacent note exists, asked fact is absent (syn_11_softmax.txt)",
+    "source": "v2-new"
+  },
+  {
+    "id": "t012",
+    "question": "What epsilon value does batch normalization use?",
+    "category": "out_of_scope_trap",
+    "should_answer": false,
+    "expected_file": "",
+    "expected_files": [],
+    "expected_key_points": [
+      "should refuse: the notes do not contain this"
+    ],
+    "notes": "near-topic trap: adjacent note exists, asked fact is absent (syn_12_regularization.txt)",
+    "source": "v2-new"
+  },
+  {
+    "id": "t013",
+    "question": "Who won the 2018 FIFA World Cup?",
+    "category": "out_of_scope",
+    "should_answer": false,
+    "expected_file": "",
+    "expected_files": [],
+    "expected_key_points": [
+      "should refuse: the notes do not contain this"
+    ],
+    "notes": "",
+    "source": "v2-new"
+  },
+  {
+    "id": "t014",
+    "question": "Jak przygotować pierogi ruskie?",
+    "category": "out_of_scope",
+    "should_answer": false,
+    "expected_file": "",
+    "expected_files": [],
+    "expected_key_points": [
+      "should refuse: the notes do not contain this"
+    ],
+    "notes": "",
+    "source": "v2-new"
+  },
+  {
+    "id": "t015",
+    "question": "What is the boiling point of water at sea level in Fahrenheit?",
+    "category": "out_of_scope",
+    "should_answer": false,
+    "expected_file": "",
+    "expected_files": [],
+    "expected_key_points": [
+      "should refuse: the notes do not contain this"
+    ],
+    "notes": "",
+    "source": "v2-new"
+  }
+]

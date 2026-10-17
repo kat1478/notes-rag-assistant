@@ -37,6 +37,13 @@ TOP_K = 3
 # Chroma settings
 CHROMA_DIR = DATA_DIR / "chroma"
 CHROMA_DIR.mkdir(parents=True, exist_ok=True)
+# Evaluation corpora: name -> (notes directory, Chroma collection). v1 is the app default; v2 is the frozen
+# benchmark corpus (v1 notes + synthetic near-topic notes). The app searches CHROMA_COLLECTION.
+CORPORA = {
+    "v1": (DATA_DIR / "notes", "notes_chunks"),
+    "v2": (DATA_DIR / "notes_v2", "notes_v2"),
+}
+CHROMA_COLLECTION = os.getenv("CHROMA_COLLECTION", "notes_chunks")
 
 # Embedding settings
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"
@@ -45,6 +52,9 @@ EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 # run may override it within [TEMPERATURE_MIN, TEMPERATURE_MAX] — 1.0 is the highest value every provider accepts.
 TEMPERATURE = float(os.getenv("TEMPERATURE", "0.0"))
 TEMPERATURE_MIN, TEMPERATURE_MAX = 0.0, 1.0
+# Hidden reasoning for models that support it: "off" (default — grounded answering doesn't need it, and it
+# dominates cost/latency) or "default" (whatever the provider does by default).
+REASONING = os.getenv("REASONING", "off")
 
 # Ollama settings (local default, no API key needed)
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
@@ -63,7 +73,8 @@ OPENROUTER_MODELS = [
         "qwen/qwen3-30b-a3b-instruct-2507,"
         "google/gemma-4-31b-it,"
         "anthropic/claude-haiku-5.5,"
-        "anthropic/claude-sonnet-5.5",
+        "anthropic/claude-sonnet-5.5,"
+        "openai/gpt-5.6-sol",
     ).split(",")
     if m.strip()
 ]

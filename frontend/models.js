@@ -16,9 +16,20 @@ const usd = (v) => (v === 0 ? '$0' : v < 0.01 ? `$${v.toFixed(4)}` : v < 1 ? `$$
 
 const CHARTS = [
     {
-        key: 'answer_rate_in_scope', title: 'Answered in-scope questions', dir: 'higher is better',
+        key: 'answer_rate_supported', fallback: 'answer_rate_in_scope',
+        title: 'Answers when the context has the answer', dir: 'higher is better',
         fmt: pct, max: () => 1,
-        detail: (r) => `${Math.round(r.answer_rate_in_scope * r.n_in_scope)} of ${r.n_in_scope} questions`,
+        detail: (r) => `n = ${r.n_supported ?? r.n_in_scope} questions where retrieval found the expected note`,
+    },
+    {
+        key: 'refusal_rate_unsupported', title: 'Refuses when retrieval missed the note', dir: 'higher is better',
+        fmt: pct, max: () => 1,
+        detail: (r) => `n = ${r.n_unsupported ?? 0} — answering here means answering without a source`,
+    },
+    {
+        key: 'refusal_rate_out_of_scope', title: 'Refuses out-of-scope questions', dir: 'higher is better',
+        fmt: pct, max: () => 1,
+        detail: (r) => `n = ${r.n_out_of_scope} questions, incl. near-topic traps`,
     },
     {
         key: 'valid_citation_rate', title: 'Answers citing a real chunk', dir: 'higher is better',
@@ -34,11 +45,15 @@ const CHARTS = [
         key: 'cost_per_1k_queries_usd', title: 'Cost per 1,000 questions', dir: 'lower is better',
         fmt: usd, tick: (t) => `$${t}`, max: (rows) => Math.max(...rows.map((r) => r.cost_per_1k_queries_usd ?? 0)),
         detail: (r) => (r.provider === 'ollama' ? 'local inference, hardware not counted'
-            : `~${r.prompt_tokens_mean ?? '?'} in / ${r.completion_tokens_mean ?? '?'} out tokens per question`),
+            : `~${r.prompt_tokens_mean ?? '?'} in / ${r.completion_tokens_mean ?? '?'} out tokens per question`
+              + (r.reasoning_tokens_mean ? ` (${r.reasoning_tokens_mean} reasoning)` : '')),
     },
 ];
 
-const state = { rows: [], selected: store.get() };
+// v1 summaries predate some metrics; fall back to the closest older one.
+const val = (r, chart) => r[chart.key] ?? (chart.fallback ? r[chart.fallback] : undefined) ?? null;
+
+const state = { rows: [], selected: store.get(), corpus: 'v1' };
 
 function shortName(r) {
     const name = r.model.includes('/') ? r.model.split('/').pop() : r.model;
@@ -70,7 +85,7 @@ function node(tag, className, text) {
 const tip = document.getElementById('tooltip');
 
 function showTip(row, chart, x, y) {
-    const v = row[chart.key];
+    const v = val(row, chart);
     tip.replaceChildren(
         node('strong', '', v === null || v === undefined ? 'n/a' : chart.fmt(v)),
         node('div', 'tt-model', row.model_id),
@@ -105,7 +120,7 @@ function renderChart(chart) {
     plot.append(grid);
 
     rows.forEach((r) => {
-        const v = r[chart.key];
+        const v = val(r, chart);
         const btn = node('button', 'bar-row');
         btn.type = 'button';
         btn.dataset.model = r.model_id;
@@ -154,7 +169,8 @@ function renderTable() {
         const na = (v, f) => (v === null || v === undefined ? '—' : f(v));
         const cells = [
             r.model_id,
-            na(r.answer_rate_in_scope, (v) => `${pct(v)} (n=${r.n_in_scope})`),
+            na(r.answer_rate_supported ?? r.answer_rate_in_scope, (v) => `${pct(v)} (n=${r.n_supported ?? r.n_in_scope})`),
+            na(r.refusal_rate_unsupported, (v) => `${pct(v)} (n=${r.n_unsupported})`),
             na(r.valid_citation_rate, pct),
             r.invalid_citations,
             na(r.refusal_rate_out_of_scope, (v) => `${pct(v)} (n=${r.n_out_of_scope})`),
@@ -189,8 +205,11 @@ function renderMeta(runs) {
     const uniq = (k) => [...new Set(runs.map((r) => r[k]).filter(Boolean))].join(', ');
     const dates = runs.map((r) => r.run_at).filter(Boolean).sort();
     const range = dates.length ? `${dates[0].slice(0, 10)}${dates.at(-1).slice(0, 10) !== dates[0].slice(0, 10) ? ` → ${dates.at(-1).slice(0, 10)}` : ''}` : '';
+    const hit = uniq('retrieval_hit_rate');
     document.getElementById('run-meta').textContent =
-        `${uniq('dataset')} · ${uniq('n_questions')} questions · top_k ${uniq('top_k')} · run ${range} · commit ${uniq('git_commit')}`;
+        `corpus ${state.corpus} · ${uniq('n_questions')} questions · top_k ${uniq('top_k')}`
+        + (hit ? ` · retrieval hit ${pct(Number(hit))}` : '')
+        + ` · reasoning ${uniq('reasoning_mode') || 'default'} · run ${range} · commit ${uniq('git_commit')}`;
 }
 
 async function fetchJson(path) {
@@ -202,12 +221,14 @@ async function fetchJson(path) {
 async function init() {
     let summary;
     try {
-        summary = await fetchJson('/benchmark');
+        const corpus = new URLSearchParams(window.location.search).get('corpus');
+        summary = await fetchJson(`/benchmark${corpus ? `?corpus=${encodeURIComponent(corpus)}` : ''}`);
+        state.corpus = summary.corpus || 'v1';
     } catch (err) {
         const notice = document.getElementById('notice');
         notice.hidden = false;
         notice.textContent = err.status === 404
-            ? 'No benchmark results yet. From backend/ run: python -m app.run_model_benchmark'
+            ? 'No benchmark results yet. From backend/ run: python -m app.run_model_benchmark --corpus v2'
             : `Backend not reachable (${err.message}). Start it from backend/: python -m uvicorn app.main:app`;
         return;
     }
