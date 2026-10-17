@@ -159,12 +159,13 @@ class OpenRouterProvider(LLMProvider):
         try:
             data = self._post(url, payload, headers)
         except RuntimeError as e:
-            # Models with mandatory reasoning reject effort "none" (a rejected request is not billed):
-            # retry once with the lowest effort they accept.
-            if reasoning != {"effort": "none"} or "400" not in str(e):
+            # Some models make reasoning mandatory and reject turning it off (rejected requests are not
+            # billed): retry once with the lowest effort they accept. The applied setting is reported.
+            if not reasoning or "400" not in str(e):
                 raise
-            logger.warning(f"{self.model} rejected reasoning effort 'none'; retrying with 'minimal'")
-            payload["reasoning"] = {"effort": "minimal"}
+            fallback = {"effort": "minimal"} if self.model.startswith("openai/") else {"effort": "low"}
+            logger.warning(f"{self.model} rejected reasoning {reasoning}: {e}; retrying with {fallback}")
+            payload["reasoning"] = fallback
             data = self._post(url, payload, headers)
 
         text = data["choices"][0]["message"].get("content") or ""
@@ -209,7 +210,11 @@ class OpenRouterProvider(LLMProvider):
                 404: f"model '{self.model}' not found on OpenRouter",
                 429: "rate limited — retry later",
             }
-            raise RuntimeError(f"OpenRouter error {status}: {hints.get(status, 'request failed')}")
+            try:
+                detail = e.response.json()["error"]["message"]
+            except Exception:
+                detail = ""
+            raise RuntimeError(f"OpenRouter error {status}: {hints.get(status, detail or 'request failed')}")
         except httpx.HTTPError as e:
             raise RuntimeError(f"Cannot reach OpenRouter at {OPENROUTER_BASE_URL}: {e}")
 

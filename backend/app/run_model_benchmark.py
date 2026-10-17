@@ -219,6 +219,33 @@ def retrieval_hits(items: List[dict], contexts: Dict[str, list]) -> Dict[str, Op
     return hits
 
 
+def rescore(out_dir: Path) -> None:
+    """Re-derives refused/answered from the saved answer texts and rewrites CSVs + summary metrics."""
+    summary_path = out_dir / "summary.json"
+    summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    as_bool = lambda v: {"True": True, "False": False}.get(v)
+    as_num = lambda v, f: f(v) if v not in ("", "None", None) else None
+    for key, old in summary["runs"].items():
+        path = out_dir / f"{slug(key)}.csv"
+        rows = []
+        for r in csv.DictReader(open(path, encoding="utf-8")):
+            r.update(should_answer=as_bool(r["should_answer"]), failed=as_bool(r["failed"]),
+                     retrieval_hit=as_bool(r["retrieval_hit"]), valid_citations=int(r["valid_citations"]),
+                     invalid_citations=int(r["invalid_citations"]), latency_ms=float(r["latency_ms"]),
+                     prompt_tokens=as_num(r["prompt_tokens"], int), completion_tokens=as_num(r["completion_tokens"], int),
+                     reasoning_tokens=as_num(r.get("reasoning_tokens"), int), cost_usd=as_num(r["cost_usd"], float),
+                     temperature=as_num(r.get("temperature"), float))
+            r["refused"] = is_refusal_response(r["answer_text"])
+            r["answered"] = (not r["failed"]) and (not r["refused"]) and bool(r["answer_text"].strip())
+            rows.append(r)
+        write_csv(path, rows)
+        new = summarize(old["model_id"], rows, old.get("temperature_requested", TEMPERATURE))
+        changed = {k: (old.get(k), v) for k, v in new.items() if old.get(k) != v and k != "by_category"}
+        summary["runs"][key] = {**old, **new, "rescored_at": datetime.now(timezone.utc).isoformat(timespec="seconds")}
+        logger.info(f"rescored {key}: {changed or 'no change'}")
+    summary_path.write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
 def write_csv(path: Path, rows: List[dict]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8", newline="") as f:
@@ -241,6 +268,8 @@ def main():
                         help="Notes corpus / Chroma collection (v2: ingest first with python -m app.ingest_corpus --corpus v2).")
     parser.add_argument("--dataset-path", help="Questions JSON (default depends on --corpus).")
     parser.add_argument("--retrieval-only", action="store_true", help="Report retrieval hit rates and exit (no LLM calls).")
+    parser.add_argument("--rescore", action="store_true",
+                        help="Recompute metrics from saved CSVs (e.g. after a refusal-detector fix); no LLM calls.")
     parser.add_argument("--max-cost-usd", type=float, default=5.0, help="Abort when the run's estimated spend exceeds this.")
     parser.add_argument("--top-k", type=int, default=3)
     parser.add_argument("--limit", type=int, help="Only the first N questions (quick check; not saved to summary).")
@@ -259,6 +288,9 @@ def main():
         sys.exit(f"Unavailable (set OPENROUTER_API_KEY in backend/.env): {unavailable}")
 
     default_dataset, default_out = DEFAULTS[args.corpus]
+    if args.rescore:
+        rescore(Path(args.out_dir or default_out))
+        return
     dataset_path = Path(args.dataset_path or default_dataset)
     notes_dir, collection = CORPORA[args.corpus]
     use_collection(collection)
@@ -306,6 +338,9 @@ def main():
         print(json.dumps(result, indent=2))
         if args.limit:
             continue  # partial runs are not comparable — keep them out of the summary
+        if result["failures"] > len(rows) / 2:
+            logger.error(f"{key}: {result['failures']}/{len(rows)} generations failed — not saved to the summary")
+            continue
         write_csv(out_dir / f"{slug(key)}.csv", rows)
         result.update({
             "dataset": dataset_path.name,

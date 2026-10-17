@@ -1,3 +1,4 @@
+import re
 import json
 import logging
 import time
@@ -88,6 +89,9 @@ def run_retrieval_evaluation(
             eval_results.append(res)
     return eval_results
 
+POLISH_REFUSAL_RE = re.compile(r"\b(nie ma|brak)\b[^.,;:!?]{0,40}?\binformacj")
+
+
 def is_refusal_response(answer_text: str) -> bool:
     """Determines if the answer text contains common refusal phrases."""
     refusal_phrases = [
@@ -102,7 +106,10 @@ def is_refusal_response(answer_text: str) -> bool:
         "brak informacji"
     ]
     answer_lower = answer_text.lower()
-    return any(phrase in answer_lower for phrase in refusal_phrases)
+    if any(phrase in answer_lower for phrase in refusal_phrases):
+        return True
+    # Polish variants with words in between: "Nie ma w tym tekście informacji", "Brak w notatkach informacji"
+    return bool(POLISH_REFUSAL_RE.search(answer_lower))
 
 def detect_source_ref_in_text(answer_text: str, retrieved_files: List[str]) -> bool:
     """Scans the answer text for source citations (bracketed notation or file names)."""
