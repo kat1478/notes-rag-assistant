@@ -204,7 +204,8 @@ function renderAnswer(text, sourceCount) {
     const cited = new Set();
     let missing = 0;
 
-    const html = escapeHtml(text).replace(CITATION_RE, (_, nums) => {
+    // Hosted models answer in light Markdown; render **bold** (on already-escaped text, so no HTML injection).
+    const html = escapeHtml(text).replace(/\*\*([^*\n]+?)\*\*/g, '<strong>$1</strong>').replace(CITATION_RE, (_, nums) => {
         return nums.match(/\d+/g).map((n) => {
             const num = Number(n);
             if (num < 1 || num > sourceCount) {
