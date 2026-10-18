@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>notes-rag — model comparison</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <span class="brand-mark" aria-hidden="true"></span>
+            <span class="brand-name">notes-rag</span>
+        </div>
+        <nav class="tabs" aria-label="Views">
+            <a class="tab" href="index.html">Ask</a>
+            <a class="tab" href="models.html" aria-current="page">Models</a>
+        </nav>
+        <nav class="topbar-links">
+            <a href="/docs" target="_blank" rel="noopener">API</a>
+            <a href="https://github.com/kat1478/notes-rag-assistant" target="_blank" rel="noopener">GitHub</a>
+        </nav>
+    </header>
+
+    <main class="page viz">
+        <h1>Model comparison</h1>
+        <p class="page-lede">
+            Every model answers the same questions from the <strong>same retrieved context</strong>
+            (retrieval runs once, <code>temperature = 0</code>), so differences come from generation only.
+            Click a model to use it in <a href="index.html">Ask</a>.
+        </p>
+        <p id="run-meta" class="run-meta"></p>
+        <div class="key" aria-hidden="true">
+            <span><i class="swatch swatch-accent"></i>model selected in Ask</span>
+            <span><i class="swatch swatch-muted"></i>other models</span>
+        </div>
+
+        <div id="notice" class="notice" hidden></div>
+
+        <div id="charts" class="charts"></div>
+
+        <h2 class="section-title">All metrics</h2>
+        <div class="table-wrap">
+            <table class="data-table" id="metrics-table">
+                <thead>
+                    <tr>
+                        <th scope="col">model</th>
+                        <th scope="col">answered (context has it)</th>
+                        <th scope="col">refused (retrieval missed)</th>
+                        <th scope="col">valid citation</th>
+                        <th scope="col">invalid cites</th>
+                        <th scope="col">refused (out of scope)</th>
+                        <th scope="col">failures</th>
+                        <th scope="col">latency p50</th>
+                        <th scope="col">latency mean</th>
+                        <th scope="col">tokens in / out</th>
+                        <th scope="col">$ / 1k questions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <h2 class="section-title">Read with care</h2>
+        <ul class="caveats">
+            <li><strong>Answered ≠ correct.</strong> "Answered" means a non-empty answer that is not a refusal; correctness is not judged automatically yet.</li>
+            <li><strong>Grounding split.</strong> When retrieval did not return the note that holds the answer, the correct grounded behaviour is to refuse — so those questions count as refusal tests, not answer tests.</li>
+            <li><strong>Corpus v2</strong> = the 11 original notes + 12 <em>synthetic</em> near-topic notes written by an LLM, frozen for benchmarking. Results are only comparable within one corpus.</li>
+            <li><strong>Valid citation</strong> = the answer contains at least one <code>[Source N]</code> pointing to a chunk that was actually in the context.</li>
+            <li><strong>Out-of-scope</strong>: 17 questions in v2 (5 unrelated, 12 near-topic traps where a related note exists but the asked fact does not); only 2 in v1. Small differences between models are still within noise.</li>
+            <li><strong>Latency</strong>: local model on this machine's CPU vs. hosted models over the network — not the same hardware.</li>
+            <li><strong>Cost</strong> from token usage × OpenRouter list prices at run time; local inference counted as $0.</li>
+        </ul>
+    </main>
+
+    <div id="tooltip" class="tooltip" role="tooltip" hidden></div>
+    <script src="models.js"></script>
+</body>
+</html>

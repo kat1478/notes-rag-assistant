@@ -1,2 +1,0 @@
-Placeholder for app_home.png.
-Replace this file with the actual screenshot of the application's home interface.

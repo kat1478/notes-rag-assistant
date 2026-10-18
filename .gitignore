@@ -1,4 +1,12 @@
-# User specific
+
+.claude/
+CLAUDE.md
+CLAUDE.local.md
+AGENT*.md
+
+STATUS.md
+concepts.md
+docs/plans/
 notes_rag_stage*.md
 
 # Python

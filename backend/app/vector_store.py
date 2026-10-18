@@ -1,7 +1,7 @@
 import logging
 import chromadb
 from typing import List
-from .config import CHROMA_DIR
+from .config import CHROMA_DIR, CHROMA_COLLECTION
 from .schemas import ChunkResponse, ChunkMetadata
 from .embeddings import embed_text, embed_texts
 
@@ -9,7 +9,13 @@ logger = logging.getLogger(__name__)
 
 # Global Chroma client
 _client = None
-COLLECTION_NAME = "notes_chunks"
+COLLECTION_NAME = CHROMA_COLLECTION
+
+
+def use_collection(name: str) -> None:
+    """Switches the collection used by search, upsert and neighbor expansion (eval scripts only)."""
+    global COLLECTION_NAME
+    COLLECTION_NAME = name
 
 def get_client() -> chromadb.PersistentClient:
     global _client

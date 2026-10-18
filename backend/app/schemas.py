@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional
 
 class ChunkMetadata(BaseModel):
@@ -22,12 +22,29 @@ class SearchResponse(BaseModel):
 class AskRequest(BaseModel):
     query: str
     top_k: Optional[int] = None
+    model: Optional[str] = None  # "<provider>:<model>" from GET /models; default model when omitted
+    # Sampling temperature; default from config (0.0). Ignored by models that don't accept it (reported as null).
+    temperature: Optional[float] = Field(None, ge=0.0, le=1.0)
 
 class AskResponseMetadata(BaseModel):
     top_k_used: int
     retrieval_mode: str
     generation_mode: str
     response_time_ms: float
+    model: Optional[str] = None
+    provider: Optional[str] = None
+    prompt_tokens: Optional[int] = None
+    completion_tokens: Optional[int] = None
+    generation_error: Optional[str] = None
+    temperature: Optional[float] = None  # applied value; null = model ignores temperature
+
+class ModelInfo(BaseModel):
+    id: str
+    provider: str
+    model: str
+    local: bool
+    available: bool
+    supports_temperature: Optional[bool] = None  # null = unknown (capabilities not fetched)
 
 class AskResponse(BaseModel):
     answer: str

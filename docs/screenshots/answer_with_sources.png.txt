@@ -1,2 +1,0 @@
-Placeholder for answer_with_sources.png.
-Replace this file with the actual screenshot showing a user query response with its cited sources.

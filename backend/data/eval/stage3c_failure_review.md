@@ -1,5 +1,20 @@
 # Stage 3C - Failure Review
 
+## Contents
+_Line numbers of each section:_
+- L22 — Row-by-Row Failure Analysis
+  - L24 — 1. `q010`
+  - L41 — 2. `q011`
+  - L57 — 3. `q016`
+  - L72 — 4. `q018`
+  - L87 — 5. `q028`
+  - L102 — 6. `q032`
+- L117 — Classification of Failure Patterns
+- L134 — Proposed Primary Improvement
+  - L136 — Windowed Context Expansion (Chunk Merging)
+  - L144 — Why this should be tested first:
+
+
 This document reviews the 6 failed in-scope queries from the Stage 3C answer quality evaluation and classifies their failure patterns.
 
 ---
