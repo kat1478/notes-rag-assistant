@@ -56,7 +56,9 @@ TEMPERATURE_MIN, TEMPERATURE_MAX = 0.0, 1.0
 # dominates cost/latency) or "default" (whatever the provider does by default).
 REASONING = os.getenv("REASONING", "off")
 
-# Ollama settings (local default, no API key needed)
+# Ollama settings (local, no API key). Off by default since 2026-10-18: on a laptop CPU it takes 5–110 s per
+# answer, and the same model hosted is in the benchmark. Kept for offline use and reproducing the Stage 1–4 evals.
+OLLAMA_ENABLED = os.getenv("OLLAMA_ENABLED", "false").lower() == "true"
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2:3b")
 
@@ -80,4 +82,5 @@ OPENROUTER_MODELS = [
 ]
 
 # Model ids are "<provider>:<model>", e.g. "ollama:llama3.2:3b" or "openrouter:qwen/qwen3-30b-a3b-instruct-2507".
-DEFAULT_MODEL_ID = os.getenv("DEFAULT_MODEL_ID", f"ollama:{OLLAMA_MODEL}")
+# Default: Claude Haiku 5.5 — the most cost-effective model in the v2 benchmark (see README "Model benchmark").
+DEFAULT_MODEL_ID = os.getenv("DEFAULT_MODEL_ID", "openrouter:anthropic/claude-haiku-5.5")

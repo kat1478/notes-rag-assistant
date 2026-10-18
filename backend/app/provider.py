@@ -13,6 +13,7 @@ import httpx
 from .config import (
     DEFAULT_MODEL_ID,
     OLLAMA_BASE_URL,
+    OLLAMA_ENABLED,
     OLLAMA_MODEL,
     OPENROUTER_API_KEY,
     OPENROUTER_BASE_URL,
@@ -238,7 +239,8 @@ _PROVIDERS = {cls.name: cls for cls in (OllamaProvider, OpenRouterProvider)}
 
 
 def _allowed_ids() -> List[str]:
-    return [f"ollama:{OLLAMA_MODEL}"] + [f"openrouter:{name}" for name in OPENROUTER_MODELS]
+    local = [f"ollama:{OLLAMA_MODEL}"] if OLLAMA_ENABLED else []
+    return local + [f"openrouter:{name}" for name in OPENROUTER_MODELS]
 
 
 def list_models() -> List[Dict]:

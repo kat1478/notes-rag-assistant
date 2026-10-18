@@ -18,8 +18,8 @@ def test_health():
                 log_test("GET /health", False, f"Status: {res.status}")
                 return False
             data = json.loads(res.read().decode())
-            if data.get("status") == "healthy" and "ollama_model" in data:
-                log_test("GET /health", True, f"Model: {data.get('ollama_model')}")
+            if data.get("status") == "healthy" and ("default_model_id" in data or "ollama_model" in data):
+                log_test("GET /health", True, f"Default model: {data.get('default_model_id') or data.get('ollama_model')}")
                 return True
             else:
                 log_test("GET /health", False, f"Invalid JSON response: {data}")
@@ -68,7 +68,7 @@ def test_ask():
         data = json.dumps(payload).encode()
         req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json"}, method="POST")
         
-        print("Sending POST /ask ('What is ReLU?')... (LLM inference may take 5-20 seconds)")
+        print("Sending POST /ask ('What is ReLU?') with the default model...")
         with urllib.request.urlopen(req, timeout=90) as res:
             if res.status != 200:
                 log_test("POST /ask", False, f"Status: {res.status}")
