@@ -23,6 +23,11 @@ def save_chunks(new_chunks: List[ChunkResponse]):
         # Convert models to dicts
         json.dump([chunk.model_dump() for chunk in existing_chunks], f, ensure_ascii=False, indent=2)
 
+def replace_chunks(chunks: List[ChunkResponse]):
+    """Overwrites the chunks file (the TF-IDF fallback corpus) with exactly these chunks."""
+    with open(CHUNKS_FILE, "w", encoding="utf-8") as f:
+        json.dump([chunk.model_dump() for chunk in chunks], f, ensure_ascii=False, indent=2)
+
 def load_chunks() -> List[ChunkResponse]:
     """Loads all chunks from the processed file."""
     if not CHUNKS_FILE.exists():
