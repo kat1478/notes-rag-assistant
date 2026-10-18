@@ -48,7 +48,7 @@ final validation run on previously unseen notes.
 
 ## Current status
 
-This repository contains a working local MVP:
+This repository contains a working MVP:
 
 - FastAPI backend with `/ask`, `/search`, `/ingest`, `/ingest/batch`, and `/health`
 - persistent ChromaDB vector store
@@ -134,10 +134,10 @@ Drop your `.txt` or `.md` study notes into the directory:
 backend/data/notes/
 ```
 
-After dropping the notes, they must be ingested into the vector database by running the following command inside the `backend/` directory:
+Then index them (from `backend/`). This rebuilds the vector collection and the TF-IDF fallback from that folder:
 
 ```bash
-python -m app.run_retrieval_eval --reset-and-reingest
+python -m app.ingest_corpus --corpus v1
 ```
 
 ### 5. Run the Backend
@@ -183,13 +183,14 @@ All smoke tests PASSED!
 
 **In-scope question — answered with source citations:**
 
-> **Q:** What is Dijkstra's algorithm used for?
+> **Q:** When should I use Bellman-Ford instead of Dijkstra?
 >
-> **A:** Dijkstra's algorithm jest używany do optymalizacji ścieżek w grafach, czyli do znalezienia
-> najkrótszej drogi między dwoma wierzchołkami. **[Source 1]**
+> **A:** You should use Bellman-Ford instead of Dijkstra when the graph has negative edge weights, because
+> Dijkstra only works correctly when all edge weights are non-negative. **[Source 2]**
 
-The UI renders citations as numbered markers; hovering or clicking one highlights and opens the matching
-chunk in the context panel.
+The cited chunk is a Polish note (*"Dijkstra działa poprawnie tylko wtedy, gdy wagi krawędzi są nieujemne…"*) —
+the English answer is grounded across languages. The UI renders citations as numbered markers; hovering or clicking
+one highlights and opens the matching chunk in the context panel. (Default model, Claude Haiku 5.5, ~1 s.)
 
 **Out-of-scope question — refused instead of guessed:**
 
@@ -241,7 +242,7 @@ model to highlight it in every chart. It is the same view as the app's **Models*
 
 **Setup.** Six hosted models (via OpenRouter) answered the same **94 questions** from **identical retrieved context** —
 retrieval runs once per question, so differences come from generation only. `temperature = 0`; hidden reasoning is
-disabled where the model allows it (Claude Sonnet 5.5 makes it mandatory, so it ran at the lowest effort). Cost is
+disabled where the model allows it (Claude Sonnet 5.5 makes it mandatory, so it ran at `effort: low`). Cost is
 token usage × OpenRouter list prices at run time. The corpus (v2, frozen) is the 11 original notes plus 12 synthetic
 near-topic notes; 17 questions are out of scope, 12 of them traps such as *"What is Expected Sarsa?"* when only a
 Sarsa note exists.
@@ -264,7 +265,7 @@ refuse — so those 18 questions are scored as refusal tests, not answer tests.
   answers without a source in almost half of the unsupported cases.
 - **Claude Haiku 5.5 became the app's default:** it is the cheapest model reaching ≥ 95% on all four grounding metrics
   (100% correct refusals, ~1 s, $0.18 per 1,000 questions) — on par with GPT-5.6 Sol and Claude Sonnet 5.5 at
-  roughly 1/22 of their cost.
+  roughly 1/22–1/25 of their cost.
 - **Local `llama3.2:3b` (Ollama) is left out:** 5–110 s per answer on my laptop CPU rules it out as a product option.
   The same model, hosted, is in the chart; local inference can still be enabled with `OLLAMA_ENABLED=true`.
 
@@ -275,9 +276,10 @@ refuse — so those 18 questions are scored as refusal tests, not answer tests.
   <img alt="Temperature 0 vs 0.7 over three runs each for Gemma 4 31B and Llama 3.2 3B" src="docs/benchmark/temperature-light.svg">
 </picture>
 
-**Temperature 0 vs 0.7, three full runs each.** Gemma 4 31B gives the same grounding numbers in all six runs. Llama 3.2 3B
-moves by up to ~20 pp *between repeated runs* — and is not stable even at temperature 0, because hosted endpoints are
-not bit-deterministic. Takeaway: with a small model, single-run differences below ~10 pp are noise.
+**Temperature 0 vs 0.7, three full runs each.** Gemma 4 31B gives the same answer and refusal rates in all six runs
+(only one citation differs). Llama 3.2 3B varies by up to 22 pp *between repeated runs* at temperature 0.7 — and by up
+to 6 pp even at temperature 0, because hosted endpoints are not bit-deterministic. Takeaway: with a small model,
+single-run differences below ~10 pp are noise.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/benchmark/retrieval-topk-dark.svg">
@@ -383,4 +385,4 @@ docs/benchmark/        # README charts + static interactive benchmark page (GitH
 
 ## License
 
-Released under the MIT License.
+Released under the [MIT License](LICENSE).
