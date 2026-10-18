@@ -108,9 +108,13 @@ def run_model(model_id: str, items: List[dict], contexts: Dict[str, list], price
     rows = []
     for i, item in enumerate(items, 1):
         sources = contexts[item["id"]]
-        t0 = time.perf_counter()
+        t0, wall0 = time.perf_counter(), time.time()
         gen = generate_answer_with_meta(item["question"], sources, model_id, temperature)
         latency_ms = (time.perf_counter() - t0) * 1000
+        # Wall clock jumping ahead of the monotonic clock means the host slept mid-request.
+        suspended = (time.time() - wall0) * 1000 - latency_ms > 5000
+        if suspended:
+            logger.warning(f"{item['id']}: host was suspended during the request — latency excluded")
 
         failed = gen.error is not None or gen.text.startswith(FALLBACK_PREFIX)
         refused = is_refusal_response(gen.text)
@@ -126,6 +130,7 @@ def run_model(model_id: str, items: List[dict], contexts: Dict[str, list], price
             "valid_citations": cites["valid"],
             "invalid_citations": cites["invalid"],
             "latency_ms": round(latency_ms, 1),
+            "suspended": suspended,
             "prompt_tokens": gen.prompt_tokens,
             "completion_tokens": gen.completion_tokens,
             "cost_usd": query_cost(model_id, gen.prompt_tokens, gen.completion_tokens, prices),
@@ -152,7 +157,7 @@ def summarize(model_id: str, rows: List[dict], temperature_requested: float = TE
     supported = [r for r in in_scope if r["retrieval_hit"] is not False]   # context contains the expected note
     unsupported = [r for r in in_scope if r["retrieval_hit"] is False]     # retrieval missed it
     answered = [r for r in rows if r["answered"]]
-    ok = [r for r in rows if not r["failed"]]
+    ok = [r for r in rows if not r["failed"] and not r.get("suspended")]
     latencies = [r["latency_ms"] / 1000 for r in ok]
     costs = [r["cost_usd"] for r in rows if r["cost_usd"] is not None]
     provider, model = model_id.split(":", 1)
@@ -180,6 +185,7 @@ def summarize(model_id: str, rows: List[dict], temperature_requested: float = TE
         "valid_citation_rate": rate(sum(r["valid_citations"] > 0 for r in answered), len(answered)),
         "invalid_citations": sum(r["invalid_citations"] for r in rows),
         "failures": sum(r["failed"] for r in rows),
+        "suspended_questions": sum(bool(r.get("suspended")) for r in rows),
         "latency_mean_s": round(statistics.mean(latencies), 2) if latencies else None,
         "latency_p50_s": round(statistics.median(latencies), 2) if latencies else None,
         "prompt_tokens_mean": round(statistics.mean([r["prompt_tokens"] for r in rows if r["prompt_tokens"]]), 1)
@@ -230,6 +236,7 @@ def rescore(out_dir: Path) -> None:
         rows = []
         for r in csv.DictReader(open(path, encoding="utf-8")):
             r.update(should_answer=as_bool(r["should_answer"]), failed=as_bool(r["failed"]),
+                     suspended=as_bool(r.get("suspended", "False")),
                      retrieval_hit=as_bool(r["retrieval_hit"]), valid_citations=int(r["valid_citations"]),
                      invalid_citations=int(r["invalid_citations"]), latency_ms=float(r["latency_ms"]),
                      prompt_tokens=as_num(r["prompt_tokens"], int), completion_tokens=as_num(r["completion_tokens"], int),
@@ -268,6 +275,7 @@ def main():
                         help="Notes corpus / Chroma collection (v2: ingest first with python -m app.ingest_corpus --corpus v2).")
     parser.add_argument("--dataset-path", help="Questions JSON (default depends on --corpus).")
     parser.add_argument("--retrieval-only", action="store_true", help="Report retrieval hit rates and exit (no LLM calls).")
+    parser.add_argument("--run-tag", help="Suffix for repeated runs, saved as '<model>[@tT]#<tag>'.")
     parser.add_argument("--rescore", action="store_true",
                         help="Recompute metrics from saved CSVs (e.g. after a refusal-detector fix); no LLM calls.")
     parser.add_argument("--max-cost-usd", type=float, default=5.0, help="Abort when the run's estimated spend exceeds this.")
@@ -325,8 +333,6 @@ def main():
     out_dir = Path(args.out_dir or default_out)
     budget = {"spent": 0.0, "max": args.max_cost_usd, "partial_dir": out_dir}
     summary_path = out_dir / "summary.json"
-    summary = json.loads(summary_path.read_text(encoding="utf-8")) if summary_path.exists() else {"runs": {}}
-
     for model_id in model_ids:
         logger.info(f"=== {model_id} ===")
         try:
@@ -334,7 +340,7 @@ def main():
         except BudgetExceeded as e:
             sys.exit(f"Budget guard: {e}")
         result = summarize(model_id, rows, args.temperature)
-        key = run_key(model_id, args.temperature)
+        key = run_key(model_id, args.temperature) + (f"#{args.run_tag}" if args.run_tag else "")
         print(json.dumps(result, indent=2))
         if args.limit:
             continue  # partial runs are not comparable — keep them out of the summary
@@ -350,6 +356,8 @@ def main():
             "run_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "git_commit": git_commit(),
         })
+        # Re-read right before writing: another benchmark process may have saved its runs meanwhile.
+        summary = json.loads(summary_path.read_text(encoding="utf-8")) if summary_path.exists() else {"runs": {}}
         summary["runs"][key] = result
         summary_path.write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         logger.info(f"Saved {key} → {summary_path} (run spend so far ${budget['spent']:.4f})")
