@@ -4,6 +4,8 @@
 
 const API_BASE = window.location.protocol === 'file:' ? 'http://127.0.0.1:8000' : '';
 const MODEL_KEY = 'notes-rag.model';
+// Static snapshot (GitHub Pages, built by app.render_benchmark_charts): no backend, data from summary.json.
+const STATIC = document.body.hasAttribute('data-static');
 
 const store = {
     get() { try { return localStorage.getItem(MODEL_KEY); } catch { return null; } },
@@ -212,6 +214,14 @@ function renderMeta(runs) {
         + ` · reasoning ${uniq('reasoning_mode') || 'default'} · run ${range} · commit ${uniq('git_commit')}`;
 }
 
+// Same rule as the README chart: cheapest model with >= 95% on all four grounding metrics.
+function recommended(rows) {
+    const keys = ['answer_rate_supported', 'refusal_rate_unsupported', 'refusal_rate_out_of_scope', 'valid_citation_rate'];
+    const ok = rows.filter((r) => keys.every((k) => (r[k] ?? 0) >= 0.95) && r.cost_per_1k_queries_usd != null);
+    ok.sort((a, b) => a.cost_per_1k_queries_usd - b.cost_per_1k_queries_usd);
+    return ok[0]?.model_id ?? null;
+}
+
 async function fetchJson(path) {
     const res = await fetch(`${API_BASE}${path}`);
     if (!res.ok) throw Object.assign(new Error(`HTTP ${res.status}`), { status: res.status });
@@ -222,7 +232,9 @@ async function init() {
     let summary;
     try {
         const corpus = new URLSearchParams(window.location.search).get('corpus');
-        summary = await fetchJson(`/benchmark${corpus ? `?corpus=${encodeURIComponent(corpus)}` : ''}`);
+        summary = STATIC
+            ? await (await fetch('summary.json')).json()
+            : await fetchJson(`/benchmark${corpus ? `?corpus=${encodeURIComponent(corpus)}` : ''}`);
         state.corpus = summary.corpus || 'v1';
     } catch (err) {
         const notice = document.getElementById('notice');
@@ -235,13 +247,19 @@ async function init() {
 
     // Stable order = the backend's model list (local first), so a model keeps its row in every chart.
     let order = [];
-    try { order = (await fetchJson('/models')).map((m) => m.id); } catch { /* fall back to run order */ }
+    if (!STATIC) {
+        try { order = (await fetchJson('/models')).map((m) => m.id); } catch { /* fall back to run order */ }
+    }
     const runs = Object.values(summary.runs || {});
     const rank = (id) => (order.includes(id) ? order.indexOf(id) : order.length);
     state.rows = runs.sort((a, b) => rank(a.model_id) - rank(b.model_id));
 
-    if (!state.selected) {
-        try { state.selected = (await fetchJson('/health')).default_model_id; } catch { /* no emphasis */ }
+    if (!state.selected || !state.rows.some((r) => r.model_id === state.selected)) {
+        if (STATIC) {
+            state.selected = recommended(state.rows);
+        } else {
+            try { state.selected = (await fetchJson('/health')).default_model_id; } catch { /* no emphasis */ }
+        }
     }
 
     renderMeta(runs);
