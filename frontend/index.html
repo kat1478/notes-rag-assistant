@@ -15,6 +15,10 @@
             <span class="brand-mark" aria-hidden="true"></span>
             <span class="brand-name">notes-rag</span>
         </div>
+        <nav class="tabs" aria-label="Views">
+            <a class="tab" href="index.html" aria-current="page">Ask</a>
+            <a class="tab" href="models.html">Models</a>
+        </nav>
         <div id="backend-status" class="backend-status" data-state="checking" role="status">
             <span class="dot" aria-hidden="true"></span>
             <span class="backend-label">connecting…</span>
@@ -36,11 +40,21 @@
                 placeholder="Ask your notes — e.g. What is the dying ReLU problem?"
                 required
             >
+            <div class="model-pick">
+                <label for="model-select" class="visually-hidden">Model</label>
+                <select id="model-select" class="model-select" title="Model that generates the answer — compare them under Models"></select>
+            </div>
             <div class="topk" title="Number of chunks retrieved before ±1 neighbor expansion">
                 <span class="topk-label">top_k</span>
                 <button type="button" class="topk-btn" data-step="-1" aria-label="Decrease top_k">−</button>
                 <output id="topk-value" class="topk-value" aria-live="polite">3</output>
                 <button type="button" class="topk-btn" data-step="1" aria-label="Increase top_k">+</button>
+            </div>
+            <div class="topk temp" id="temp-box" title="Sampling temperature: 0 = deterministic (used for benchmarks), higher = more varied wording">
+                <span class="topk-label">temp</span>
+                <button type="button" class="temp-btn" data-step="-1" aria-label="Decrease temperature">−</button>
+                <output id="temp-value" class="topk-value" aria-live="polite">0.0</output>
+                <button type="button" class="temp-btn" data-step="1" aria-label="Increase temperature">+</button>
             </div>
             <button type="submit" id="submit-btn" class="ask-btn">
                 Ask <kbd>⏎</kbd>
@@ -79,7 +93,7 @@
                     <li class="step done">query sent</li>
                     <li class="step active">retrieving chunks &amp; generating answer <span id="elapsed" class="mono">0.0 s</span></li>
                 </ol>
-                <p class="note">Local CPU inference takes ~30–45 s. The first request after startup is slower while the model loads.</p>
+                <p id="loading-note" class="note"></p>
             </div>
 
             <div id="view-error" class="panel-body" hidden>
@@ -109,8 +123,10 @@
         <div class="stat"><span class="stat-k">retrieval</span><span class="stat-v" id="stat-retrieval">—</span></div>
         <div class="stat"><span class="stat-k">generation</span><span class="stat-v" id="stat-generation">—</span></div>
         <div class="stat"><span class="stat-k">top_k</span><span class="stat-v" id="stat-topk">—</span></div>
+        <div class="stat"><span class="stat-k">temp</span><span class="stat-v" id="stat-temp">—</span></div>
         <div class="stat"><span class="stat-k">chunks</span><span class="stat-v" id="stat-chunks">—</span></div>
         <div class="stat"><span class="stat-k">cited</span><span class="stat-v" id="stat-cited">—</span></div>
+        <div class="stat"><span class="stat-k">tokens</span><span class="stat-v" id="stat-tokens">—</span></div>
         <div class="stat"><span class="stat-k">latency</span><span class="stat-v" id="stat-latency">—</span></div>
     </footer>
 

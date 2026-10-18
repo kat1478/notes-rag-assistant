@@ -1,0 +1,490 @@
+{
+  "runs": {
+    "openrouter:meta-llama/llama-3.2-3b-instruct": {
+      "model_id": "openrouter:meta-llama/llama-3.2-3b-instruct",
+      "provider": "openrouter",
+      "model": "meta-llama/llama-3.2-3b-instruct",
+      "temperature_requested": 0.0,
+      "temperature_applied": 0.0,
+      "n_questions": 94,
+      "n_in_scope": 77,
+      "n_out_of_scope": 17,
+      "answer_rate_in_scope": 0.8442,
+      "n_supported": 59,
+      "answer_rate_supported": 0.9661,
+      "n_unsupported": 18,
+      "refusal_rate_unsupported": 0.5556,
+      "refusal_rate_out_of_scope": 0.8824,
+      "valid_citation_rate": 0.8657,
+      "invalid_citations": 0,
+      "failures": 0,
+      "latency_mean_s": 0.77,
+      "latency_p50_s": 0.69,
+      "prompt_tokens_mean": 954.1,
+      "completion_tokens_mean": 51.7,
+      "cost_per_1k_queries_usd": 0.0648,
+      "reasoning": null,
+      "reasoning_tokens_mean": 0,
+      "retrieval_hit_rate": 0.7662,
+      "by_category": {
+        "direct_fact": {
+          "n": 30,
+          "rate": 0.8333,
+          "metric": "answered"
+        },
+        "explanation": {
+          "n": 19,
+          "rate": 0.8947,
+          "metric": "answered"
+        },
+        "comparison": {
+          "n": 12,
+          "rate": 0.75,
+          "metric": "answered"
+        },
+        "example": {
+          "n": 4,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "paraphrase": {
+          "n": 3,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "out_of_scope": {
+          "n": 5,
+          "rate": 1.0,
+          "metric": "refused"
+        },
+        "distraction_resistance": {
+          "n": 3,
+          "rate": 0.6667,
+          "metric": "answered"
+        },
+        "multi_note": {
+          "n": 6,
+          "rate": 0.8333,
+          "metric": "answered"
+        },
+        "out_of_scope_trap": {
+          "n": 12,
+          "rate": 0.8333,
+          "metric": "refused"
+        }
+      },
+      "dataset": "questions.json",
+      "corpus": "v2",
+      "reasoning_mode": "off",
+      "top_k": 3,
+      "run_at": "2026-10-17T17:29:56+00:00",
+      "git_commit": "8461ce9",
+      "rescored_at": "2026-10-17T17:42:32+00:00"
+    },
+    "openrouter:qwen/qwen3-30b-a3b-instruct-2507": {
+      "model_id": "openrouter:qwen/qwen3-30b-a3b-instruct-2507",
+      "provider": "openrouter",
+      "model": "qwen/qwen3-30b-a3b-instruct-2507",
+      "temperature_requested": 0.0,
+      "temperature_applied": 0.0,
+      "n_questions": 94,
+      "n_in_scope": 77,
+      "n_out_of_scope": 17,
+      "answer_rate_in_scope": 0.7922,
+      "n_supported": 59,
+      "answer_rate_supported": 0.9831,
+      "n_unsupported": 18,
+      "refusal_rate_unsupported": 0.8333,
+      "refusal_rate_out_of_scope": 0.9412,
+      "valid_citation_rate": 0.9677,
+      "invalid_citations": 0,
+      "failures": 0,
+      "latency_mean_s": 2.65,
+      "latency_p50_s": 2.18,
+      "prompt_tokens_mean": 934.8,
+      "completion_tokens_mean": 51.4,
+      "cost_per_1k_queries_usd": 0.1089,
+      "reasoning": null,
+      "reasoning_tokens_mean": 0,
+      "retrieval_hit_rate": 0.7662,
+      "by_category": {
+        "direct_fact": {
+          "n": 30,
+          "rate": 0.7333,
+          "metric": "answered"
+        },
+        "explanation": {
+          "n": 19,
+          "rate": 0.7895,
+          "metric": "answered"
+        },
+        "comparison": {
+          "n": 12,
+          "rate": 0.75,
+          "metric": "answered"
+        },
+        "example": {
+          "n": 4,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "paraphrase": {
+          "n": 3,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "out_of_scope": {
+          "n": 5,
+          "rate": 1.0,
+          "metric": "refused"
+        },
+        "distraction_resistance": {
+          "n": 3,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "multi_note": {
+          "n": 6,
+          "rate": 0.8333,
+          "metric": "answered"
+        },
+        "out_of_scope_trap": {
+          "n": 12,
+          "rate": 0.9167,
+          "metric": "refused"
+        }
+      },
+      "dataset": "questions.json",
+      "corpus": "v2",
+      "reasoning_mode": "off",
+      "top_k": 3,
+      "run_at": "2026-10-17T17:33:57+00:00",
+      "git_commit": "8461ce9",
+      "rescored_at": "2026-10-17T17:42:32+00:00"
+    },
+    "openrouter:google/gemma-4-31b-it": {
+      "model_id": "openrouter:google/gemma-4-31b-it",
+      "provider": "openrouter",
+      "model": "google/gemma-4-31b-it",
+      "temperature_requested": 0.0,
+      "temperature_applied": 0.0,
+      "n_questions": 94,
+      "n_in_scope": 77,
+      "n_out_of_scope": 17,
+      "answer_rate_in_scope": 0.7532,
+      "n_supported": 59,
+      "answer_rate_supported": 0.9661,
+      "n_unsupported": 18,
+      "refusal_rate_unsupported": 0.9444,
+      "refusal_rate_out_of_scope": 1.0,
+      "valid_citation_rate": 1.0,
+      "invalid_citations": 0,
+      "failures": 0,
+      "latency_mean_s": 1.43,
+      "latency_p50_s": 1.09,
+      "prompt_tokens_mean": 933.8,
+      "completion_tokens_mean": 38.1,
+      "cost_per_1k_queries_usd": 0.202,
+      "reasoning": "enabled=False",
+      "reasoning_tokens_mean": 0,
+      "retrieval_hit_rate": 0.7662,
+      "by_category": {
+        "direct_fact": {
+          "n": 30,
+          "rate": 0.7333,
+          "metric": "answered"
+        },
+        "explanation": {
+          "n": 19,
+          "rate": 0.6842,
+          "metric": "answered"
+        },
+        "comparison": {
+          "n": 12,
+          "rate": 0.75,
+          "metric": "answered"
+        },
+        "example": {
+          "n": 4,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "paraphrase": {
+          "n": 3,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "out_of_scope": {
+          "n": 5,
+          "rate": 1.0,
+          "metric": "refused"
+        },
+        "distraction_resistance": {
+          "n": 3,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "multi_note": {
+          "n": 6,
+          "rate": 0.6667,
+          "metric": "answered"
+        },
+        "out_of_scope_trap": {
+          "n": 12,
+          "rate": 1.0,
+          "metric": "refused"
+        }
+      },
+      "dataset": "questions.json",
+      "corpus": "v2",
+      "reasoning_mode": "off",
+      "top_k": 3,
+      "run_at": "2026-10-17T17:36:08+00:00",
+      "git_commit": "8461ce9",
+      "rescored_at": "2026-10-17T17:42:32+00:00"
+    },
+    "openrouter:anthropic/claude-haiku-5.5": {
+      "model_id": "openrouter:anthropic/claude-haiku-5.5",
+      "provider": "openrouter",
+      "model": "anthropic/claude-haiku-5.5",
+      "temperature_requested": 0.0,
+      "temperature_applied": null,
+      "n_questions": 94,
+      "n_in_scope": 77,
+      "n_out_of_scope": 17,
+      "answer_rate_in_scope": 0.7403,
+      "n_supported": 59,
+      "answer_rate_supported": 0.9661,
+      "n_unsupported": 18,
+      "refusal_rate_unsupported": 1.0,
+      "refusal_rate_out_of_scope": 1.0,
+      "valid_citation_rate": 1.0,
+      "invalid_citations": 0,
+      "failures": 0,
+      "latency_mean_s": 1.23,
+      "latency_p50_s": 1.11,
+      "prompt_tokens_mean": 1371.5,
+      "completion_tokens_mean": 77.1,
+      "cost_per_1k_queries_usd": 0.1757,
+      "reasoning": "enabled=False",
+      "reasoning_tokens_mean": 0,
+      "retrieval_hit_rate": 0.7662,
+      "by_category": {
+        "direct_fact": {
+          "n": 30,
+          "rate": 0.7,
+          "metric": "answered"
+        },
+        "explanation": {
+          "n": 19,
+          "rate": 0.6842,
+          "metric": "answered"
+        },
+        "comparison": {
+          "n": 12,
+          "rate": 0.75,
+          "metric": "answered"
+        },
+        "example": {
+          "n": 4,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "paraphrase": {
+          "n": 3,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "out_of_scope": {
+          "n": 5,
+          "rate": 1.0,
+          "metric": "refused"
+        },
+        "distraction_resistance": {
+          "n": 3,
+          "rate": 0.6667,
+          "metric": "answered"
+        },
+        "multi_note": {
+          "n": 6,
+          "rate": 0.8333,
+          "metric": "answered"
+        },
+        "out_of_scope_trap": {
+          "n": 12,
+          "rate": 1.0,
+          "metric": "refused"
+        }
+      },
+      "dataset": "questions.json",
+      "corpus": "v2",
+      "reasoning_mode": "off",
+      "top_k": 3,
+      "run_at": "2026-10-17T17:38:00+00:00",
+      "git_commit": "8461ce9",
+      "rescored_at": "2026-10-17T17:42:32+00:00"
+    },
+    "openrouter:openai/gpt-5.6-sol": {
+      "model_id": "openrouter:openai/gpt-5.6-sol",
+      "provider": "openrouter",
+      "model": "openai/gpt-5.6-sol",
+      "temperature_requested": 0.0,
+      "temperature_applied": null,
+      "n_questions": 94,
+      "n_in_scope": 77,
+      "n_out_of_scope": 17,
+      "answer_rate_in_scope": 0.7662,
+      "n_supported": 59,
+      "answer_rate_supported": 0.9831,
+      "n_unsupported": 18,
+      "refusal_rate_unsupported": 0.9444,
+      "refusal_rate_out_of_scope": 1.0,
+      "valid_citation_rate": 1.0,
+      "invalid_citations": 0,
+      "failures": 0,
+      "latency_mean_s": 1.6,
+      "latency_p50_s": 1.49,
+      "prompt_tokens_mean": 899.8,
+      "completion_tokens_mean": 39.8,
+      "cost_per_1k_queries_usd": 4.3947,
+      "reasoning": "effort=none",
+      "reasoning_tokens_mean": 0,
+      "retrieval_hit_rate": 0.7662,
+      "by_category": {
+        "direct_fact": {
+          "n": 30,
+          "rate": 0.7333,
+          "metric": "answered"
+        },
+        "explanation": {
+          "n": 19,
+          "rate": 0.6842,
+          "metric": "answered"
+        },
+        "comparison": {
+          "n": 12,
+          "rate": 0.75,
+          "metric": "answered"
+        },
+        "example": {
+          "n": 4,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "paraphrase": {
+          "n": 3,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "out_of_scope": {
+          "n": 5,
+          "rate": 1.0,
+          "metric": "refused"
+        },
+        "distraction_resistance": {
+          "n": 3,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "multi_note": {
+          "n": 6,
+          "rate": 0.8333,
+          "metric": "answered"
+        },
+        "out_of_scope_trap": {
+          "n": 12,
+          "rate": 1.0,
+          "metric": "refused"
+        }
+      },
+      "dataset": "questions.json",
+      "corpus": "v2",
+      "reasoning_mode": "off",
+      "top_k": 3,
+      "run_at": "2026-10-17T17:40:37+00:00",
+      "git_commit": "8461ce9",
+      "rescored_at": "2026-10-17T17:42:32+00:00"
+    },
+    "openrouter:anthropic/claude-sonnet-5.5": {
+      "model_id": "openrouter:anthropic/claude-sonnet-5.5",
+      "provider": "openrouter",
+      "model": "anthropic/claude-sonnet-5.5",
+      "temperature_requested": 0.0,
+      "temperature_applied": null,
+      "n_questions": 94,
+      "n_in_scope": 77,
+      "n_out_of_scope": 17,
+      "answer_rate_in_scope": 0.7662,
+      "n_supported": 59,
+      "answer_rate_supported": 0.9831,
+      "n_unsupported": 18,
+      "refusal_rate_unsupported": 0.9444,
+      "refusal_rate_out_of_scope": 1.0,
+      "valid_citation_rate": 1.0,
+      "invalid_citations": 0,
+      "failures": 0,
+      "suspended_questions": 0,
+      "latency_mean_s": 2.11,
+      "latency_p50_s": 1.86,
+      "prompt_tokens_mean": 1373.5,
+      "completion_tokens_mean": 109.9,
+      "cost_per_1k_queries_usd": 3.8461,
+      "reasoning": "effort=low",
+      "reasoning_tokens_mean": 0,
+      "retrieval_hit_rate": 0.7662,
+      "by_category": {
+        "direct_fact": {
+          "n": 30,
+          "rate": 0.7333,
+          "metric": "answered"
+        },
+        "explanation": {
+          "n": 19,
+          "rate": 0.6842,
+          "metric": "answered"
+        },
+        "comparison": {
+          "n": 12,
+          "rate": 0.75,
+          "metric": "answered"
+        },
+        "example": {
+          "n": 4,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "paraphrase": {
+          "n": 3,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "out_of_scope": {
+          "n": 5,
+          "rate": 1.0,
+          "metric": "refused"
+        },
+        "distraction_resistance": {
+          "n": 3,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "multi_note": {
+          "n": 6,
+          "rate": 0.8333,
+          "metric": "answered"
+        },
+        "out_of_scope_trap": {
+          "n": 12,
+          "rate": 1.0,
+          "metric": "refused"
+        }
+      },
+      "dataset": "questions.json",
+      "corpus": "v2",
+      "reasoning_mode": "off",
+      "top_k": 3,
+      "run_at": "2026-10-18T08:40:05+00:00",
+      "git_commit": "a853516"
+    }
+  }
+}
