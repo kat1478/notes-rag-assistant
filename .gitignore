@@ -1,10 +1,9 @@
-# Agent working files — never part of the public portfolio repo.
-# Everything agent-related lives in .claude/ (CLAUDE.md, plans, notes, archive).
+
 .claude/
 CLAUDE.md
 CLAUDE.local.md
 AGENT*.md
-# Safety net: default output paths of the global skills, in case one ignores CLAUDE.md
+
 STATUS.md
 concepts.md
 docs/plans/
