@@ -68,7 +68,7 @@
         <ul class="caveats">
             <li><strong>Answered ≠ correct.</strong> "Answered" means a non-empty answer that is not a refusal; correctness is not judged automatically yet.</li>
             <li><strong>Grounding split.</strong> When retrieval did not return the note that holds the answer, the correct grounded behaviour is to refuse — so those questions count as refusal tests, not answer tests.</li>
-            <li><strong>Corpus v2</strong> = the 11 original notes + 12 <em>synthetic</em> near-topic notes written by an LLM, frozen for benchmarking. Results are only comparable within one corpus (add <code>?corpus=v1</code> for the old one).</li>
+            <li><strong>Corpus v2</strong> = the 11 original notes + 12 <em>synthetic</em> near-topic notes written by an LLM, frozen for benchmarking. Results are only comparable within one corpus.</li>
             <li><strong>Valid citation</strong> = the answer contains at least one <code>[Source N]</code> pointing to a chunk that was actually in the context.</li>
             <li><strong>Out-of-scope</strong>: 17 questions in v2 (5 unrelated, 12 near-topic traps where a related note exists but the asked fact does not); only 2 in v1. Small differences between models are still within noise.</li>
             <li><strong>Latency</strong>: local model on this machine's CPU vs. hosted models over the network — not the same hardware.</li>
