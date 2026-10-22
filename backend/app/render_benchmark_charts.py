@@ -1,6 +1,6 @@
 # Run from the backend directory:  python -m app.render_benchmark_charts
-# Renders the README charts (light + dark SVG) from benchmark results, and a retrieval top_k sweep (free:
-# embeddings + Chroma only, no LLM calls). Output: docs/benchmark/*.svg and data/eval/v2/retrieval_topk.json.
+# Renders the README charts (light + dark SVG) from benchmark results and the embedding comparison
+# (data/eval/v2/embeddings_comparison.json, from app.compare_embeddings). Output: docs/benchmark/*.svg.
 #
 # Chart forms follow the app's Models page: small multiples of horizontal bars (one metric each, same model
 # order, emphasis on the most cost-effective model), a dot plot for repeated temperature runs, and a line chart
@@ -13,8 +13,7 @@ from html import escape
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-from .config import CORPORA, DATA_DIR
-from .evaluation import load_evaluation_dataset
+from .config import DATA_DIR, EMBEDDING_MODEL, EMBEDDING_MODELS, LEGACY_EMBEDDING_KEY
 
 REPO_ROOT = DATA_DIR.parent.parent
 OUT_DIR = REPO_ROOT / "docs" / "benchmark"
@@ -121,56 +120,100 @@ def pick_recommended(runs: List[dict]) -> Optional[str]:
     return min(ok, key=lambda r: r["cost_per_1k_queries_usd"])["model_id"] if ok else None
 
 
-def models_chart(runs: List[dict], theme: str, meta: dict) -> str:
+def small_multiples(rows: List[dict], panels, emphasized: Optional[str], label_fn, theme: str, title: str,
+                    subtitle: str, legend: str, svg_title: str) -> str:
+    """2-column grid of horizontal-bar panels (one metric each, same row order), emphasis on one row.
+    panels: (key, title, direction, value_fmt, fixed_max or None, tick_fmt or None)."""
     t = THEMES[theme]
-    rec = pick_recommended(runs)
     col_w = (W - 2 * PAD - 24) / 2
     label_w, value_w, row_h, bar_h = 150, 74, 22, 12
     track_w = col_w - label_w - value_w
-    panel_h = 30 + len(runs) * row_h + 24
+    panel_h = 30 + len(rows) * row_h + 24
     top = 100
-    out = [
-        text(PAD, 32, "Grounded RAG: which model is worth paying for?", "h1"),
-        text(PAD, 52, f"{meta['n']} questions · identical retrieved context for every model · corpus v2 · top_k 3 · "
-                      f"temperature 0 · hidden reasoning off where the model allows it", "sub"),
-    ]
+    out = [text(PAD, 32, title, "h1"), text(PAD, 52, subtitle, "sub")]
     lx = PAD
-    for color, label in ((t["accent"], "most cost-effective: cheapest within 3 pp of the best correctness, refusing ≥ 95%"),
-                         (t["gray"], "other models")):
+    for color, label in ((t["accent"], legend), (t["gray"], "other models")):
         out.append(f'<rect x="{lx}" y="66" width="12" height="8" rx="2" fill="{color}"/>')
         out.append(text(lx + 18, 74, label, "legend"))
         lx += 18 + len(label) * 6.3 + 22
 
-    for i, (key, title, direction, fmt, fixed_max) in enumerate(PANELS):
+    for i, (key, ptitle, direction, fmt, fixed_max, tick_fmt) in enumerate(panels):
         px = PAD + (i % 2) * (col_w + 24)
         py = top + (i // 2) * (panel_h + 16)
-        vals = [r.get(key) for r in runs]
+        vals = [r.get(key) for r in rows]
         vmax = fixed_max or max(v for v in vals if v is not None)
         ticks = nice_ticks(vmax) if fixed_max is None else [0, 0.5, 1.0]
         tmax = ticks[-1]
         tx = px + label_w
-        out.append(text(px, py + 14, title, "ptitle"))
+        out.append(text(px, py + 14, ptitle, "ptitle"))
         out.append(text(px + col_w, py + 14, direction, "dir", "end"))
-        gy0, gy1 = py + 24, py + 30 + len(runs) * row_h
+        gy0, gy1 = py + 24, py + 30 + len(rows) * row_h
         for tk in ticks:
             x = tx + track_w * tk / tmax
             out.append(f'<line x1="{x:.1f}" y1="{gy0}" x2="{x:.1f}" y2="{gy1}" stroke="{t["base"] if tk == 0 else t["grid"]}" stroke-width="1"/>')
-            tick_label = pct(tk) if fixed_max else (f"${tk:g}" if key.startswith("cost") else f"{tk:g} s")
-            out.append(text(x, gy1 + 14, tick_label, "tick", "middle" if 0 < tk < tmax else ("start" if tk == 0 else "end")))
-        for j, r in enumerate(runs):
+            out.append(text(x, gy1 + 14, (tick_fmt or fmt)(tk), "tick", "middle" if 0 < tk < tmax else ("start" if tk == 0 else "end")))
+        for j, r in enumerate(rows):
             y = py + 30 + j * row_h
-            em = r["model_id"] == rec
-            out.append(text(px, y + 12, short_name(r), "label-em" if em else "label"))
+            em = r["id"] == emphasized
+            out.append(text(px, y + 12, label_fn(r), "label-em" if em else "label"))
             v = r.get(key)
             if v is None:
                 out.append(text(tx + track_w + 8, y + 12, "n/a", "tick"))
                 continue
             out.append(f'<path d="{bar_path(tx, y + 2, track_w * v / tmax, bar_h)}" fill="{t["accent"] if em else t["gray"]}">'
-                       f'<title>{escape(r["model_id"])}: {escape(fmt(v))}</title></path>')
+                       f'<title>{escape(r["id"])}: {escape(fmt(v))}</title></path>')
             out.append(text(tx + track_w + 8, y + 12, fmt(v), "val"))
-    height = int(top + 3 * (panel_h + 16) + 8)
-    desc = "; ".join(f"{r['model_id']}: " + ", ".join(f"{k}={r.get(k)}" for k, *_ in PANELS) for r in runs)
-    return svg(height, "\n".join(out), theme, "Model comparison on the notes-rag benchmark (corpus v2)", desc)
+    height = int(top + ((len(panels) + 1) // 2) * (panel_h + 16) + 8)
+    desc = "; ".join(f"{r['id']}: " + ", ".join(f"{p[0]}={r.get(p[0])}" for p in panels) for r in rows)
+    return svg(height, "\n".join(out), theme, svg_title, desc)
+
+
+def models_chart(runs: List[dict], theme: str, meta: dict) -> str:
+    rows = [{**r, "id": r["model_id"]} for r in runs]
+    panels = [(k, ti, d, f, m, (pct if m else (lambda tk, k=k: f"${tk:g}" if k.startswith("cost") else f"{tk:g} s")))
+              for k, ti, d, f, m in PANELS]
+    return small_multiples(
+        rows, panels, pick_recommended(runs), short_name, theme,
+        "Grounded RAG: which model is worth paying for?",
+        f"{meta['n']} questions · identical retrieved context for every model · corpus v2 · top_k 3 · "
+        "temperature 0 · hidden reasoning off where the model allows it",
+        "most cost-effective: cheapest within 3 pp of the best correctness, refusing ≥ 95%",
+        "Model comparison on the notes-rag benchmark (corpus v2)")
+
+
+# ── chart 1b: embedding models (retrieval only) ────────────────────────────
+
+EMBED_PANELS = [
+    ("cross_hit3", "Cross-language: right note in top 3", "higher is better", pct, 1.0, None),
+    ("cross_hit1", "Cross-language: right note ranked first", "higher is better", pct, 1.0, None),
+    ("same_hit3", "Same language: right note in top 3", "higher is better", pct, 1.0, None),
+    ("query_ms", "Query embedding time (laptop CPU)", "lower is better", lambda v: f"{v:.0f} ms", None,
+     lambda tk: f"{tk:g} ms"),
+]
+
+
+EMBED_LABELS = {
+    "sentence-transformers/all-MiniLM-L6-v2": "all-MiniLM-L6 (English)",
+    "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2": "multiling. MiniLM-L12",
+    "sentence-transformers/paraphrase-multilingual-mpnet-base-v2": "multiling. mpnet-base",
+}
+
+
+def embeddings_chart(comparison: dict, chosen: str, theme: str) -> str:
+    rows = [{"id": name, "cross_hit3": r["cross_language"]["hit@3"], "cross_hit1": r["cross_language"]["hit@1"],
+             "same_hit3": r["same_language"]["hit@3"], "query_ms": r["query_ms"], "params_m": r["params_m"]}
+            for name, r in comparison.items()]
+    n_cross = next(iter(comparison.values()))["cross_language"]["n"]
+    n_same = next(iter(comparison.values()))["same_language"]["n"]
+    return small_multiples(
+        rows, EMBED_PANELS, chosen,
+        lambda r: EMBED_LABELS.get(r["id"], r["id"].split("/")[-1]), theme,
+        "Retrieval: which embedding model finds the right note?",
+        f"{n_cross} cross-language + {n_same} same-language questions (v2 + Polish probe) · corpus v2 · "
+        "free, local retrieval only",
+        f"chosen for the app: {EMBED_LABELS.get(chosen, chosen)} — "
+        f"{pct(comparison[chosen]['cross_language']['hit@3'])} in top 3, {comparison[chosen]['query_ms']:.0f} ms per query",
+        "Embedding model comparison for cross-language retrieval")
 
 
 # ── chart 2: temperature (dot plot of repeated runs) ───────────────────────
@@ -241,68 +284,43 @@ def temperature_chart(runs: Dict[str, dict], theme: str) -> Optional[str]:
     return svg(height, "\n".join(out), theme, "Temperature 0 vs 0.7 across repeated runs", desc)
 
 
-# ── chart 3: retrieval top_k sweep (free) ──────────────────────────────────
+# ── chart 3: top_k sweep, before/after the embedding switch ────────────────
 
-PL_CHARS = re.compile(r"[ąćęłńóśźż]", re.I)
-PL_WORDS = re.compile(r"\b(jak|jakie|czym|czy|dlaczego|co)\b", re.I)
-
-
-def is_polish(s: str) -> bool:
-    return bool(PL_CHARS.search(s) or PL_WORDS.search(s))
-
-
-def retrieval_sweep(top_ks=(1, 2, 3, 5, 8)) -> dict:
-    from .retrieval import perform_search
-    from .vector_store import use_collection
-    notes_dir, collection = CORPORA["v2"]
-    use_collection(collection)
-    note_pl = {p.name: len(PL_CHARS.findall(p.read_text(encoding="utf-8"))) > 5 for p in notes_dir.glob("*.txt")}
-    items = [q for q in load_evaluation_dataset(V2 / "questions.json") if q.get("expected_files")]
-    result = {"n": len(items), "top_k": list(top_ks), "series": {"same language": [], "cross-language": []}, "counts": {}}
-    for k in top_ks:
-        hits = {"same language": [], "cross-language": []}
-        for q in items:
-            files = {c.metadata.file_name for c in perform_search(q["question"], top_k=k)}
-            q_pl = is_polish(q["question"])
-            cross = all(note_pl.get(f, False) != q_pl for f in q["expected_files"])
-            hits["cross-language" if cross else "same language"].append(bool(files & set(q["expected_files"])))
-        for s, v in hits.items():
-            result["series"][s].append(round(sum(v) / len(v), 4))
-            result["counts"][s] = len(v)
-    return result
-
-
-def topk_chart(data: dict, theme: str) -> str:
+def topk_chart(comparison: dict, legacy: str, chosen: str, theme: str) -> str:
     t = THEMES[theme]
-    ks = data["top_k"]
-    x0, x1, y0, y1 = PAD + 40, W - PAD - 140, 92, 300
+    ks = [1, 2, 3, 5, 8]
+    x0, x1, y0, y1 = PAD + 40, W - PAD - 190, 92, 300
     xs = {k: x0 + (x1 - x0) * i / (len(ks) - 1) for i, k in enumerate(ks)}
     yv = lambda v: y1 - (y1 - y0) * v
+    n = comparison[legacy]["cross_language"]["n"]
     out = [
-        text(PAD, 32, "Retrieval: how often is the right note in the context?", "h1"),
-        text(PAD, 52, f"{data['n']} in-scope questions on corpus v2 (English-centric embeddings, all-MiniLM-L6-v2). "
-                      "Cross-language = question and note in different languages (EN↔PL).", "sub"),
+        text(PAD, 32, "Cross-language retrieval before and after switching the embedding model", "h1"),
+        text(PAD, 52, f"{n} questions whose language differs from their note's (EN↔PL) · share with the right note in "
+                      f"the top k · same-language questions stay ≥ 95% with both models", "sub"),
     ]
     for v in (0, 0.25, 0.5, 0.75, 1.0):
         out.append(f'<line x1="{x0}" y1="{yv(v):.1f}" x2="{x1}" y2="{yv(v):.1f}" stroke="{t["base"] if v == 0 else t["grid"]}" stroke-width="1"/>')
         out.append(text(x0 - 8, yv(v) + 4, pct(v), "tick", "end"))
     for k in ks:
         out.append(text(xs[k], y1 + 18, f"top_k {k}", "tick", "middle"))
-    xk = xs.get(3)
-    if xk:
-        out.append(f'<line x1="{xk:.1f}" y1="{y0}" x2="{xk:.1f}" y2="{y1}" stroke="{t["muted"]}" stroke-width="1"/>')
-        out.append(text(xk + 6, y1 - 8, "used in the model benchmark", "dir"))
-    for (series, vals), color in zip(data["series"].items(), (t["s1"], t["s2"])):
-        pts = " ".join(f"{xs[k]:.1f},{yv(v):.1f}" for k, v in zip(ks, vals))
+    out.append(f'<line x1="{xs[3]:.1f}" y1="{y0}" x2="{xs[3]:.1f}" y2="{y1}" stroke="{t["muted"]}" stroke-width="1"/>')
+    out.append(text(xs[3] + 6, y1 - 8, "used by the app", "dir"))
+    for model, label, color in ((legacy, "before: all-MiniLM-L6-v2", t["s2"]),
+                                (chosen, "after: multilingual-MiniLM-L12", t["s1"])):
+        vals = [comparison[model]["cross_language"].get(f"hit@{k}") for k in ks]
+        pts = " ".join(f"{xs[k]:.1f},{yv(v):.1f}" for k, v in zip(ks, vals) if v is not None)
         out.append(f'<polyline points="{pts}" fill="none" stroke="{color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>')
         for k, v in zip(ks, vals):
+            if v is None:
+                continue
             out.append(f'<circle cx="{xs[k]:.1f}" cy="{yv(v):.1f}" r="4.5" fill="{color}" stroke="{t["bg"]}" stroke-width="2">'
-                       f'<title>{series}, top_k {k}: {pct(v)}</title></circle>')
+                       f'<title>{label}, top_k {k}: {pct(v)}</title></circle>')
         out.append(f'<line x1="{x1 + 14}" y1="{yv(vals[-1]):.1f}" x2="{x1 + 26}" y2="{yv(vals[-1]):.1f}" stroke="{color}" stroke-width="2"/>')
-        out.append(text(x1 + 32, yv(vals[-1]) + 4, f"{series} (n={data['counts'][series]})", "label"))
-        out.append(text(xs[3], yv(vals[ks.index(3)]) - 10, pct(vals[ks.index(3)]), "val", "middle"))
-    desc = "; ".join(f"{s}: " + ", ".join(f"top_k {k}={pct(v)}" for k, v in zip(ks, vals)) for s, vals in data["series"].items())
-    return svg(y1 + 40, "\n".join(out), theme, "Retrieval hit rate by top_k, same-language vs cross-language", desc)
+        out.append(text(x1 + 32, yv(vals[-1]) + 4, label, "label"))
+        out.append(text(xs[3], yv(vals[2]) - 10, pct(vals[2]), "val", "middle"))
+    desc = "; ".join(f"{m}: " + ", ".join(f"top_k {k}={comparison[m]['cross_language'].get(f'hit@{k}')}" for k in ks)
+                     for m in (legacy, chosen))
+    return svg(y1 + 40, "\n".join(out), theme, "Cross-language retrieval hit rate by top_k, before/after", desc)
 
 
 # ── static interactive page for GitHub Pages ──────────────────────────────
@@ -338,20 +356,19 @@ def main():
     rank = lambda r: next((i for i, p in enumerate(order) if r["model_id"].startswith(p)), len(order))
     runs = sorted(load_runs(V2 / "models" / "summary.json").values(), key=rank)
     temp_runs = load_runs(V2 / "temperature" / "summary.json")
-    sweep_path = V2 / "retrieval_topk.json"
-    sweep = retrieval_sweep()
-    sweep_path.write_text(json.dumps(sweep, indent=2) + "\n", encoding="utf-8")
+    comparison = json.loads((V2 / "embeddings_comparison.json").read_text(encoding="utf-8"))
+    legacy, chosen = f"sentence-transformers/{EMBEDDING_MODELS[LEGACY_EMBEDDING_KEY]}", EMBEDDING_MODEL
 
     for theme in THEMES:
         (OUT_DIR / f"models-{theme}.svg").write_text(models_chart(runs, theme, {"n": runs[0]["n_questions"]}), encoding="utf-8")
         tc = temperature_chart(temp_runs, theme)
         if tc:
             (OUT_DIR / f"temperature-{theme}.svg").write_text(tc, encoding="utf-8")
-        (OUT_DIR / f"retrieval-topk-{theme}.svg").write_text(topk_chart(sweep, theme), encoding="utf-8")
+        (OUT_DIR / f"retrieval-topk-{theme}.svg").write_text(topk_chart(comparison, legacy, chosen, theme), encoding="utf-8")
+        (OUT_DIR / f"embeddings-{theme}.svg").write_text(embeddings_chart(comparison, chosen, theme), encoding="utf-8")
     build_pages()
     print(f"recommended: {pick_recommended(runs)}")
     print(f"charts → {OUT_DIR}")
-    print(json.dumps(sweep["series"]))
 
 
 if __name__ == "__main__":

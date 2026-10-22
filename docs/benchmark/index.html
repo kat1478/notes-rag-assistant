@@ -71,6 +71,7 @@
             <li><strong>Corpus v2</strong> = the 11 original notes + 12 <em>synthetic</em> near-topic notes written by an LLM, frozen for benchmarking. Results are only comparable within one corpus.</li>
             <li><strong>Valid citation</strong> = the answer contains at least one <code>[Source N]</code> pointing to a chunk that was actually in the context.</li>
             <li><strong>Out-of-scope</strong>: 17 questions in v2 (5 unrelated, 12 near-topic traps where a related note exists but the asked fact does not); only 2 in v1. Small differences between models are still within noise.</li>
+            <li><strong>Configuration</strong>: these runs used the original setup (English-only embeddings, prompt v1) so all models stay comparable. The app now runs multilingual embeddings and prompt v3, which raised Haiku's share of correctly answered questions from 68% to 94% — see the README.</li>
             <li><strong>Latency</strong>: local model on this machine's CPU vs. hosted models over the network — not the same hardware.</li>
             <li><strong>Cost</strong> from token usage × OpenRouter list prices at run time; local inference counted as $0.</li>
         </ul>

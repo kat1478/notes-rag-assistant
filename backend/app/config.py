@@ -37,16 +37,33 @@ TOP_K = 3
 # Chroma settings
 CHROMA_DIR = DATA_DIR / "chroma"
 CHROMA_DIR.mkdir(parents=True, exist_ok=True)
+# Embedding settings. Since Stage 5B (2026-10-22) the default is multilingual: cross-language retrieval hit@3
+# went from 56% to 100% (research spike, README). The legacy English model stays selectable to reproduce
+# the published benchmark (EMBEDDING_MODEL_KEY=minilm-l6).
+EMBEDDING_MODELS = {
+    "minilm-l6": "all-MiniLM-L6-v2",
+    "multilingual-minilm-l12": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+}
+LEGACY_EMBEDDING_KEY = "minilm-l6"
+EMBEDDING_MODEL_KEY = os.getenv("EMBEDDING_MODEL_KEY", "multilingual-minilm-l12")
+if EMBEDDING_MODEL_KEY not in EMBEDDING_MODELS:
+    raise ValueError(f"Unknown EMBEDDING_MODEL_KEY={EMBEDDING_MODEL_KEY!r}; use one of {list(EMBEDDING_MODELS)}")
+EMBEDDING_MODEL = EMBEDDING_MODELS[EMBEDDING_MODEL_KEY]
+
+
+def _collection(base: str) -> str:
+    """One Chroma collection per (corpus, embedding model). Both models output 384-dim vectors, so a shared
+    collection would silently mix them. The legacy model keeps the original names."""
+    return base if EMBEDDING_MODEL_KEY == LEGACY_EMBEDDING_KEY else f"{base}__{EMBEDDING_MODEL_KEY}"
+
+
 # Evaluation corpora: name -> (notes directory, Chroma collection). v1 is the app default; v2 is the frozen
 # benchmark corpus (v1 notes + synthetic near-topic notes). The app searches CHROMA_COLLECTION.
 CORPORA = {
-    "v1": (DATA_DIR / "notes", "notes_chunks"),
-    "v2": (DATA_DIR / "notes_v2", "notes_v2"),
+    "v1": (DATA_DIR / "notes", _collection("notes_chunks")),
+    "v2": (DATA_DIR / "notes_v2", _collection("notes_v2")),
 }
-CHROMA_COLLECTION = os.getenv("CHROMA_COLLECTION", "notes_chunks")
-
-# Embedding settings
-EMBEDDING_MODEL = "all-MiniLM-L6-v2"
+CHROMA_COLLECTION = os.getenv("CHROMA_COLLECTION", CORPORA["v1"][1])
 
 # Generation settings. The default 0.0 (deterministic) keeps eval runs comparable; a request or a benchmark
 # run may override it within [TEMPERATURE_MIN, TEMPERATURE_MAX] — 1.0 is the highest value every provider accepts.
