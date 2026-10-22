@@ -12,7 +12,11 @@ from .schemas import ChunkResponse
 
 logger = logging.getLogger(__name__)
 
+# v1 (2026-10-22): listed unsupported claims directly → calibration showed 5/5 false "unfaithful" flags
+# (English claims vs Polish evidence). v2: every claim must be matched to a verbatim quote from the context.
+JUDGE_VERSION = "v2"
 VERDICTS = ("correct", "partially_correct", "incorrect")
+CITATION_ONLY = re.compile(r"^\s*(\[Sources?[^\]]*\]\s*)+\.?\s*$", re.I)
 COVERAGE = {"yes": 1.0, "partial": 0.5, "no": 0.0}
 
 JUDGE_SCHEMA = {
@@ -23,7 +27,7 @@ JUDGE_SCHEMA = {
         "schema": {
             "type": "object",
             "additionalProperties": False,
-            "required": ["key_points", "unsupported_claims", "verdict", "reason"],
+            "required": ["key_points", "claims", "verdict", "reason"],
             "properties": {
                 "key_points": {
                     "type": "array",
@@ -37,7 +41,18 @@ JUDGE_SCHEMA = {
                         },
                     },
                 },
-                "unsupported_claims": {"type": "array", "items": {"type": "string"}},
+                "claims": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": False,
+                        "required": ["claim", "evidence"],
+                        "properties": {
+                            "claim": {"type": "string"},
+                            "evidence": {"type": "string"},
+                        },
+                    },
+                },
                 "verdict": {"type": "string", "enum": list(VERDICTS)},
                 "reason": {"type": "string"},
             },
@@ -51,9 +66,12 @@ paraphrases and translations count as conveying the same content.
 
 1. Key points: for EACH expected key point, decide whether the answer conveys it: "yes", "partial" (only part
    of it, or vaguely), or "no".
-2. Unsupported claims: list every factual claim in the answer that the CONTEXT does not support. A claim that
-   is true in general but absent from the context IS unsupported. Ignore citation markers like [Source 1],
-   restating the question, and statements that the notes lack information.
+2. Claims: list each factual claim the answer makes. For EACH claim, copy into "evidence" a short VERBATIM quote
+   from the CONTEXT that states it — the quote may be in Polish while the claim is in English (translations and
+   paraphrases count as support). Search the whole context in both languages before giving up. If no passage
+   supports the claim, set "evidence" to "" (empty). A claim that is true in general but absent from the context
+   gets "". Skip citation markers like [Source 1], restating the question, and statements that the notes lack
+   information.
 3. Verdict: "correct" if every key point is "yes"; "incorrect" if no key point is at least "partial" or the
    answer contradicts a key point; otherwise "partially_correct".
 4. Reason: one short sentence.
@@ -99,6 +117,15 @@ def judge_answer(question: str, key_points: List[str], sources: List[ChunkRespon
     if grade.get("verdict") not in VERDICTS:
         raise RuntimeError(f"Judge returned an invalid verdict: {grade.get('verdict')!r}")
 
+    # A bare citation marker is not a claim (seen in calibration: "[Source 2]" listed as unsupported).
+    claims = [c for c in grade.get("claims", []) if not CITATION_ONLY.match(c.get("claim", ""))]
+    grade["unsupported_claims"] = [c["claim"] for c in claims if not c.get("evidence", "").strip()]
+    grade["judge_version"] = JUDGE_VERSION
+    # Guard against invented evidence: a quote must actually occur in the context (whitespace/case-insensitive).
+    norm = lambda t: re.sub(r"\s+", " ", t).strip().lower()
+    quotes = [c["evidence"] for c in grade.get("claims", []) if c.get("evidence", "").strip()]
+    found = [q for q in quotes if norm(q)[:120] in norm(context)]
+    grade["evidence_verified_rate"] = round(len(found) / len(quotes), 3) if quotes else None
     covered = [COVERAGE.get(kp.get("covered"), 0.0) for kp in grade.get("key_points", [])]
     grade["key_point_recall"] = round(sum(covered) / len(covered), 4) if covered else None
     grade["faithful"] = not grade.get("unsupported_claims")

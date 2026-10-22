@@ -20,7 +20,7 @@ from typing import Dict, List
 
 from .config import CORPORA, DATA_DIR, JUDGE_MODEL
 from .evaluation import load_evaluation_dataset
-from .judge import judge_answer
+from .judge import JUDGE_VERSION, judge_answer
 from .retrieval import perform_search
 from .run_model_benchmark import fetch_openrouter_prices, slug, write_csv
 from .vector_store import use_collection
@@ -34,7 +34,7 @@ CACHE = JUDGE_DIR / "cache.jsonl"
 
 
 def cache_key(model_id: str, qid: str, answer: str) -> str:
-    return hashlib.sha256(f"{JUDGE_MODEL}|{model_id}|{qid}|{answer}".encode("utf-8")).hexdigest()[:24]
+    return hashlib.sha256(f"{JUDGE_MODEL}|{JUDGE_VERSION}|{model_id}|{qid}|{answer}".encode("utf-8")).hexdigest()[:24]
 
 
 def load_cache() -> Dict[str, dict]:
@@ -93,7 +93,7 @@ def main():
     cache = load_cache()
     contexts: Dict[str, list] = {}
     spent = 0.0
-    judge_summary = {"judge_model": JUDGE_MODEL, "runs": {}}
+    judge_summary = {"judge_model": JUDGE_MODEL, "judge_version": JUDGE_VERSION, "runs": {}}
 
     for key in keys:
         rows = []
