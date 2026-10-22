@@ -30,7 +30,9 @@ FONT = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-se
 W = 900
 PAD = 24
 
-GROUNDING = ["answer_rate_supported", "refusal_rate_unsupported", "refusal_rate_out_of_scope", "valid_citation_rate"]
+REFUSALS = ["refusal_rate_unsupported", "refusal_rate_out_of_scope"]
+CORRECTNESS = "judge_correct_rate_supported"
+CORRECTNESS_MARGIN = 0.03  # models within 3 pp of the best judge-verified correctness count as equally good
 
 
 # ── helpers ────────────────────────────────────────────────────────────────
@@ -99,18 +101,23 @@ def svg(height: int, body: str, theme: str, title: str, desc: str) -> str:
 # ── chart 1: model comparison (small multiples) ────────────────────────────
 
 PANELS = [
-    ("answer_rate_supported", "Answers when context has the answer", "higher is better", pct, 1.0),
+    ("judge_correct_rate_supported", "Correct when the note was retrieved (judge)", "higher is better", pct, 1.0),
     ("refusal_rate_unsupported", "Refuses when retrieval missed the note", "higher is better", pct, 1.0),
     ("refusal_rate_out_of_scope", "Refuses out-of-scope questions", "higher is better", pct, 1.0),
-    ("valid_citation_rate", "Answers citing a real chunk", "higher is better", pct, 1.0),
+    ("judge_faithful_rate", "Answers faithful to the context (judge)", "higher is better", pct, 1.0),
     ("latency_p50_s", "Median latency", "lower is better", secs, None),
     ("cost_per_1k_queries_usd", "Cost per 1,000 questions", "lower is better", usd, None),
 ]
 
 
 def pick_recommended(runs: List[dict]) -> Optional[str]:
-    """Cheapest model that reaches >= 95% on every grounding metric."""
-    ok = [r for r in runs if all((r.get(m) or 0) >= 0.95 for m in GROUNDING) and r.get("cost_per_1k_queries_usd") is not None]
+    """Cheapest model within CORRECTNESS_MARGIN of the best judge-verified correctness that also refuses
+    >= 95% of the time both when retrieval missed and out of scope."""
+    scored = [r for r in runs if r.get(CORRECTNESS) is not None and r.get("cost_per_1k_queries_usd") is not None]
+    if not scored:
+        return None
+    best = max(r[CORRECTNESS] for r in scored)
+    ok = [r for r in scored if r[CORRECTNESS] >= best - CORRECTNESS_MARGIN and all((r.get(m) or 0) >= 0.95 for m in REFUSALS)]
     return min(ok, key=lambda r: r["cost_per_1k_queries_usd"])["model_id"] if ok else None
 
 
@@ -128,7 +135,7 @@ def models_chart(runs: List[dict], theme: str, meta: dict) -> str:
                       f"temperature 0 · hidden reasoning off where the model allows it", "sub"),
     ]
     lx = PAD
-    for color, label in ((t["accent"], "most cost-effective: cheapest model with ≥ 95% on all four grounding metrics"),
+    for color, label in ((t["accent"], "most cost-effective: cheapest within 3 pp of the best correctness, refusing ≥ 95%"),
                          (t["gray"], "other models")):
         out.append(f'<rect x="{lx}" y="66" width="12" height="8" rx="2" fill="{color}"/>')
         out.append(text(lx + 18, 74, label, "legend"))

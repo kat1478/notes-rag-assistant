@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="900" height="714" viewBox="0 0 900 714" role="img" aria-labelledby="t d">
 <title id="t">Model comparison on the notes-rag benchmark (corpus v2)</title>
-<desc id="d">openrouter:meta-llama/llama-3.2-3b-instruct: answer_rate_supported=0.9661, refusal_rate_unsupported=0.5556, refusal_rate_out_of_scope=0.8824, valid_citation_rate=0.8657, latency_p50_s=0.69, cost_per_1k_queries_usd=0.0648; openrouter:qwen/qwen3-30b-a3b-instruct-2507: answer_rate_supported=0.9831, refusal_rate_unsupported=0.8333, refusal_rate_out_of_scope=0.9412, valid_citation_rate=0.9677, latency_p50_s=2.18, cost_per_1k_queries_usd=0.1089; openrouter:google/gemma-4-31b-it: answer_rate_supported=0.9661, refusal_rate_unsupported=0.9444, refusal_rate_out_of_scope=1.0, valid_citation_rate=1.0, latency_p50_s=1.09, cost_per_1k_queries_usd=0.202; openrouter:anthropic/claude-haiku-5.5: answer_rate_supported=0.9661, refusal_rate_unsupported=1.0, refusal_rate_out_of_scope=1.0, valid_citation_rate=1.0, latency_p50_s=1.11, cost_per_1k_queries_usd=0.1757; openrouter:anthropic/claude-sonnet-5.5: answer_rate_supported=0.9831, refusal_rate_unsupported=0.9444, refusal_rate_out_of_scope=1.0, valid_citation_rate=1.0, latency_p50_s=1.86, cost_per_1k_queries_usd=3.8461; openrouter:openai/gpt-5.6-sol: answer_rate_supported=0.9831, refusal_rate_unsupported=0.9444, refusal_rate_out_of_scope=1.0, valid_citation_rate=1.0, latency_p50_s=1.49, cost_per_1k_queries_usd=4.3947</desc>
+<desc id="d">openrouter:meta-llama/llama-3.2-3b-instruct: judge_correct_rate_supported=0.6271, refusal_rate_unsupported=0.5556, refusal_rate_out_of_scope=0.8824, judge_faithful_rate=0.8, latency_p50_s=0.69, cost_per_1k_queries_usd=0.0648; openrouter:qwen/qwen3-30b-a3b-instruct-2507: judge_correct_rate_supported=0.7966, refusal_rate_unsupported=0.8333, refusal_rate_out_of_scope=0.9412, judge_faithful_rate=0.7377, latency_p50_s=2.18, cost_per_1k_queries_usd=0.1089; openrouter:google/gemma-4-31b-it: judge_correct_rate_supported=0.7627, refusal_rate_unsupported=0.9444, refusal_rate_out_of_scope=1.0, judge_faithful_rate=1.0, latency_p50_s=1.09, cost_per_1k_queries_usd=0.202; openrouter:anthropic/claude-haiku-5.5: judge_correct_rate_supported=0.8814, refusal_rate_unsupported=1.0, refusal_rate_out_of_scope=1.0, judge_faithful_rate=0.9649, latency_p50_s=1.11, cost_per_1k_queries_usd=0.1757; openrouter:anthropic/claude-sonnet-5.5: judge_correct_rate_supported=0.8983, refusal_rate_unsupported=0.9444, refusal_rate_out_of_scope=1.0, judge_faithful_rate=0.9322, latency_p50_s=1.86, cost_per_1k_queries_usd=3.8461; openrouter:openai/gpt-5.6-sol: judge_correct_rate_supported=0.8305, refusal_rate_unsupported=0.9444, refusal_rate_out_of_scope=1.0, judge_faithful_rate=0.9661, latency_p50_s=1.49, cost_per_1k_queries_usd=4.3947</desc>
 <style>
     text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; fill: #1f2328; }
     .h1 { font-size: 16px; font-weight: 600; }
@@ -17,10 +17,10 @@
 <text x="24.0" y="32.0" class="h1" text-anchor="start" >Grounded RAG: which model is worth paying for?</text>
 <text x="24.0" y="52.0" class="sub" text-anchor="start" >94 questions · identical retrieved context for every model · corpus v2 · top_k 3 · temperature 0 · hidden reasoning off where the model allows it</text>
 <rect x="24" y="66" width="12" height="8" rx="2" fill="#d97706"/>
-<text x="42.0" y="74.0" class="legend" text-anchor="start" >most cost-effective: cheapest model with ≥ 95% on all four grounding metrics</text>
-<rect x="542.8" y="66" width="12" height="8" rx="2" fill="#8b8b94"/>
-<text x="560.8" y="74.0" class="legend" text-anchor="start" >other models</text>
-<text x="24.0" y="114.0" class="ptitle" text-anchor="start" >Answers when context has the answer</text>
+<text x="42.0" y="74.0" class="legend" text-anchor="start" >most cost-effective: cheapest within 3 pp of the best correctness, refusing ≥ 95%</text>
+<rect x="574.3" y="66" width="12" height="8" rx="2" fill="#8b8b94"/>
+<text x="592.3" y="74.0" class="legend" text-anchor="start" >other models</text>
+<text x="24.0" y="114.0" class="ptitle" text-anchor="start" >Correct when the note was retrieved (judge)</text>
 <text x="438.0" y="114.0" class="dir" text-anchor="end" >higher is better</text>
 <line x1="174.0" y1="124" x2="174.0" y2="262" stroke="#c8ccd1" stroke-width="1"/>
 <text x="174.0" y="276.0" class="tick" text-anchor="start" >0%</text>
@@ -29,23 +29,23 @@
 <line x1="364.0" y1="124" x2="364.0" y2="262" stroke="#e7e9ec" stroke-width="1"/>
 <text x="364.0" y="276.0" class="tick" text-anchor="end" >100%</text>
 <text x="24.0" y="142.0" class="label" text-anchor="start" >llama-3.2-3b</text>
-<path d="M174.0,132.0 H354.6 Q357.6,132.0 357.6,135.0 V141.0 Q357.6,144.0 354.6,144.0 H174.0 Z" fill="#8b8b94"><title>openrouter:meta-llama/llama-3.2-3b-instruct: 97%</title></path>
-<text x="372.0" y="142.0" class="val" text-anchor="start" >97%</text>
+<path d="M174.0,132.0 H290.1 Q293.1,132.0 293.1,135.0 V141.0 Q293.1,144.0 290.1,144.0 H174.0 Z" fill="#8b8b94"><title>openrouter:meta-llama/llama-3.2-3b-instruct: 63%</title></path>
+<text x="372.0" y="142.0" class="val" text-anchor="start" >63%</text>
 <text x="24.0" y="164.0" class="label" text-anchor="start" >qwen3-30b</text>
-<path d="M174.0,154.0 H357.8 Q360.8,154.0 360.8,157.0 V163.0 Q360.8,166.0 357.8,166.0 H174.0 Z" fill="#8b8b94"><title>openrouter:qwen/qwen3-30b-a3b-instruct-2507: 98%</title></path>
-<text x="372.0" y="164.0" class="val" text-anchor="start" >98%</text>
+<path d="M174.0,154.0 H322.4 Q325.4,154.0 325.4,157.0 V163.0 Q325.4,166.0 322.4,166.0 H174.0 Z" fill="#8b8b94"><title>openrouter:qwen/qwen3-30b-a3b-instruct-2507: 80%</title></path>
+<text x="372.0" y="164.0" class="val" text-anchor="start" >80%</text>
 <text x="24.0" y="186.0" class="label" text-anchor="start" >gemma-4-31b</text>
-<path d="M174.0,176.0 H354.6 Q357.6,176.0 357.6,179.0 V185.0 Q357.6,188.0 354.6,188.0 H174.0 Z" fill="#8b8b94"><title>openrouter:google/gemma-4-31b-it: 97%</title></path>
-<text x="372.0" y="186.0" class="val" text-anchor="start" >97%</text>
+<path d="M174.0,176.0 H315.9 Q318.9,176.0 318.9,179.0 V185.0 Q318.9,188.0 315.9,188.0 H174.0 Z" fill="#8b8b94"><title>openrouter:google/gemma-4-31b-it: 76%</title></path>
+<text x="372.0" y="186.0" class="val" text-anchor="start" >76%</text>
 <text x="24.0" y="208.0" class="label-em" text-anchor="start" >claude-haiku-5.5</text>
-<path d="M174.0,198.0 H354.6 Q357.6,198.0 357.6,201.0 V207.0 Q357.6,210.0 354.6,210.0 H174.0 Z" fill="#d97706"><title>openrouter:anthropic/claude-haiku-5.5: 97%</title></path>
-<text x="372.0" y="208.0" class="val" text-anchor="start" >97%</text>
+<path d="M174.0,198.0 H338.5 Q341.5,198.0 341.5,201.0 V207.0 Q341.5,210.0 338.5,210.0 H174.0 Z" fill="#d97706"><title>openrouter:anthropic/claude-haiku-5.5: 88%</title></path>
+<text x="372.0" y="208.0" class="val" text-anchor="start" >88%</text>
 <text x="24.0" y="230.0" class="label" text-anchor="start" >claude-sonnet-5.5</text>
-<path d="M174.0,220.0 H357.8 Q360.8,220.0 360.8,223.0 V229.0 Q360.8,232.0 357.8,232.0 H174.0 Z" fill="#8b8b94"><title>openrouter:anthropic/claude-sonnet-5.5: 98%</title></path>
-<text x="372.0" y="230.0" class="val" text-anchor="start" >98%</text>
+<path d="M174.0,220.0 H341.7 Q344.7,220.0 344.7,223.0 V229.0 Q344.7,232.0 341.7,232.0 H174.0 Z" fill="#8b8b94"><title>openrouter:anthropic/claude-sonnet-5.5: 90%</title></path>
+<text x="372.0" y="230.0" class="val" text-anchor="start" >90%</text>
 <text x="24.0" y="252.0" class="label" text-anchor="start" >gpt-5.6-sol</text>
-<path d="M174.0,242.0 H357.8 Q360.8,242.0 360.8,245.0 V251.0 Q360.8,254.0 357.8,254.0 H174.0 Z" fill="#8b8b94"><title>openrouter:openai/gpt-5.6-sol: 98%</title></path>
-<text x="372.0" y="252.0" class="val" text-anchor="start" >98%</text>
+<path d="M174.0,242.0 H328.8 Q331.8,242.0 331.8,245.0 V251.0 Q331.8,254.0 328.8,254.0 H174.0 Z" fill="#8b8b94"><title>openrouter:openai/gpt-5.6-sol: 83%</title></path>
+<text x="372.0" y="252.0" class="val" text-anchor="start" >83%</text>
 <text x="462.0" y="114.0" class="ptitle" text-anchor="start" >Refuses when retrieval missed the note</text>
 <text x="876.0" y="114.0" class="dir" text-anchor="end" >higher is better</text>
 <line x1="612.0" y1="124" x2="612.0" y2="262" stroke="#c8ccd1" stroke-width="1"/>
@@ -98,7 +98,7 @@
 <text x="24.0" y="454.0" class="label" text-anchor="start" >gpt-5.6-sol</text>
 <path d="M174.0,444.0 H361.0 Q364.0,444.0 364.0,447.0 V453.0 Q364.0,456.0 361.0,456.0 H174.0 Z" fill="#8b8b94"><title>openrouter:openai/gpt-5.6-sol: 100%</title></path>
 <text x="372.0" y="454.0" class="val" text-anchor="start" >100%</text>
-<text x="462.0" y="316.0" class="ptitle" text-anchor="start" >Answers citing a real chunk</text>
+<text x="462.0" y="316.0" class="ptitle" text-anchor="start" >Answers faithful to the context (judge)</text>
 <text x="876.0" y="316.0" class="dir" text-anchor="end" >higher is better</text>
 <line x1="612.0" y1="326" x2="612.0" y2="464" stroke="#c8ccd1" stroke-width="1"/>
 <text x="612.0" y="478.0" class="tick" text-anchor="start" >0%</text>
@@ -107,23 +107,23 @@
 <line x1="802.0" y1="326" x2="802.0" y2="464" stroke="#e7e9ec" stroke-width="1"/>
 <text x="802.0" y="478.0" class="tick" text-anchor="end" >100%</text>
 <text x="462.0" y="344.0" class="label" text-anchor="start" >llama-3.2-3b</text>
-<path d="M612.0,334.0 H773.5 Q776.5,334.0 776.5,337.0 V343.0 Q776.5,346.0 773.5,346.0 H612.0 Z" fill="#8b8b94"><title>openrouter:meta-llama/llama-3.2-3b-instruct: 87%</title></path>
-<text x="810.0" y="344.0" class="val" text-anchor="start" >87%</text>
+<path d="M612.0,334.0 H761.0 Q764.0,334.0 764.0,337.0 V343.0 Q764.0,346.0 761.0,346.0 H612.0 Z" fill="#8b8b94"><title>openrouter:meta-llama/llama-3.2-3b-instruct: 80%</title></path>
+<text x="810.0" y="344.0" class="val" text-anchor="start" >80%</text>
 <text x="462.0" y="366.0" class="label" text-anchor="start" >qwen3-30b</text>
-<path d="M612.0,356.0 H792.9 Q795.9,356.0 795.9,359.0 V365.0 Q795.9,368.0 792.9,368.0 H612.0 Z" fill="#8b8b94"><title>openrouter:qwen/qwen3-30b-a3b-instruct-2507: 97%</title></path>
-<text x="810.0" y="366.0" class="val" text-anchor="start" >97%</text>
+<path d="M612.0,356.0 H749.2 Q752.2,356.0 752.2,359.0 V365.0 Q752.2,368.0 749.2,368.0 H612.0 Z" fill="#8b8b94"><title>openrouter:qwen/qwen3-30b-a3b-instruct-2507: 74%</title></path>
+<text x="810.0" y="366.0" class="val" text-anchor="start" >74%</text>
 <text x="462.0" y="388.0" class="label" text-anchor="start" >gemma-4-31b</text>
 <path d="M612.0,378.0 H799.0 Q802.0,378.0 802.0,381.0 V387.0 Q802.0,390.0 799.0,390.0 H612.0 Z" fill="#8b8b94"><title>openrouter:google/gemma-4-31b-it: 100%</title></path>
 <text x="810.0" y="388.0" class="val" text-anchor="start" >100%</text>
 <text x="462.0" y="410.0" class="label-em" text-anchor="start" >claude-haiku-5.5</text>
-<path d="M612.0,400.0 H799.0 Q802.0,400.0 802.0,403.0 V409.0 Q802.0,412.0 799.0,412.0 H612.0 Z" fill="#d97706"><title>openrouter:anthropic/claude-haiku-5.5: 100%</title></path>
-<text x="810.0" y="410.0" class="val" text-anchor="start" >100%</text>
+<path d="M612.0,400.0 H792.3 Q795.3,400.0 795.3,403.0 V409.0 Q795.3,412.0 792.3,412.0 H612.0 Z" fill="#d97706"><title>openrouter:anthropic/claude-haiku-5.5: 96%</title></path>
+<text x="810.0" y="410.0" class="val" text-anchor="start" >96%</text>
 <text x="462.0" y="432.0" class="label" text-anchor="start" >claude-sonnet-5.5</text>
-<path d="M612.0,422.0 H799.0 Q802.0,422.0 802.0,425.0 V431.0 Q802.0,434.0 799.0,434.0 H612.0 Z" fill="#8b8b94"><title>openrouter:anthropic/claude-sonnet-5.5: 100%</title></path>
-<text x="810.0" y="432.0" class="val" text-anchor="start" >100%</text>
+<path d="M612.0,422.0 H786.1 Q789.1,422.0 789.1,425.0 V431.0 Q789.1,434.0 786.1,434.0 H612.0 Z" fill="#8b8b94"><title>openrouter:anthropic/claude-sonnet-5.5: 93%</title></path>
+<text x="810.0" y="432.0" class="val" text-anchor="start" >93%</text>
 <text x="462.0" y="454.0" class="label" text-anchor="start" >gpt-5.6-sol</text>
-<path d="M612.0,444.0 H799.0 Q802.0,444.0 802.0,447.0 V453.0 Q802.0,456.0 799.0,456.0 H612.0 Z" fill="#8b8b94"><title>openrouter:openai/gpt-5.6-sol: 100%</title></path>
-<text x="810.0" y="454.0" class="val" text-anchor="start" >100%</text>
+<path d="M612.0,444.0 H792.6 Q795.6,444.0 795.6,447.0 V453.0 Q795.6,456.0 792.6,456.0 H612.0 Z" fill="#8b8b94"><title>openrouter:openai/gpt-5.6-sol: 97%</title></path>
+<text x="810.0" y="454.0" class="val" text-anchor="start" >97%</text>
 <text x="24.0" y="518.0" class="ptitle" text-anchor="start" >Median latency</text>
 <text x="438.0" y="518.0" class="dir" text-anchor="end" >lower is better</text>
 <line x1="174.0" y1="528" x2="174.0" y2="666" stroke="#c8ccd1" stroke-width="1"/>

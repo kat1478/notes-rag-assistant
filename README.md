@@ -59,8 +59,9 @@ This repository contains a working MVP:
 - smoke test for the Stage 4 application layer
 - retrieval, answer-quality, and validation evaluation artifacts
 - a model benchmark (6 models, 94 questions, frozen corpus) with charts and an interactive comparison view
+- an LLM-as-judge for answer correctness and faithfulness, calibrated against blind human labels
 
-The next planned technical step is an LLM-as-judge for answer correctness, then multilingual embeddings.
+The next planned technical step is multilingual embeddings for the cross-language retrieval gap.
 
 ---
 
@@ -237,7 +238,7 @@ model to highlight it in every chart. It is the same view as the app's **Models*
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/benchmark/models-dark.svg">
-  <img alt="Six models compared on grounding, citations, latency and cost; Claude Haiku 5.5 highlighted as the most cost-effective" src="docs/benchmark/models-light.svg">
+  <img alt="Six models compared on judge-verified correctness, faithfulness, refusals, latency and cost; Claude Haiku 5.5 highlighted as the most cost-effective" src="docs/benchmark/models-light.svg">
 </picture>
 
 **Setup.** Six hosted models (via OpenRouter) answered the same **94 questions** from **identical retrieved context** —
@@ -250,24 +251,53 @@ Sarsa note exists.
 **Grounding split.** When retrieval did not return the note that holds the answer, the correct grounded behaviour is to
 refuse — so those 18 questions are scored as refusal tests, not answer tests.
 
-| Model | Answers — context has it (n=59) | Refuses — retrieval missed (n=18) | Refuses — out of scope (n=17) | Cites a real chunk | Median latency | $ / 1k questions |
+| Model | Correct — note retrieved (judge, n=59) | Faithful to context (judge) | Refuses — retrieval missed (n=18) | Refuses — out of scope (n=17) | Median latency | $ / 1k questions |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
-| llama-3.2-3b | 97% | 56% | 88% | 87% | 0.7 s | $0.06 |
-| qwen3-30b | 98% | 83% | 94% | 97% | 2.2 s | $0.11 |
-| gemma-4-31b | 97% | 94% | 100% | 100% | 1.1 s | $0.20 |
-| **claude-haiku-5.5** (default) | 97% | 100% | 100% | 100% | 1.1 s | $0.18 |
-| claude-sonnet-5.5 | 98% | 94% | 100% | 100% | 1.9 s | $3.85 |
-| gpt-5.6-sol | 98% | 94% | 100% | 100% | 1.5 s | $4.39 |
+| llama-3.2-3b | 63% | 80% | 56% | 88% | 0.7 s | $0.06 |
+| qwen3-30b | 80% | 74% | 83% | 94% | 2.2 s | $0.11 |
+| gemma-4-31b | 76% | 100% | 94% | 100% | 1.1 s | $0.20 |
+| **claude-haiku-5.5** (default) | 88% | 96% | 100% | 100% | 1.1 s | $0.18 |
+| claude-sonnet-5.5 | 90% | 93% | 94% | 100% | 1.9 s | $3.85 |
+| gpt-5.6-sol | 83% | 97% | 94% | 100% | 1.5 s | $4.39 |
+
+Correctness and faithfulness are graded by an LLM judge that was checked against human labels — see
+[Is the judge trustworthy?](#is-the-judge-trustworthy) below.
 
 **What I took from it**
 
-- **Answering is saturated (97–98% for every model); the difference is knowing when *not* to answer.** The 3B model
-  answers without a source in almost half of the unsupported cases.
-- **Claude Haiku 5.5 became the app's default:** it is the cheapest model reaching ≥ 95% on all four grounding metrics
-  (100% correct refusals, ~1 s, $0.18 per 1,000 questions) — on par with GPT-5.6 Sol and Claude Sonnet 5.5 at
-  roughly 1/22–1/25 of their cost.
+- **Every model *answers* 97–98% of the time — what separates them is whether the answer is right and grounded.**
+  Judge-verified correctness ranges from 63% (Llama 3.2 3B) to 90% (Claude Sonnet 5.5); Qwen3 30B answers well but adds
+  claims the context doesn't support in a quarter of its answers; Gemma 4 31B is perfectly faithful but less complete.
+- **Knowing when not to answer matters as much.** The 3B model answers without a source in almost half of the cases where
+  retrieval missed the note.
+- **Claude Haiku 5.5 became the app's default:** rule — the cheapest model within 3 pp of the best correctness that also
+  refuses ≥ 95% of the time. Haiku: 88% correct (Sonnet 90%), 96% faithful, 100% correct refusals, ~1 s, $0.18 per 1,000
+  questions — roughly 1/22–1/25 of the cost of Claude Sonnet 5.5 and GPT-5.6 Sol, which scores lower (83%) here.
 - **Local `llama3.2:3b` (Ollama) is left out:** 5–110 s per answer on my laptop CPU rules it out as a product option.
   The same model, hosted, is in the chart; local inference can still be enabled with `OLLAMA_ENABLED=true`.
+
+### Is the judge trustworthy?
+
+The judge (GPT-5.6 Luna, structured JSON, reasoning off) grades each answer against the dataset's expected key points
+and the retrieved context. I labelled a **blind, stratified sample of 25 answers** myself (no model names, no judge
+grades) in a small labelling page, then compared:
+
+| | Judge v1 | Judge v2 (final) |
+| :--- | ---: | ---: |
+| Correct vs. not correct — agreement | 84% | 84% |
+| 3-class verdict — agreement (Cohen's κ) | 76% (0.50) | 76% (0.50) |
+| Faithfulness — agreement | 80% | 84% |
+
+- **v1 → v2:** every answer the v1 judge flagged as unfaithful was a false alarm — English claims vs. Polish evidence.
+  v2 must quote the supporting passage for each claim (in any language) or leave it empty; 97% of its quotes occur
+  verbatim in the context, so it isn't inventing evidence. I stopped there rather than tune the prompt to 25 examples.
+- **Direction of errors:** the judge is *stricter* than me — it never called an answer correct that I rated lower.
+  Several disagreements trace back to the dataset, not the judge (e.g. a question whose key points require saying
+  "this is outside the notes"), and one to a rubric gap: an answer in the wrong language isn't penalised.
+- **Bias:** GPT-5.6 Luna (OpenAI) also grades GPT-5.6 Sol; Sol scoring *below* Claude here suggests no strong
+  family preference, but a second judge would be needed to rule it out.
+
+Judge cost for all 359 graded answers: about $0.18.
 
 ### Parameters tested
 
@@ -303,7 +333,7 @@ language as their note hit 100% from `top_k = 2`, while cross-language ones (Eng
 - **Latency hygiene.** A laptop that went to sleep mid-run inflated latencies; the benchmark now detects host
   suspension and excludes those timings, and warms local models up before timing.
 - **Guardrails:** a model allowlist, a `--max-cost-usd` budget guard, and an abort if the context comes from the wrong
-  corpus. Total API spend for everything on this page: under $1.
+  corpus. Total API spend for everything on this page, including the judge: about $1.30.
 
 **Reproduce** (from `backend/`, with `OPENROUTER_API_KEY` in `backend/.env`):
 
@@ -313,11 +343,15 @@ python -m app.run_model_benchmark --corpus v2 --retrieval-only       # free: ret
 python -m app.run_model_benchmark --corpus v2 --max-cost-usd 5       # all allowlisted models
 python -m app.run_model_benchmark --corpus v2 --temperature 0.7 --run-tag r1 \
        --out-dir data/eval/v2/temperature --models openrouter:google/gemma-4-31b-it
+python -m app.run_judge --max-cost-usd 2                             # LLM judge on the saved answers (cached)
+python -m app.judge_calibration build                                # blind labelling page for a 25-answer sample
+python -m app.judge_calibration score <labels.json>                  # human vs. judge agreement
 python -m app.render_benchmark_charts                                # charts + interactive page → docs/benchmark/
 ```
 
-**Limits.** "Answered" is not "correct" — answer correctness is not judged yet (an LLM-as-judge against the dataset's
-expected key points is the next step). The 12 added notes are synthetic, and n is small: one question is 1.7–6 pp.
+**Limits.** Correctness comes from an LLM judge with 84% agreement to one human labeller on 25 answers — good enough
+to rank models that differ by ~10 pp, not to separate Haiku from Sonnet (2 pp). The 12 added notes are synthetic, and
+n is small: one question is 1.7–6 pp.
 
 ---
 
@@ -372,7 +406,7 @@ docs/benchmark/        # README charts + static interactive benchmark page (GitH
 ## Roadmap / Next steps
 
 - [x] **OpenRouter provider + model benchmark** — six models compared; Claude Haiku 5.5 chosen as default ([results](#model-benchmark-which-llm-is-worth-paying-for)).
-- [ ] **LLM-as-judge** — score answer correctness against the dataset's expected key points, not only answer/refusal.
+- [x] **LLM-as-judge** — correctness + faithfulness graded by GPT-5.6 Luna, calibrated on 25 blind human labels ([details](#is-the-judge-trustworthy)).
 - [ ] **Reranking** — add a cross-encoder reranker over the top-k candidates to improve answer precision.
 - [ ] **Hybrid search** — combine dense (embeddings) with sparse (BM25) retrieval instead of TF-IDF fallback.
 - [ ] **Multilingual embeddings** — swap `all-MiniLM-L6-v2` for a multilingual model to close the cross-lingual gap (62% → ? hit rate on cross-language questions).

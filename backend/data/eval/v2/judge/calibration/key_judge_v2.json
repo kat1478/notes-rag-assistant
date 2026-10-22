@@ -1,0 +1,211 @@
+[
+  {
+    "item": 1,
+    "model": "openrouter:qwen/qwen3-30b-a3b-instruct-2507",
+    "question_id": "val004",
+    "judge_verdict": "correct",
+    "judge_faithful": false,
+    "unsupported_claims": [
+      "The model is trained on the training set and evaluated on the test set."
+    ]
+  },
+  {
+    "item": 2,
+    "model": "openrouter:anthropic/claude-haiku-5.5",
+    "question_id": "n006",
+    "judge_verdict": "correct",
+    "judge_faithful": true,
+    "unsupported_claims": []
+  },
+  {
+    "item": 3,
+    "model": "openrouter:openai/gpt-5.6-sol",
+    "question_id": "q030",
+    "judge_verdict": "partially_correct",
+    "judge_faithful": false,
+    "unsupported_claims": [
+      "Bellman–Ford computes shortest paths."
+    ]
+  },
+  {
+    "item": 4,
+    "model": "openrouter:anthropic/claude-haiku-5.5",
+    "question_id": "q015",
+    "judge_verdict": "correct",
+    "judge_faithful": true,
+    "unsupported_claims": []
+  },
+  {
+    "item": 5,
+    "model": "openrouter:meta-llama/llama-3.2-3b-instruct",
+    "question_id": "q007",
+    "judge_verdict": "correct",
+    "judge_faithful": true,
+    "unsupported_claims": []
+  },
+  {
+    "item": 6,
+    "model": "openrouter:meta-llama/llama-3.2-3b-instruct",
+    "question_id": "q012",
+    "judge_verdict": "partially_correct",
+    "judge_faithful": true,
+    "unsupported_claims": []
+  },
+  {
+    "item": 7,
+    "model": "openrouter:meta-llama/llama-3.2-3b-instruct",
+    "question_id": "val016",
+    "judge_verdict": "partially_correct",
+    "judge_faithful": true,
+    "unsupported_claims": []
+  },
+  {
+    "item": 8,
+    "model": "openrouter:anthropic/claude-sonnet-5.5",
+    "question_id": "q004",
+    "judge_verdict": "correct",
+    "judge_faithful": true,
+    "unsupported_claims": []
+  },
+  {
+    "item": 9,
+    "model": "openrouter:qwen/qwen3-30b-a3b-instruct-2507",
+    "question_id": "q001",
+    "judge_verdict": "correct",
+    "judge_faithful": true,
+    "unsupported_claims": []
+  },
+  {
+    "item": 10,
+    "model": "openrouter:openai/gpt-5.6-sol",
+    "question_id": "val016",
+    "judge_verdict": "partially_correct",
+    "judge_faithful": true,
+    "unsupported_claims": []
+  },
+  {
+    "item": 11,
+    "model": "openrouter:anthropic/claude-sonnet-5.5",
+    "question_id": "val014",
+    "judge_verdict": "correct",
+    "judge_faithful": true,
+    "unsupported_claims": []
+  },
+  {
+    "item": 12,
+    "model": "openrouter:google/gemma-4-31b-it",
+    "question_id": "n014",
+    "judge_verdict": "correct",
+    "judge_faithful": true,
+    "unsupported_claims": []
+  },
+  {
+    "item": 13,
+    "model": "openrouter:anthropic/claude-sonnet-5.5",
+    "question_id": "val016",
+    "judge_verdict": "partially_correct",
+    "judge_faithful": true,
+    "unsupported_claims": []
+  },
+  {
+    "item": 14,
+    "model": "openrouter:qwen/qwen3-30b-a3b-instruct-2507",
+    "question_id": "q018",
+    "judge_verdict": "correct",
+    "judge_faithful": false,
+    "unsupported_claims": [
+      "This process helps build a decision tree that effectively classifies data by making informative decisions."
+    ]
+  },
+  {
+    "item": 15,
+    "model": "openrouter:openai/gpt-5.6-sol",
+    "question_id": "n021",
+    "judge_verdict": "correct",
+    "judge_faithful": true,
+    "unsupported_claims": []
+  },
+  {
+    "item": 16,
+    "model": "openrouter:google/gemma-4-31b-it",
+    "question_id": "n026",
+    "judge_verdict": "partially_correct",
+    "judge_faithful": true,
+    "unsupported_claims": []
+  },
+  {
+    "item": 17,
+    "model": "openrouter:openai/gpt-5.6-sol",
+    "question_id": "val013",
+    "judge_verdict": "correct",
+    "judge_faithful": true,
+    "unsupported_claims": []
+  },
+  {
+    "item": 18,
+    "model": "openrouter:anthropic/claude-haiku-5.5",
+    "question_id": "n024",
+    "judge_verdict": "partially_correct",
+    "judge_faithful": false,
+    "unsupported_claims": [
+      "Bellman-Ford should be used when the graph may contain negative edge weights.",
+      "The notes do not explicitly compare performance or directly state that Dijkstra fails with negative weights."
+    ]
+  },
+  {
+    "item": 19,
+    "model": "openrouter:qwen/qwen3-30b-a3b-instruct-2507",
+    "question_id": "n021",
+    "judge_verdict": "correct",
+    "judge_faithful": true,
+    "unsupported_claims": []
+  },
+  {
+    "item": 20,
+    "model": "openrouter:google/gemma-4-31b-it",
+    "question_id": "n009",
+    "judge_verdict": "partially_correct",
+    "judge_faithful": true,
+    "unsupported_claims": []
+  },
+  {
+    "item": 21,
+    "model": "openrouter:meta-llama/llama-3.2-3b-instruct",
+    "question_id": "n007",
+    "judge_verdict": "partially_correct",
+    "judge_faithful": true,
+    "unsupported_claims": []
+  },
+  {
+    "item": 22,
+    "model": "openrouter:anthropic/claude-haiku-5.5",
+    "question_id": "n023",
+    "judge_verdict": "correct",
+    "judge_faithful": true,
+    "unsupported_claims": []
+  },
+  {
+    "item": 23,
+    "model": "openrouter:anthropic/claude-sonnet-5.5",
+    "question_id": "val011",
+    "judge_verdict": "correct",
+    "judge_faithful": true,
+    "unsupported_claims": []
+  },
+  {
+    "item": 24,
+    "model": "openrouter:google/gemma-4-31b-it",
+    "question_id": "q023",
+    "judge_verdict": "correct",
+    "judge_faithful": true,
+    "unsupported_claims": []
+  },
+  {
+    "item": 25,
+    "model": "openrouter:anthropic/claude-haiku-5.5",
+    "question_id": "q030",
+    "judge_verdict": "partially_correct",
+    "judge_faithful": true,
+    "unsupported_claims": []
+  }
+]

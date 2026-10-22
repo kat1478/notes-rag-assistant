@@ -18,10 +18,9 @@ const usd = (v) => (v === 0 ? '$0' : v < 0.01 ? `$${v.toFixed(4)}` : v < 1 ? `$$
 
 const CHARTS = [
     {
-        key: 'answer_rate_supported', fallback: 'answer_rate_in_scope',
-        title: 'Answers when the context has the answer', dir: 'higher is better',
+        key: 'judge_correct_rate_supported', title: 'Correct when the note was retrieved (judge)', dir: 'higher is better',
         fmt: pct, max: () => 1,
-        detail: (r) => `n = ${r.n_supported ?? r.n_in_scope} questions where retrieval found the expected note`,
+        detail: (r) => `LLM judge vs. expected key points; key-point recall ${r.judge_key_point_recall != null ? pct(r.judge_key_point_recall) : 'n/a'}`,
     },
     {
         key: 'refusal_rate_unsupported', title: 'Refuses when retrieval missed the note', dir: 'higher is better',
@@ -34,9 +33,9 @@ const CHARTS = [
         detail: (r) => `n = ${r.n_out_of_scope} questions, incl. near-topic traps`,
     },
     {
-        key: 'valid_citation_rate', title: 'Answers citing a real chunk', dir: 'higher is better',
+        key: 'judge_faithful_rate', title: 'Answers faithful to the context (judge)', dir: 'higher is better',
         fmt: pct, max: () => 1,
-        detail: (r) => `${r.invalid_citations} citation(s) to chunks not in context`,
+        detail: (r) => 'no claim the retrieved context does not support (judge requires a quote per claim)',
     },
     {
         key: 'latency_p50_s', title: 'Median latency', dir: 'lower is better',
@@ -171,6 +170,8 @@ function renderTable() {
         const na = (v, f) => (v === null || v === undefined ? '—' : f(v));
         const cells = [
             r.model_id,
+            na(r.judge_correct_rate_supported, pct),
+            na(r.judge_faithful_rate, pct),
             na(r.answer_rate_supported ?? r.answer_rate_in_scope, (v) => `${pct(v)} (n=${r.n_supported ?? r.n_in_scope})`),
             na(r.refusal_rate_unsupported, (v) => `${pct(v)} (n=${r.n_unsupported})`),
             na(r.valid_citation_rate, pct),
@@ -214,10 +215,13 @@ function renderMeta(runs) {
         + ` · reasoning ${uniq('reasoning_mode') || 'default'} · run ${range} · commit ${uniq('git_commit')}`;
 }
 
-// Same rule as the README chart: cheapest model with >= 95% on all four grounding metrics.
+// Same rule as the README chart: cheapest model within 3 pp of the best judge-verified correctness
+// that refuses >= 95% both when retrieval missed and out of scope.
 function recommended(rows) {
-    const keys = ['answer_rate_supported', 'refusal_rate_unsupported', 'refusal_rate_out_of_scope', 'valid_citation_rate'];
-    const ok = rows.filter((r) => keys.every((k) => (r[k] ?? 0) >= 0.95) && r.cost_per_1k_queries_usd != null);
+    const scored = rows.filter((r) => r.judge_correct_rate_supported != null && r.cost_per_1k_queries_usd != null);
+    const best = Math.max(...scored.map((r) => r.judge_correct_rate_supported));
+    const ok = scored.filter((r) => r.judge_correct_rate_supported >= best - 0.03
+        && ['refusal_rate_unsupported', 'refusal_rate_out_of_scope'].every((k) => (r[k] ?? 0) >= 0.95));
     ok.sort((a, b) => a.cost_per_1k_queries_usd - b.cost_per_1k_queries_usd);
     return ok[0]?.model_id ?? null;
 }

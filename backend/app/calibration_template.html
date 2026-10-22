@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>notes-rag — judge calibration</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#fafafa; --panel:#fff; --sunken:#f4f4f5; --line:#e4e4e7; --text:#18181b; --text2:#52525b; --text3:#a1a1aa;
+          --hl:#fde68a; --hl-line:#d97706; --ok:#15803d; --bad:#b91c1c; --warn:#b45309;
+          --sans:'IBM Plex Sans',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#09090b; --panel:#0f0f11; --sunken:#18181b; --line:#27272a; --text:#f4f4f5; --text2:#a1a1aa; --text3:#71717a;
+            --hl:rgba(251,191,36,.28); --ok:#4ade80; --bad:#f87171; --warn:#fbbf24; } }
+  * { box-sizing:border-box; margin:0; }
+  body { background:var(--bg); color:var(--text); font:15px/1.6 var(--sans); }
+  header { display:flex; align-items:center; gap:16px; padding:12px 20px; border-bottom:1px solid var(--line); background:var(--panel); }
+  header b { font:600 14px var(--mono); }
+  .progress { flex:1; height:6px; background:var(--sunken); border-radius:3px; overflow:hidden; }
+  .progress i { display:block; height:100%; background:var(--hl-line); width:0; transition:width .2s; }
+  .count { font:12px var(--mono); color:var(--text2); }
+  main { max-width:1100px; margin:0 auto; padding:20px; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:20px; }
+  section { background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:16px; min-width:0; }
+  h2 { font:600 11px var(--mono); text-transform:uppercase; letter-spacing:.08em; color:var(--text2); margin-bottom:8px; }
+  .q { font-size:17px; font-weight:500; margin-bottom:14px; }
+  ul.kp { padding-left:18px; margin-bottom:6px; } ul.kp li { margin:2px 0; }
+  .answer { white-space:pre-wrap; background:var(--sunken); border-radius:4px; padding:12px; }
+  details { border-top:1px solid var(--line); padding:8px 0; } summary { cursor:pointer; font:12.5px var(--mono); color:var(--text2); }
+  details p { white-space:pre-wrap; font-size:13.5px; color:var(--text2); margin-top:6px; }
+  .rate { grid-column:1 / -1; display:grid; gap:14px; }
+  .row { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+  .row .label { width:270px; font-size:14px; color:var(--text2); }
+  button { font:500 13.5px var(--sans); padding:6px 12px; border-radius:4px; border:1px solid var(--line); background:var(--panel); color:var(--text); cursor:pointer; }
+  button kbd { font:11px var(--mono); color:var(--text3); margin-left:6px; }
+  button.on { background:var(--hl); border-color:var(--hl-line); }
+  button:focus-visible { outline:2px solid var(--hl-line); outline-offset:2px; }
+  textarea { width:100%; min-height:44px; font:13.5px var(--sans); padding:8px; border:1px solid var(--line); border-radius:4px; background:var(--panel); color:var(--text); }
+  .nav { display:flex; gap:8px; justify-content:space-between; }
+  .help { font-size:13px; color:var(--text3); }
+  .done { grid-column:1 / -1; text-align:center; padding:40px; }
+  @media (max-width: 800px) { main { grid-template-columns:1fr; } .row .label { width:100%; } }
+</style>
+</head>
+<body>
+<header>
+  <b>judge calibration</b>
+  <div class="progress"><i id="bar"></i></div>
+  <span class="count" id="count"></span>
+  <button id="download">Download labels.json</button>
+</header>
+<main id="main"></main>
+<script>
+const ITEMS = /*ITEMS*/[];
+const KEY = 'notes-rag.calibration.v1';
+const VERDICTS = [['correct', 'Correct', '1'], ['partially_correct', 'Partially correct', '2'], ['incorrect', 'Incorrect', '3']];
+let labels = {};
+try { labels = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch { /* private mode: labels live in this tab only */ }
+let pos = Math.max(0, ITEMS.findIndex((it) => !complete(it.item)));
+if (pos < 0) pos = 0;
+
+function complete(id) { const l = labels[id]; return l && l.verdict && typeof l.faithful === 'boolean'; }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(labels)); } catch { /* ignore */ } }
+function el(tag, cls, text) { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; }
+
+function render() {
+  const main = document.getElementById('main');
+  const done = ITEMS.filter((it) => complete(it.item)).length;
+  document.getElementById('bar').style.width = `${(100 * done) / ITEMS.length}%`;
+  document.getElementById('count').textContent = `${done} / ${ITEMS.length} labelled`;
+  main.replaceChildren();
+  if (pos >= ITEMS.length) {
+    const d = el('section', 'done');
+    d.append(el('p', '', `All ${ITEMS.length} items labelled. Click "Download labels.json" and save it into this folder.`));
+    main.append(d); return;
+  }
+  const it = ITEMS[pos];
+  const l = labels[it.item] || (labels[it.item] = {});
+
+  const left = el('section');
+  left.append(el('h2', '', `Item ${pos + 1} of ${ITEMS.length} · question`), el('p', 'q', it.question));
+  left.append(el('h2', '', 'Expected key points'));
+  const ul = el('ul', 'kp'); it.key_points.forEach((k) => ul.append(el('li', '', k))); left.append(ul);
+  left.append(el('h2', '', 'Answer to grade'), el('div', 'answer', it.answer));
+
+  const right = el('section');
+  right.append(el('h2', '', 'Context the model saw'));
+  // Open the chunks the answer cites (that is what faithfulness is checked against); the rest stay one click away.
+  const citedIds = new Set([...it.answer.matchAll(/\[Sources?\s*([\d,\s&and]+)\]/gi)].flatMap((m) => m[1].match(/\d+/g).map(Number)));
+  right.append(el('p', 'help', citedIds.size ? 'Cited sources are expanded.' : 'The answer cites no source — check all chunks.'));
+  it.context.forEach((c) => {
+    const d = el('details'); d.open = citedIds.has(c.n) || it.context.length <= 3;
+    d.append(el('summary', '', `[Source ${c.n}] ${c.file}`), el('p', '', c.text)); right.append(d);
+  });
+
+  const rate = el('section', 'rate');
+  const r1 = el('div', 'row'); r1.append(el('span', 'label', 'Does it convey the key points?'));
+  VERDICTS.forEach(([v, text, k]) => {
+    const b = el('button', l.verdict === v ? 'on' : ''); b.append(text, el('kbd', '', k));
+    b.onclick = () => { l.verdict = v; save(); render(); }; r1.append(b);
+  });
+  const r2 = el('div', 'row'); r2.append(el('span', 'label', 'Claims NOT supported by the context?'));
+  [[true, 'No — faithful', 'f'], [false, 'Yes — unsupported claims', 'u']].forEach(([v, text, k]) => {
+    const b = el('button', l.faithful === v ? 'on' : ''); b.append(text, el('kbd', '', k));
+    b.onclick = () => { l.faithful = v; save(); render(); }; r2.append(b);
+  });
+  const note = el('textarea'); note.placeholder = 'Optional note (why?)'; note.value = l.note || '';
+  note.oninput = () => { l.note = note.value; save(); };
+  const nav = el('div', 'nav');
+  const prev = el('button', '', '← Previous'); prev.onclick = () => { pos = Math.max(0, pos - 1); render(); };
+  const next = el('button', '', complete(it.item) ? 'Next →' : 'Next (skip) →'); next.onclick = () => { pos += 1; render(); };
+  nav.append(prev, el('span', 'help', 'Keys: 1/2/3 verdict · f/u faithfulness · Enter next · Backspace previous'), next);
+  rate.append(r1, r2, note, nav);
+  main.append(left, right, rate);
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'TEXTAREA' || pos >= ITEMS.length) return;
+  const l = labels[ITEMS[pos].item];
+  const v = VERDICTS.find(([, , k]) => k === e.key);
+  if (v) { l.verdict = v[0]; save(); render(); }
+  else if (e.key === 'f') { l.faithful = true; save(); render(); }
+  else if (e.key === 'u') { l.faithful = false; save(); render(); }
+  else if (e.key === 'Enter') { pos += 1; render(); }
+  else if (e.key === 'Backspace') { pos = Math.max(0, pos - 1); render(); }
+});
+
+document.getElementById('download').onclick = () => {
+  const out = { labelled_at: new Date().toISOString(), labels: ITEMS.map((it) => ({ item: it.item, ...(labels[it.item] || {}) })) };
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' }));
+  a.download = 'labels.json'; a.click();
+};
+render();
+</script>
+</body>
+</html>
