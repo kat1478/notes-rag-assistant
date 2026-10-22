@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="512" viewBox="0 0 900 512" role="img" aria-labelledby="t d">
+<title id="t">Embedding model comparison for cross-language retrieval</title>
+<desc id="d">sentence-transformers/all-MiniLM-L6-v2: cross_hit3=0.561, cross_hit1=0.351, same_hit3=0.95, query_ms=20.0; sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2: cross_hit3=1.0, cross_hit1=0.86, same_hit3=0.975, query_ms=31.6; sentence-transformers/paraphrase-multilingual-mpnet-base-v2: cross_hit3=1.0, cross_hit1=0.877, same_hit3=0.975, query_ms=83.0; intfloat/multilingual-e5-small: cross_hit3=0.719, cross_hit1=0.614, same_hit3=1.0, query_ms=64.9; intfloat/multilingual-e5-base: cross_hit3=0.895, cross_hit1=0.632, same_hit3=1.0, query_ms=111.0; BAAI/bge-m3: cross_hit3=1.0, cross_hit1=0.965, same_hit3=1.0, query_ms=340.7</desc>
+<style>
+    text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; fill: #1f2328; }
+    .h1 { font-size: 16px; font-weight: 600; }
+    .sub { font-size: 12px; fill: #59636e; }
+    .ptitle { font-size: 13px; font-weight: 600; }
+    .dir { font-size: 11px; fill: #818b98; }
+    .label { font-size: 12px; fill: #59636e; }
+    .label-em { font-size: 12px; font-weight: 600; fill: #1f2328; }
+    .val { font-size: 12px; font-variant-numeric: tabular-nums; }
+    .tick { font-size: 10.5px; fill: #818b98; font-variant-numeric: tabular-nums; }
+    .legend { font-size: 12px; fill: #59636e; }
+    </style>
+<rect x="0.5" y="0.5" width="899" height="511" rx="6" fill="#ffffff" stroke="#d1d9e0"/>
+<text x="24.0" y="32.0" class="h1" text-anchor="start" >Retrieval: which embedding model finds the right note?</text>
+<text x="24.0" y="52.0" class="sub" text-anchor="start" >57 cross-language + 40 same-language questions (v2 + Polish probe) · corpus v2 · free, local retrieval only</text>
+<rect x="24" y="66" width="12" height="8" rx="2" fill="#d97706"/>
+<text x="42.0" y="74.0" class="legend" text-anchor="start" >chosen for the app: multiling. MiniLM-L12 — 100% in top 3, 32 ms per query</text>
+<rect x="530.2" y="66" width="12" height="8" rx="2" fill="#8b8b94"/>
+<text x="548.2" y="74.0" class="legend" text-anchor="start" >other models</text>
+<text x="24.0" y="114.0" class="ptitle" text-anchor="start" >Cross-language: right note in top 3</text>
+<text x="438.0" y="114.0" class="dir" text-anchor="end" >higher is better</text>
+<line x1="174.0" y1="124" x2="174.0" y2="262" stroke="#c8ccd1" stroke-width="1"/>
+<text x="174.0" y="276.0" class="tick" text-anchor="start" >0%</text>
+<line x1="269.0" y1="124" x2="269.0" y2="262" stroke="#e7e9ec" stroke-width="1"/>
+<text x="269.0" y="276.0" class="tick" text-anchor="middle" >50%</text>
+<line x1="364.0" y1="124" x2="364.0" y2="262" stroke="#e7e9ec" stroke-width="1"/>
+<text x="364.0" y="276.0" class="tick" text-anchor="end" >100%</text>
+<text x="24.0" y="142.0" class="label" text-anchor="start" >all-MiniLM-L6 (English)</text>
+<path d="M174.0,132.0 H277.6 Q280.6,132.0 280.6,135.0 V141.0 Q280.6,144.0 277.6,144.0 H174.0 Z" fill="#8b8b94"><title>sentence-transformers/all-MiniLM-L6-v2: 56%</title></path>
+<text x="372.0" y="142.0" class="val" text-anchor="start" >56%</text>
+<text x="24.0" y="164.0" class="label-em" text-anchor="start" >multiling. MiniLM-L12</text>
+<path d="M174.0,154.0 H361.0 Q364.0,154.0 364.0,157.0 V163.0 Q364.0,166.0 361.0,166.0 H174.0 Z" fill="#d97706"><title>sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2: 100%</title></path>
+<text x="372.0" y="164.0" class="val" text-anchor="start" >100%</text>
+<text x="24.0" y="186.0" class="label" text-anchor="start" >multiling. mpnet-base</text>
+<path d="M174.0,176.0 H361.0 Q364.0,176.0 364.0,179.0 V185.0 Q364.0,188.0 361.0,188.0 H174.0 Z" fill="#8b8b94"><title>sentence-transformers/paraphrase-multilingual-mpnet-base-v2: 100%</title></path>
+<text x="372.0" y="186.0" class="val" text-anchor="start" >100%</text>
+<text x="24.0" y="208.0" class="label" text-anchor="start" >multilingual-e5-small</text>
+<path d="M174.0,198.0 H307.6 Q310.6,198.0 310.6,201.0 V207.0 Q310.6,210.0 307.6,210.0 H174.0 Z" fill="#8b8b94"><title>intfloat/multilingual-e5-small: 72%</title></path>
+<text x="372.0" y="208.0" class="val" text-anchor="start" >72%</text>
+<text x="24.0" y="230.0" class="label" text-anchor="start" >multilingual-e5-base</text>
+<path d="M174.0,220.0 H341.1 Q344.1,220.0 344.1,223.0 V229.0 Q344.1,232.0 341.1,232.0 H174.0 Z" fill="#8b8b94"><title>intfloat/multilingual-e5-base: 90%</title></path>
+<text x="372.0" y="230.0" class="val" text-anchor="start" >90%</text>
+<text x="24.0" y="252.0" class="label" text-anchor="start" >bge-m3</text>
+<path d="M174.0,242.0 H361.0 Q364.0,242.0 364.0,245.0 V251.0 Q364.0,254.0 361.0,254.0 H174.0 Z" fill="#8b8b94"><title>BAAI/bge-m3: 100%</title></path>
+<text x="372.0" y="252.0" class="val" text-anchor="start" >100%</text>
+<text x="462.0" y="114.0" class="ptitle" text-anchor="start" >Cross-language: right note ranked first</text>
+<text x="876.0" y="114.0" class="dir" text-anchor="end" >higher is better</text>
+<line x1="612.0" y1="124" x2="612.0" y2="262" stroke="#c8ccd1" stroke-width="1"/>
+<text x="612.0" y="276.0" class="tick" text-anchor="start" >0%</text>
+<line x1="707.0" y1="124" x2="707.0" y2="262" stroke="#e7e9ec" stroke-width="1"/>
+<text x="707.0" y="276.0" class="tick" text-anchor="middle" >50%</text>
+<line x1="802.0" y1="124" x2="802.0" y2="262" stroke="#e7e9ec" stroke-width="1"/>
+<text x="802.0" y="276.0" class="tick" text-anchor="end" >100%</text>
+<text x="462.0" y="142.0" class="label" text-anchor="start" >all-MiniLM-L6 (English)</text>
+<path d="M612.0,132.0 H675.7 Q678.7,132.0 678.7,135.0 V141.0 Q678.7,144.0 675.7,144.0 H612.0 Z" fill="#8b8b94"><title>sentence-transformers/all-MiniLM-L6-v2: 35%</title></path>
+<text x="810.0" y="142.0" class="val" text-anchor="start" >35%</text>
+<text x="462.0" y="164.0" class="label-em" text-anchor="start" >multiling. MiniLM-L12</text>
+<path d="M612.0,154.0 H772.4 Q775.4,154.0 775.4,157.0 V163.0 Q775.4,166.0 772.4,166.0 H612.0 Z" fill="#d97706"><title>sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2: 86%</title></path>
+<text x="810.0" y="164.0" class="val" text-anchor="start" >86%</text>
+<text x="462.0" y="186.0" class="label" text-anchor="start" >multiling. mpnet-base</text>
+<path d="M612.0,176.0 H775.6 Q778.6,176.0 778.6,179.0 V185.0 Q778.6,188.0 775.6,188.0 H612.0 Z" fill="#8b8b94"><title>sentence-transformers/paraphrase-multilingual-mpnet-base-v2: 88%</title></path>
+<text x="810.0" y="186.0" class="val" text-anchor="start" >88%</text>
+<text x="462.0" y="208.0" class="label" text-anchor="start" >multilingual-e5-small</text>
+<path d="M612.0,198.0 H725.7 Q728.7,198.0 728.7,201.0 V207.0 Q728.7,210.0 725.7,210.0 H612.0 Z" fill="#8b8b94"><title>intfloat/multilingual-e5-small: 61%</title></path>
+<text x="810.0" y="208.0" class="val" text-anchor="start" >61%</text>
+<text x="462.0" y="230.0" class="label" text-anchor="start" >multilingual-e5-base</text>
+<path d="M612.0,220.0 H729.1 Q732.1,220.0 732.1,223.0 V229.0 Q732.1,232.0 729.1,232.0 H612.0 Z" fill="#8b8b94"><title>intfloat/multilingual-e5-base: 63%</title></path>
+<text x="810.0" y="230.0" class="val" text-anchor="start" >63%</text>
+<text x="462.0" y="252.0" class="label" text-anchor="start" >bge-m3</text>
+<path d="M612.0,242.0 H792.4 Q795.4,242.0 795.4,245.0 V251.0 Q795.4,254.0 792.4,254.0 H612.0 Z" fill="#8b8b94"><title>BAAI/bge-m3: 96%</title></path>
+<text x="810.0" y="252.0" class="val" text-anchor="start" >96%</text>
+<text x="24.0" y="316.0" class="ptitle" text-anchor="start" >Same language: right note in top 3</text>
+<text x="438.0" y="316.0" class="dir" text-anchor="end" >higher is better</text>
+<line x1="174.0" y1="326" x2="174.0" y2="464" stroke="#c8ccd1" stroke-width="1"/>
+<text x="174.0" y="478.0" class="tick" text-anchor="start" >0%</text>
+<line x1="269.0" y1="326" x2="269.0" y2="464" stroke="#e7e9ec" stroke-width="1"/>
+<text x="269.0" y="478.0" class="tick" text-anchor="middle" >50%</text>
+<line x1="364.0" y1="326" x2="364.0" y2="464" stroke="#e7e9ec" stroke-width="1"/>
+<text x="364.0" y="478.0" class="tick" text-anchor="end" >100%</text>
+<text x="24.0" y="344.0" class="label" text-anchor="start" >all-MiniLM-L6 (English)</text>
+<path d="M174.0,334.0 H351.5 Q354.5,334.0 354.5,337.0 V343.0 Q354.5,346.0 351.5,346.0 H174.0 Z" fill="#8b8b94"><title>sentence-transformers/all-MiniLM-L6-v2: 95%</title></path>
+<text x="372.0" y="344.0" class="val" text-anchor="start" >95%</text>
+<text x="24.0" y="366.0" class="label-em" text-anchor="start" >multiling. MiniLM-L12</text>
+<path d="M174.0,356.0 H356.2 Q359.2,356.0 359.2,359.0 V365.0 Q359.2,368.0 356.2,368.0 H174.0 Z" fill="#d97706"><title>sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2: 98%</title></path>
+<text x="372.0" y="366.0" class="val" text-anchor="start" >98%</text>
+<text x="24.0" y="388.0" class="label" text-anchor="start" >multiling. mpnet-base</text>
+<path d="M174.0,378.0 H356.2 Q359.2,378.0 359.2,381.0 V387.0 Q359.2,390.0 356.2,390.0 H174.0 Z" fill="#8b8b94"><title>sentence-transformers/paraphrase-multilingual-mpnet-base-v2: 98%</title></path>
+<text x="372.0" y="388.0" class="val" text-anchor="start" >98%</text>
+<text x="24.0" y="410.0" class="label" text-anchor="start" >multilingual-e5-small</text>
+<path d="M174.0,400.0 H361.0 Q364.0,400.0 364.0,403.0 V409.0 Q364.0,412.0 361.0,412.0 H174.0 Z" fill="#8b8b94"><title>intfloat/multilingual-e5-small: 100%</title></path>
+<text x="372.0" y="410.0" class="val" text-anchor="start" >100%</text>
+<text x="24.0" y="432.0" class="label" text-anchor="start" >multilingual-e5-base</text>
+<path d="M174.0,422.0 H361.0 Q364.0,422.0 364.0,425.0 V431.0 Q364.0,434.0 361.0,434.0 H174.0 Z" fill="#8b8b94"><title>intfloat/multilingual-e5-base: 100%</title></path>
+<text x="372.0" y="432.0" class="val" text-anchor="start" >100%</text>
+<text x="24.0" y="454.0" class="label" text-anchor="start" >bge-m3</text>
+<path d="M174.0,444.0 H361.0 Q364.0,444.0 364.0,447.0 V453.0 Q364.0,456.0 361.0,456.0 H174.0 Z" fill="#8b8b94"><title>BAAI/bge-m3: 100%</title></path>
+<text x="372.0" y="454.0" class="val" text-anchor="start" >100%</text>
+<text x="462.0" y="316.0" class="ptitle" text-anchor="start" >Query embedding time (laptop CPU)</text>
+<text x="876.0" y="316.0" class="dir" text-anchor="end" >lower is better</text>
+<line x1="612.0" y1="326" x2="612.0" y2="464" stroke="#c8ccd1" stroke-width="1"/>
+<text x="612.0" y="478.0" class="tick" text-anchor="start" >0 ms</text>
+<line x1="707.0" y1="326" x2="707.0" y2="464" stroke="#e7e9ec" stroke-width="1"/>
+<text x="707.0" y="478.0" class="tick" text-anchor="middle" >200 ms</text>
+<line x1="802.0" y1="326" x2="802.0" y2="464" stroke="#e7e9ec" stroke-width="1"/>
+<text x="802.0" y="478.0" class="tick" text-anchor="end" >400 ms</text>
+<text x="462.0" y="344.0" class="label" text-anchor="start" >all-MiniLM-L6 (English)</text>
+<path d="M612.0,334.0 H618.5 Q621.5,334.0 621.5,337.0 V343.0 Q621.5,346.0 618.5,346.0 H612.0 Z" fill="#8b8b94"><title>sentence-transformers/all-MiniLM-L6-v2: 20 ms</title></path>
+<text x="810.0" y="344.0" class="val" text-anchor="start" >20 ms</text>
+<text x="462.0" y="366.0" class="label-em" text-anchor="start" >multiling. MiniLM-L12</text>
+<path d="M612.0,356.0 H624.0 Q627.0,356.0 627.0,359.0 V365.0 Q627.0,368.0 624.0,368.0 H612.0 Z" fill="#d97706"><title>sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2: 32 ms</title></path>
+<text x="810.0" y="366.0" class="val" text-anchor="start" >32 ms</text>
+<text x="462.0" y="388.0" class="label" text-anchor="start" >multiling. mpnet-base</text>
+<path d="M612.0,378.0 H648.4 Q651.4,378.0 651.4,381.0 V387.0 Q651.4,390.0 648.4,390.0 H612.0 Z" fill="#8b8b94"><title>sentence-transformers/paraphrase-multilingual-mpnet-base-v2: 83 ms</title></path>
+<text x="810.0" y="388.0" class="val" text-anchor="start" >83 ms</text>
+<text x="462.0" y="410.0" class="label" text-anchor="start" >multilingual-e5-small</text>
+<path d="M612.0,400.0 H639.8 Q642.8,400.0 642.8,403.0 V409.0 Q642.8,412.0 639.8,412.0 H612.0 Z" fill="#8b8b94"><title>intfloat/multilingual-e5-small: 65 ms</title></path>
+<text x="810.0" y="410.0" class="val" text-anchor="start" >65 ms</text>
+<text x="462.0" y="432.0" class="label" text-anchor="start" >multilingual-e5-base</text>
+<path d="M612.0,422.0 H661.7 Q664.7,422.0 664.7,425.0 V431.0 Q664.7,434.0 661.7,434.0 H612.0 Z" fill="#8b8b94"><title>intfloat/multilingual-e5-base: 111 ms</title></path>
+<text x="810.0" y="432.0" class="val" text-anchor="start" >111 ms</text>
+<text x="462.0" y="454.0" class="label" text-anchor="start" >bge-m3</text>
+<path d="M612.0,444.0 H770.8 Q773.8,444.0 773.8,447.0 V453.0 Q773.8,456.0 770.8,456.0 H612.0 Z" fill="#8b8b94"><title>BAAI/bge-m3: 341 ms</title></path>
+<text x="810.0" y="454.0" class="val" text-anchor="start" >341 ms</text>
+</svg>

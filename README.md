@@ -61,7 +61,7 @@ This repository contains a working MVP:
 - a model benchmark (6 models, 94 questions, frozen corpus) with charts and an interactive comparison view
 - an LLM-as-judge for answer correctness and faithfulness, calibrated against blind human labels
 
-The next planned technical step is multilingual embeddings for the cross-language retrieval gap.
+The next planned technical step is Docker Compose and CI with the judge as a quality gate.
 
 ---
 
@@ -73,7 +73,7 @@ flowchart LR
 
     subgraph Ingestion[Ingestion - offline]
         F[".txt / .md notes"] --> CH["Chunking<br/>paragraph-aware + overlap"]
-        CH --> EMB["Embeddings<br/>all-MiniLM-L6-v2"]
+        CH --> EMB["Embeddings<br/>multilingual MiniLM-L12"]
         EMB --> VDB[("ChromaDB<br/>persistent")]
     end
 
@@ -95,7 +95,7 @@ flowchart LR
 | :----------- | :------------------------------------------------------------------------------- |
 | API          | FastAPI (`/ask`, `/search`, `/ingest`, `/ingest/batch`, `/health`)               |
 | Chunking     | Paragraph-aware with character-level fallback and overlap                        |
-| Embeddings   | `sentence-transformers` — `all-MiniLM-L6-v2`                                     |
+| Embeddings   | `sentence-transformers` — `paraphrase-multilingual-MiniLM-L12-v2` (PL + EN)       |
 | Vector store | ChromaDB (persistent, per-file upsert/delete)                                    |
 | Retrieval    | Semantic (Chroma) with TF-IDF fallback + 1-hop neighbor context expansion        |
 | Generation   | Provider layer: OpenRouter (allowlisted models) or Ollama; `temperature = 0.0` by default, strict grounding prompt |
@@ -135,7 +135,8 @@ Drop your `.txt` or `.md` study notes into the directory:
 backend/data/notes/
 ```
 
-Then index them (from `backend/`). This rebuilds the vector collection and the TF-IDF fallback from that folder:
+Then index them (from `backend/`). This rebuilds the vector collection and the TF-IDF fallback from that folder.
+The first run downloads the multilingual embedding model (~470 MB); re-run this after changing `EMBEDDING_MODEL_KEY`:
 
 ```bash
 python -m app.ingest_corpus --corpus v1
@@ -323,6 +324,43 @@ mention who invented A\*"*) don't match the fixed refusal sentence the scorer lo
 above still uses prompt v1, so all six models stay comparable. Experiment cost: about $0.30. Reproduce with
 `python -m app.compare_prompts` after running `run_model_benchmark --prompt v1|v2|v3`.
 
+### Multilingual embeddings: closing the cross-language gap
+
+The retrieval bottleneck was the English-only embedding model: an English question about a Polish note found the right
+note only 56% of the time at `top_k = 3`. I compared six embedding models on retrieval
+alone (free, local, same chunks and the same file-level hit as the benchmark; the old model reproduces the
+benchmark's misses exactly):
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/benchmark/embeddings-dark.svg">
+  <img alt="Six embedding models compared on cross-language and same-language retrieval and query time; multilingual MiniLM-L12 chosen" src="docs/benchmark/embeddings-light.svg">
+</picture>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/benchmark/retrieval-topk-dark.svg">
+  <img alt="Cross-language retrieval by top_k: 56% before and 100% after switching to the multilingual model" src="docs/benchmark/retrieval-topk-light.svg">
+</picture>
+
+- **Chosen: `paraphrase-multilingual-MiniLM-L12-v2`** — cross-language hits at `top_k = 3` go from
+  56% to 100%, same-language ones stay high
+  (95% → 98%), for ~32 ms per query on a laptop CPU.
+- `bge-m3` ranks even better (the right note first in 96% of cross-language
+  questions) but costs ~341 ms per query and a 2 GB model; with only 3 chunks used, ranking beyond the top 3
+  doesn't change the answer. The e5 family underperformed cross-lingually despite its query/passage prefixes.
+- Each embedding model gets its own vector collections: both models output 384-dimensional vectors, so sharing a
+  collection would have mixed them silently. The old model stays selectable (`EMBEDDING_MODEL_KEY=minilm-l6`) to
+  reproduce the published model table.
+
+**End to end** (Claude Haiku 5.5, prompt v3, judge-verified) — share of *all* in-scope questions answered correctly:
+
+| | English-only embeddings | Multilingual embeddings |
+| :--- | ---: | ---: |
+| Benchmark questions | 52/77 (68%) | **72/77 (94%)** |
+| Polish probe | 11/20 (55%) | **20/20 (100%)** |
+
+Questions refused because retrieval missed the note dropped from 18 to 1;
+out-of-scope refusals are unchanged (94%). Cost of the end-to-end check: about $0.07.
+
 ### Parameters tested
 
 <picture>
@@ -334,15 +372,6 @@ above still uses prompt v1, so all six models stay comparable. Experiment cost: 
 (only one citation differs). Llama 3.2 3B varies by up to 22 pp *between repeated runs* at temperature 0.7 — and by up
 to 6 pp even at temperature 0, because hosted endpoints are not bit-deterministic. Takeaway: with a small model,
 single-run differences below ~10 pp are noise.
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/benchmark/retrieval-topk-dark.svg">
-  <img alt="Retrieval hit rate by top_k: same-language questions reach 100%, cross-language questions 62% at top_k 3" src="docs/benchmark/retrieval-topk-light.svg">
-</picture>
-
-**Retrieval top_k sweep (free — embeddings only).** The bottleneck is retrieval, not the LLM: questions in the same
-language as their note hit 100% from `top_k = 2`, while cross-language ones (English question, Polish note) reach only
-62% at the `top_k = 3` used above and 81% even at 8. This is what the next stage — multilingual embeddings — targets.
 
 ### What the benchmark caught along the way
 
@@ -357,7 +386,7 @@ language as their note hit 100% from `top_k = 2`, while cross-language ones (Eng
 - **Latency hygiene.** A laptop that went to sleep mid-run inflated latencies; the benchmark now detects host
   suspension and excludes those timings, and warms local models up before timing.
 - **Guardrails:** a model allowlist, a `--max-cost-usd` budget guard, and an abort if the context comes from the wrong
-  corpus. Total API spend for everything on this page, including the judge and the prompt experiment: about $1.60.
+  corpus. Total API spend for everything on this page, including the judge and both experiments: about $1.70.
 
 **Reproduce** (from `backend/`, with `OPENROUTER_API_KEY` in `backend/.env`):
 
@@ -370,6 +399,7 @@ python -m app.run_model_benchmark --corpus v2 --temperature 0.7 --run-tag r1 \
 python -m app.run_judge --max-cost-usd 2                             # LLM judge on the saved answers (cached)
 python -m app.judge_calibration build                                # blind labelling page for a 25-answer sample
 python -m app.judge_calibration score <labels.json>                  # human vs. judge agreement
+python -m app.compare_embeddings                                     # free: embedding-model retrieval comparison
 python -m app.render_benchmark_charts                                # charts + interactive page → docs/benchmark/
 ```
 
@@ -383,7 +413,7 @@ n is small: one question is 1.7–6 pp.
 
 Based on validation run insights, the system has the following limitations:
 
-- **Cross-lingual retrieval gap:** The monolingual English embedding model (`all-MiniLM-L6-v2`) fails on Polish concepts with no spelling/lexical overlap (e.g., _indukcja_ vs _inductive_). Retrieval succeeds when technical terms share spelling roots across English/Polish (e.g., _Bayes_ → _Bayesowski_ or _Markov_ → _Markowa_), but fails when there is no orthographic overlap (e.g., _hypothesis space_ vs _przestrzeń wersji_). On the larger v2 corpus, cross-language questions find the right note only 62% of the time at `top_k = 3` (see [Model benchmark](#parameters-tested)).
+- **Cross-lingual retrieval (largely fixed):** the original English-only embedding model missed Polish notes for English questions (56% found at top_k 3). The multilingual model finds them 100% of the time on the v2 benchmark; a larger, real corpus would be needed to confirm this holds beyond 23 notes ([details](#multilingual-embeddings-closing-the-cross-language-gap)).
 - **Context fragmentation:** The 1-hop neighbor expansion (±1 chunk) misses relevant information lying 2+ chunks away from the primary hit.
 - **Latency / model limitations (local mode):** The small model (`llama3.2:3b`) running on CPU is slow (averaging ~39.0 seconds per response) and sensitive to prompt/context size. Under large context sizes, it can become overly cautious and refuse to answer even when the answer is present in the context. Note: The first query after startup may take 30-45+ seconds as Ollama loads the model into memory; subsequent queries are faster.
 
@@ -406,6 +436,8 @@ backend/
     llm_client.py      # thin facade over the providers
     run_retrieval_eval.py / run_answer_eval.py
     run_model_benchmark.py / render_benchmark_charts.py / ingest_corpus.py
+    run_judge.py / judge.py / judge_calibration.py     # LLM-as-judge + human calibration
+    compare_prompts.py / compare_embeddings.py         # prompt and embedding-model experiments
   data/
     notes/             # sample study notes (corpus v1, indexed by the app)
     notes_v2/          # frozen benchmark corpus: v1 notes + 12 synthetic near-topic notes
@@ -433,7 +465,7 @@ docs/benchmark/        # README charts + static interactive benchmark page (GitH
 - [x] **LLM-as-judge** — correctness + faithfulness graded by GPT-5.6 Luna, calibrated on 25 blind human labels ([details](#is-the-judge-trustworthy)).
 - [ ] **Reranking** — add a cross-encoder reranker over the top-k candidates to improve answer precision.
 - [ ] **Hybrid search** — combine dense (embeddings) with sparse (BM25) retrieval instead of TF-IDF fallback.
-- [ ] **Multilingual embeddings** — swap `all-MiniLM-L6-v2` for a multilingual model to close the cross-lingual gap (62% → ? hit rate on cross-language questions).
+- [x] **Multilingual embeddings** — cross-language retrieval 56% → 100% at top_k 3; correct answers 68% → 94% end to end ([details](#multilingual-embeddings-closing-the-cross-language-gap)).
 - [ ] **Docker Compose** — one-command, reproducible setup.
 - [ ] **API authentication** — protect the endpoints for any non-local deployment.
 - [ ] **Deployment** — host the API + a small managed vector store.
