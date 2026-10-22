@@ -1,0 +1,262 @@
+{
+  "sentence-transformers/all-MiniLM-L6-v2": {
+    "model": "sentence-transformers/all-MiniLM-L6-v2",
+    "params_m": 23,
+    "load_s": 3.6,
+    "query_ms": 20.0,
+    "all": {
+      "n": 97,
+      "hit@1": 0.567,
+      "hit@2": 0.68,
+      "hit@3": 0.722,
+      "hit@5": 0.763,
+      "hit@8": 0.814,
+      "mrr": 0.664
+    },
+    "same_language": {
+      "n": 40,
+      "hit@1": 0.875,
+      "hit@2": 0.925,
+      "hit@3": 0.95,
+      "hit@5": 0.95,
+      "hit@8": 0.95,
+      "mrr": 0.912
+    },
+    "cross_language": {
+      "n": 57,
+      "hit@1": 0.351,
+      "hit@2": 0.509,
+      "hit@3": 0.561,
+      "hit@5": 0.632,
+      "hit@8": 0.719,
+      "mrr": 0.489
+    },
+    "misses_at_3": [
+      "q009",
+      "q010",
+      "q011",
+      "q017",
+      "q020",
+      "val001",
+      "val002",
+      "val003",
+      "val005",
+      "val006",
+      "val008",
+      "val012",
+      "n001",
+      "n002",
+      "n003",
+      "n010",
+      "n016",
+      "n030",
+      "pl-q014",
+      "pl-q021",
+      "pl-q023",
+      "pl-val011",
+      "pl-n004",
+      "pl-n006",
+      "pl-n014",
+      "pl-n018",
+      "pl-n022"
+    ]
+  },
+  "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2": {
+    "model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+    "params_m": 118,
+    "load_s": 6.4,
+    "query_ms": 31.6,
+    "all": {
+      "n": 97,
+      "hit@1": 0.876,
+      "hit@2": 0.979,
+      "hit@3": 0.99,
+      "hit@5": 0.99,
+      "hit@8": 1.0,
+      "mrr": 0.933
+    },
+    "same_language": {
+      "n": 40,
+      "hit@1": 0.9,
+      "hit@2": 0.975,
+      "hit@3": 0.975,
+      "hit@5": 0.975,
+      "hit@8": 1.0,
+      "mrr": 0.941
+    },
+    "cross_language": {
+      "n": 57,
+      "hit@1": 0.86,
+      "hit@2": 0.982,
+      "hit@3": 1.0,
+      "hit@5": 1.0,
+      "hit@8": 1.0,
+      "mrr": 0.927
+    },
+    "misses_at_3": [
+      "q015"
+    ]
+  },
+  "sentence-transformers/paraphrase-multilingual-mpnet-base-v2": {
+    "model": "sentence-transformers/paraphrase-multilingual-mpnet-base-v2",
+    "params_m": 278,
+    "load_s": 6.5,
+    "query_ms": 83.0,
+    "all": {
+      "n": 97,
+      "hit@1": 0.866,
+      "hit@2": 0.99,
+      "hit@3": 0.99,
+      "hit@5": 1.0,
+      "hit@8": 1.0,
+      "mrr": 0.93
+    },
+    "same_language": {
+      "n": 40,
+      "hit@1": 0.85,
+      "hit@2": 0.975,
+      "hit@3": 0.975,
+      "hit@5": 1.0,
+      "hit@8": 1.0,
+      "mrr": 0.919
+    },
+    "cross_language": {
+      "n": 57,
+      "hit@1": 0.877,
+      "hit@2": 1.0,
+      "hit@3": 1.0,
+      "hit@5": 1.0,
+      "hit@8": 1.0,
+      "mrr": 0.939
+    },
+    "misses_at_3": [
+      "q026"
+    ]
+  },
+  "intfloat/multilingual-e5-small": {
+    "model": "intfloat/multilingual-e5-small",
+    "params_m": 118,
+    "load_s": 6.3,
+    "query_ms": 64.9,
+    "all": {
+      "n": 97,
+      "hit@1": 0.753,
+      "hit@2": 0.825,
+      "hit@3": 0.835,
+      "hit@5": 0.887,
+      "hit@8": 0.938,
+      "mrr": 0.815
+    },
+    "same_language": {
+      "n": 40,
+      "hit@1": 0.95,
+      "hit@2": 1.0,
+      "hit@3": 1.0,
+      "hit@5": 1.0,
+      "hit@8": 1.0,
+      "mrr": 0.975
+    },
+    "cross_language": {
+      "n": 57,
+      "hit@1": 0.614,
+      "hit@2": 0.702,
+      "hit@3": 0.719,
+      "hit@5": 0.807,
+      "hit@8": 0.895,
+      "mrr": 0.704
+    },
+    "misses_at_3": [
+      "q001",
+      "q002",
+      "q003",
+      "q010",
+      "q011",
+      "q019",
+      "q020",
+      "val002",
+      "val003",
+      "val008",
+      "val009",
+      "val010",
+      "val011",
+      "val012",
+      "pl-q014",
+      "pl-n014"
+    ]
+  },
+  "intfloat/multilingual-e5-base": {
+    "model": "intfloat/multilingual-e5-base",
+    "params_m": 278,
+    "load_s": 6.4,
+    "query_ms": 111.0,
+    "all": {
+      "n": 97,
+      "hit@1": 0.773,
+      "hit@2": 0.897,
+      "hit@3": 0.938,
+      "hit@5": 0.948,
+      "hit@8": 0.959,
+      "mrr": 0.855
+    },
+    "same_language": {
+      "n": 40,
+      "hit@1": 0.975,
+      "hit@2": 1.0,
+      "hit@3": 1.0,
+      "hit@5": 1.0,
+      "hit@8": 1.0,
+      "mrr": 0.988
+    },
+    "cross_language": {
+      "n": 57,
+      "hit@1": 0.632,
+      "hit@2": 0.825,
+      "hit@3": 0.895,
+      "hit@5": 0.912,
+      "hit@8": 0.93,
+      "mrr": 0.762
+    },
+    "misses_at_3": [
+      "q010",
+      "val008",
+      "val009",
+      "val012",
+      "pl-q014",
+      "pl-n014"
+    ]
+  },
+  "BAAI/bge-m3": {
+    "model": "BAAI/bge-m3",
+    "params_m": 568,
+    "load_s": 6.0,
+    "query_ms": 340.7,
+    "all": {
+      "n": 97,
+      "hit@1": 0.969,
+      "hit@2": 1.0,
+      "hit@3": 1.0,
+      "hit@5": 1.0,
+      "hit@8": 1.0,
+      "mrr": 0.985
+    },
+    "same_language": {
+      "n": 40,
+      "hit@1": 0.975,
+      "hit@2": 1.0,
+      "hit@3": 1.0,
+      "hit@5": 1.0,
+      "hit@8": 1.0,
+      "mrr": 0.988
+    },
+    "cross_language": {
+      "n": 57,
+      "hit@1": 0.965,
+      "hit@2": 1.0,
+      "hit@3": 1.0,
+      "hit@5": 1.0,
+      "hit@8": 1.0,
+      "mrr": 0.982
+    },
+    "misses_at_3": []
+  }
+}

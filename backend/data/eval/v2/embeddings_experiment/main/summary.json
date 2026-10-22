@@ -1,0 +1,92 @@
+{
+  "runs": {
+    "openrouter:anthropic/claude-haiku-5.5": {
+      "model_id": "openrouter:anthropic/claude-haiku-5.5",
+      "provider": "openrouter",
+      "model": "anthropic/claude-haiku-5.5",
+      "temperature_requested": 0.0,
+      "temperature_applied": null,
+      "n_questions": 94,
+      "n_in_scope": 77,
+      "n_out_of_scope": 17,
+      "answer_rate_in_scope": 0.987,
+      "n_supported": 76,
+      "answer_rate_supported": 1.0,
+      "n_unsupported": 1,
+      "refusal_rate_unsupported": 1.0,
+      "refusal_rate_out_of_scope": 0.9412,
+      "valid_citation_rate": 1.0,
+      "invalid_citations": 0,
+      "failures": 0,
+      "suspended_questions": 0,
+      "latency_mean_s": 1.36,
+      "latency_p50_s": 1.3,
+      "prompt_tokens_mean": 1472.6,
+      "completion_tokens_mean": 89.8,
+      "cost_per_1k_queries_usd": 0.1922,
+      "reasoning": "enabled=False",
+      "language_match_rate": 1.0,
+      "reasoning_tokens_mean": 0,
+      "retrieval_hit_rate": 0.987,
+      "by_category": {
+        "direct_fact": {
+          "n": 30,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "explanation": {
+          "n": 19,
+          "rate": 0.9474,
+          "metric": "answered"
+        },
+        "comparison": {
+          "n": 12,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "example": {
+          "n": 4,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "paraphrase": {
+          "n": 3,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "out_of_scope": {
+          "n": 5,
+          "rate": 1.0,
+          "metric": "refused"
+        },
+        "distraction_resistance": {
+          "n": 3,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "multi_note": {
+          "n": 6,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "out_of_scope_trap": {
+          "n": 12,
+          "rate": 0.9167,
+          "metric": "refused"
+        }
+      },
+      "dataset": "questions.json",
+      "corpus": "v2",
+      "prompt_version": "v3",
+      "embedding_model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+      "reasoning_mode": "off",
+      "top_k": 3,
+      "run_at": "2026-10-22T19:22:32+00:00",
+      "git_commit": "d6d66a2",
+      "judge_model": "openai/gpt-5.6-luna",
+      "judge_correct_rate_supported": 0.9474,
+      "judge_key_point_recall": 0.977,
+      "judge_faithful_rate": 0.9474
+    }
+  }
+}

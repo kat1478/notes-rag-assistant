@@ -1,0 +1,19 @@
+{
+  "judge_model": "openai/gpt-5.6-luna",
+  "judge_version": "v2",
+  "runs": {
+    "openrouter:anthropic/claude-haiku-5.5": {
+      "n_in_scope": 77,
+      "n_answered": 76,
+      "correct_rate_supported": 0.9474,
+      "correct_rate_answered": 0.9474,
+      "partial_rate_answered": 0.0526,
+      "incorrect_rate_answered": 0.0,
+      "key_point_recall_mean": 0.977,
+      "faithful_rate_answered": 0.9474,
+      "n_answered_without_note": 0,
+      "faithful_rate_without_note": null
+    }
+  },
+  "run_at": "2026-10-22T19:27:02+00:00"
+}
