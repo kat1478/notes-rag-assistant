@@ -1,0 +1,205 @@
+{
+  "runs": {
+    "openrouter:anthropic/claude-haiku-5.5": {
+      "model_id": "openrouter:anthropic/claude-haiku-5.5",
+      "provider": "openrouter",
+      "model": "anthropic/claude-haiku-5.5",
+      "temperature_requested": 0.0,
+      "temperature_applied": null,
+      "n_questions": 23,
+      "n_in_scope": 20,
+      "n_out_of_scope": 3,
+      "answer_rate_in_scope": 0.5,
+      "n_supported": 11,
+      "answer_rate_supported": 0.9091,
+      "n_unsupported": 9,
+      "refusal_rate_unsupported": 1.0,
+      "refusal_rate_out_of_scope": 1.0,
+      "valid_citation_rate": 1.0,
+      "invalid_citations": 0,
+      "failures": 0,
+      "suspended_questions": 0,
+      "latency_mean_s": 1.32,
+      "latency_p50_s": 1.28,
+      "prompt_tokens_mean": 1733.2,
+      "completion_tokens_mean": 78.5,
+      "cost_per_1k_queries_usd": 0.2126,
+      "reasoning": "enabled=False",
+      "language_match_rate": 0.3478,
+      "reasoning_tokens_mean": 0,
+      "retrieval_hit_rate": 0.55,
+      "by_category": {
+        "direct_fact": {
+          "n": 13,
+          "rate": 0.4615,
+          "metric": "answered"
+        },
+        "explanation": {
+          "n": 5,
+          "rate": 0.6,
+          "metric": "answered"
+        },
+        "comparison": {
+          "n": 2,
+          "rate": 0.5,
+          "metric": "answered"
+        },
+        "out_of_scope_trap": {
+          "n": 2,
+          "rate": 1.0,
+          "metric": "refused"
+        },
+        "out_of_scope": {
+          "n": 1,
+          "rate": 1.0,
+          "metric": "refused"
+        }
+      },
+      "dataset": "questions_pl_probe.json",
+      "corpus": "v2",
+      "prompt_version": "v1",
+      "reasoning_mode": "off",
+      "top_k": 3,
+      "run_at": "2026-10-22T17:44:13+00:00",
+      "git_commit": "ba039a0",
+      "judge_model": "openai/gpt-5.6-luna",
+      "judge_correct_rate_supported": 0.8182,
+      "judge_key_point_recall": 0.9833,
+      "judge_faithful_rate": 1.0
+    },
+    "openrouter:meta-llama/llama-3.2-3b-instruct": {
+      "model_id": "openrouter:meta-llama/llama-3.2-3b-instruct",
+      "provider": "openrouter",
+      "model": "meta-llama/llama-3.2-3b-instruct",
+      "temperature_requested": 0.0,
+      "temperature_applied": 0.0,
+      "n_questions": 23,
+      "n_in_scope": 20,
+      "n_out_of_scope": 3,
+      "answer_rate_in_scope": 0.65,
+      "n_supported": 11,
+      "answer_rate_supported": 1.0,
+      "n_unsupported": 9,
+      "refusal_rate_unsupported": 0.7778,
+      "refusal_rate_out_of_scope": 1.0,
+      "valid_citation_rate": 0.7692,
+      "invalid_citations": 0,
+      "failures": 0,
+      "suspended_questions": 0,
+      "latency_mean_s": 0.99,
+      "latency_p50_s": 0.92,
+      "prompt_tokens_mean": 1251.6,
+      "completion_tokens_mean": 59.3,
+      "cost_per_1k_queries_usd": 0.0836,
+      "reasoning": null,
+      "language_match_rate": 0.9565,
+      "reasoning_tokens_mean": 0,
+      "retrieval_hit_rate": 0.55,
+      "by_category": {
+        "direct_fact": {
+          "n": 13,
+          "rate": 0.5385,
+          "metric": "answered"
+        },
+        "explanation": {
+          "n": 5,
+          "rate": 0.8,
+          "metric": "answered"
+        },
+        "comparison": {
+          "n": 2,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "out_of_scope_trap": {
+          "n": 2,
+          "rate": 1.0,
+          "metric": "refused"
+        },
+        "out_of_scope": {
+          "n": 1,
+          "rate": 1.0,
+          "metric": "refused"
+        }
+      },
+      "dataset": "questions_pl_probe.json",
+      "corpus": "v2",
+      "prompt_version": "v1",
+      "reasoning_mode": "off",
+      "top_k": 3,
+      "run_at": "2026-10-22T17:44:36+00:00",
+      "git_commit": "ba039a0",
+      "judge_model": "openai/gpt-5.6-luna",
+      "judge_correct_rate_supported": 0.7273,
+      "judge_key_point_recall": 0.782,
+      "judge_faithful_rate": 0.8462
+    },
+    "openrouter:qwen/qwen3-30b-a3b-instruct-2507": {
+      "model_id": "openrouter:qwen/qwen3-30b-a3b-instruct-2507",
+      "provider": "openrouter",
+      "model": "qwen/qwen3-30b-a3b-instruct-2507",
+      "temperature_requested": 0.0,
+      "temperature_applied": 0.0,
+      "n_questions": 23,
+      "n_in_scope": 20,
+      "n_out_of_scope": 3,
+      "answer_rate_in_scope": 0.55,
+      "n_supported": 11,
+      "answer_rate_supported": 0.9091,
+      "n_unsupported": 9,
+      "refusal_rate_unsupported": 0.8889,
+      "refusal_rate_out_of_scope": 1.0,
+      "valid_citation_rate": 1.0,
+      "invalid_citations": 0,
+      "failures": 0,
+      "suspended_questions": 0,
+      "latency_mean_s": 2.81,
+      "latency_p50_s": 2.74,
+      "prompt_tokens_mean": 1194.5,
+      "completion_tokens_mean": 59.4,
+      "cost_per_1k_queries_usd": 0.1253,
+      "reasoning": null,
+      "language_match_rate": 0.4348,
+      "reasoning_tokens_mean": 0,
+      "retrieval_hit_rate": 0.55,
+      "by_category": {
+        "direct_fact": {
+          "n": 13,
+          "rate": 0.4615,
+          "metric": "answered"
+        },
+        "explanation": {
+          "n": 5,
+          "rate": 0.8,
+          "metric": "answered"
+        },
+        "comparison": {
+          "n": 2,
+          "rate": 0.5,
+          "metric": "answered"
+        },
+        "out_of_scope_trap": {
+          "n": 2,
+          "rate": 1.0,
+          "metric": "refused"
+        },
+        "out_of_scope": {
+          "n": 1,
+          "rate": 1.0,
+          "metric": "refused"
+        }
+      },
+      "dataset": "questions_pl_probe.json",
+      "corpus": "v2",
+      "prompt_version": "v1",
+      "reasoning_mode": "off",
+      "top_k": 3,
+      "run_at": "2026-10-22T17:45:44+00:00",
+      "git_commit": "ba039a0",
+      "judge_model": "openai/gpt-5.6-luna",
+      "judge_correct_rate_supported": 0.9091,
+      "judge_key_point_recall": 1.0,
+      "judge_faithful_rate": 0.8182
+    }
+  }
+}

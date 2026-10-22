@@ -24,8 +24,9 @@ from typing import Dict, List, Optional
 
 import httpx
 
-from .answering import FALLBACK_PREFIX, generate_answer_with_meta
-from .config import CORPORA, DATA_DIR, OPENROUTER_BASE_URL, REASONING, TEMPERATURE
+from .answering import FALLBACK_PREFIX, PROMPT_VERSIONS, generate_answer_with_meta
+from .config import CORPORA, DATA_DIR, OPENROUTER_BASE_URL, PROMPT_VERSION, REASONING, TEMPERATURE
+from .language import detect_language
 from .evaluation import is_refusal_response, load_evaluation_dataset
 from .provider import get_provider, list_models
 from .retrieval import perform_search
@@ -103,13 +104,14 @@ def run_key(model_id: str, temperature: float) -> str:
 
 
 def run_model(model_id: str, items: List[dict], contexts: Dict[str, list], prices,
-              temperature: float, budget: Dict[str, float], hits: Dict[str, Optional[bool]]) -> List[dict]:
+              temperature: float, budget: Dict[str, float], hits: Dict[str, Optional[bool]],
+              prompt_version: str = PROMPT_VERSION) -> List[dict]:
     warm_up(model_id)
     rows = []
     for i, item in enumerate(items, 1):
         sources = contexts[item["id"]]
         t0, wall0 = time.perf_counter(), time.time()
-        gen = generate_answer_with_meta(item["question"], sources, model_id, temperature)
+        gen = generate_answer_with_meta(item["question"], sources, model_id, temperature, prompt_version)
         latency_ms = (time.perf_counter() - t0) * 1000
         # Wall clock jumping ahead of the monotonic clock means the host slept mid-request.
         suspended = (time.time() - wall0) * 1000 - latency_ms > 5000
@@ -120,6 +122,7 @@ def run_model(model_id: str, items: List[dict], contexts: Dict[str, list], price
         refused = is_refusal_response(gen.text)
         cites = parse_citations(gen.text, len(sources))
         should_answer = bool(item.get("should_answer", True))
+        q_lang, a_lang = detect_language(item["question"]), detect_language(gen.text)
         rows.append({
             "question_id": item["id"],
             "category": item.get("category", ""),
@@ -137,6 +140,9 @@ def run_model(model_id: str, items: List[dict], contexts: Dict[str, list], price
             "reasoning_tokens": gen.reasoning_tokens,
             "reasoning": gen.reasoning or "",
             "retrieval_hit": hits[item["id"]],
+            "question_language": q_lang,
+            "answer_language": a_lang,
+            "language_match": (q_lang == a_lang) if "unknown" not in (q_lang, a_lang) and not failed else None,
             "temperature": gen.temperature,
             "answer_text": gen.text.replace("\n", " ").replace("\r", " "),
             "error": gen.error or "",
@@ -194,6 +200,9 @@ def summarize(model_id: str, rows: List[dict], temperature_requested: float = TE
         if any(r["completion_tokens"] for r in rows) else None,
         "cost_per_1k_queries_usd": round(1000 * sum(costs) / len(costs), 4) if costs and len(costs) == len(rows) else None,
         "reasoning": next((r["reasoning"] for r in rows if r.get("reasoning")), None),
+        # Answer written in the question's language (refusals included; undetectable answers excluded).
+        "language_match_rate": rate(sum(r.get("language_match") is True for r in rows),
+                                    sum(r.get("language_match") is not None for r in rows)),
         "reasoning_tokens_mean": round(statistics.mean([r["reasoning_tokens"] or 0 for r in rows]), 1)
         if any(r.get("reasoning_tokens") is not None for r in rows) else None,
         "retrieval_hit_rate": rate(sum(bool(r["retrieval_hit"]) for r in in_scope if r["retrieval_hit"] is not None),
@@ -275,6 +284,8 @@ def main():
                         help="Notes corpus / Chroma collection (v2: ingest first with python -m app.ingest_corpus --corpus v2).")
     parser.add_argument("--dataset-path", help="Questions JSON (default depends on --corpus).")
     parser.add_argument("--retrieval-only", action="store_true", help="Report retrieval hit rates and exit (no LLM calls).")
+    parser.add_argument("--prompt", choices=PROMPT_VERSIONS, default=PROMPT_VERSION,
+                        help=f"Grounding prompt version (default {PROMPT_VERSION}).")
     parser.add_argument("--run-tag", help="Suffix for repeated runs, saved as '<model>[@tT]#<tag>'.")
     parser.add_argument("--rescore", action="store_true",
                         help="Recompute metrics from saved CSVs (e.g. after a refusal-detector fix); no LLM calls.")
@@ -336,7 +347,7 @@ def main():
     for model_id in model_ids:
         logger.info(f"=== {model_id} ===")
         try:
-            rows = run_model(model_id, items, contexts, prices, args.temperature, budget, hits)
+            rows = run_model(model_id, items, contexts, prices, args.temperature, budget, hits, args.prompt)
         except BudgetExceeded as e:
             sys.exit(f"Budget guard: {e}")
         result = summarize(model_id, rows, args.temperature)
@@ -351,6 +362,7 @@ def main():
         result.update({
             "dataset": dataset_path.name,
             "corpus": args.corpus,
+            "prompt_version": args.prompt,
             "reasoning_mode": REASONING,
             "top_k": args.top_k,
             "run_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),

@@ -81,6 +81,11 @@ OPENROUTER_MODELS = [
     if m.strip()
 ]
 
+# Grounding prompt version used by the app (see answering.py). Benchmarks can override it with --prompt.
+# v3 since 2026-10-22: states the detected question language (prompt experiment in README). The published v2
+# benchmark table was run with v1.
+PROMPT_VERSION = os.getenv("PROMPT_VERSION", "v3")
+
 # LLM judge (internal, not selectable per request): grades saved benchmark answers for correctness and
 # faithfulness. Chosen 2026-10-22 as a cheap judge from a different family than the default model (Haiku).
 JUDGE_MODEL = os.getenv("JUDGE_MODEL", "openai/gpt-5.6-luna")
