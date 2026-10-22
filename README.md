@@ -299,6 +299,30 @@ grades) in a small labelling page, then compared:
 
 Judge cost for all 359 graded answers: about $0.18.
 
+### Prompt iteration: answering in the question's language
+
+The original grounding prompt told the model *"the question is in English"*. Claude Haiku obeyed it and answered
+Polish questions in English, while Llama 3.2 3B drifted the other way — into the notes' Polish on half of the
+English questions. I measured three prompt versions on the 94 benchmark questions plus a **Polish probe set**
+(23 benchmark questions translated to Polish), with a deterministic language check and the LLM judge:
+
+- **v2** — "the question may be in either language": fixed Polish questions, but primed Haiku into Polish on 5
+  English questions and confused Llama 3B. Rejected.
+- **v3** — the app detects the question's language and states it (*"The question is in Polish. Write the whole answer
+  in Polish."*), with one refusal sentence in that language. **Adopted as the default.**
+
+| Model (v1 → v3) | Same language — English questions | Same language — Polish questions | Correct — English | Correct — Polish |
+| :--- | ---: | ---: | ---: | ---: |
+| **claude-haiku-5.5** (default) | 95% → 99% | 35% → 100% | 88% → 88% | 82% → 91% |
+| qwen3-30b | 96% → 100% | 44% → 100% | 80% → 86% | 91% → 100% |
+| llama-3.2-3b | 50% → 90% | 96% → 100% | 63% → 73% | 73% → 64% |
+
+Haiku's faithfulness and refusal scores dip slightly under v3, but on inspection those are measurement artefacts:
+the judge counts hedges such as *"the notes do not explicitly state…"* as claims, and soft refusals (*"the notes do not
+mention who invented A\*"*) don't match the fixed refusal sentence the scorer looks for. The published model table
+above still uses prompt v1, so all six models stay comparable. Experiment cost: about $0.30. Reproduce with
+`python -m app.compare_prompts` after running `run_model_benchmark --prompt v1|v2|v3`.
+
 ### Parameters tested
 
 <picture>
@@ -333,7 +357,7 @@ language as their note hit 100% from `top_k = 2`, while cross-language ones (Eng
 - **Latency hygiene.** A laptop that went to sleep mid-run inflated latencies; the benchmark now detects host
   suspension and excludes those timings, and warms local models up before timing.
 - **Guardrails:** a model allowlist, a `--max-cost-usd` budget guard, and an abort if the context comes from the wrong
-  corpus. Total API spend for everything on this page, including the judge: about $1.30.
+  corpus. Total API spend for everything on this page, including the judge and the prompt experiment: about $1.60.
 
 **Reproduce** (from `backend/`, with `OPENROUTER_API_KEY` in `backend/.env`):
 
