@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="900" height="340" viewBox="0 0 900 340" role="img" aria-labelledby="t d">
-<title id="t">Retrieval hit rate by top_k, same-language vs cross-language</title>
-<desc id="d">same language: top_k 1=97%, top_k 2=100%, top_k 3=100%, top_k 5=100%, top_k 8=100%; cross-language: top_k 1=40%, top_k 2=58%, top_k 3=62%, top_k 5=71%, top_k 8=81%</desc>
+<title id="t">Cross-language retrieval hit rate by top_k, before/after</title>
+<desc id="d">sentence-transformers/all-MiniLM-L6-v2: top_k 1=0.351, top_k 2=0.509, top_k 3=0.561, top_k 5=0.632, top_k 8=0.719; sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2: top_k 1=0.86, top_k 2=0.982, top_k 3=1.0, top_k 5=1.0, top_k 8=1.0</desc>
 <style>
     text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; fill: #e6edf3; }
     .h1 { font-size: 16px; font-weight: 600; }
@@ -14,41 +14,41 @@
     .legend { font-size: 12px; fill: #9198a1; }
     </style>
 <rect x="0.5" y="0.5" width="899" height="339" rx="6" fill="#0d1117" stroke="#30363d"/>
-<text x="24.0" y="32.0" class="h1" text-anchor="start" >Retrieval: how often is the right note in the context?</text>
-<text x="24.0" y="52.0" class="sub" text-anchor="start" >77 in-scope questions on corpus v2 (English-centric embeddings, all-MiniLM-L6-v2). Cross-language = question and note in different languages (EN↔PL).</text>
-<line x1="64" y1="300.0" x2="736" y2="300.0" stroke="#3d444d" stroke-width="1"/>
+<text x="24.0" y="32.0" class="h1" text-anchor="start" >Cross-language retrieval before and after switching the embedding model</text>
+<text x="24.0" y="52.0" class="sub" text-anchor="start" >57 questions whose language differs from their note&#x27;s (EN↔PL) · share with the right note in the top k · same-language questions stay ≥ 95% with both models</text>
+<line x1="64" y1="300.0" x2="686" y2="300.0" stroke="#3d444d" stroke-width="1"/>
 <text x="56.0" y="304.0" class="tick" text-anchor="end" >0%</text>
-<line x1="64" y1="248.0" x2="736" y2="248.0" stroke="#21262d" stroke-width="1"/>
+<line x1="64" y1="248.0" x2="686" y2="248.0" stroke="#21262d" stroke-width="1"/>
 <text x="56.0" y="252.0" class="tick" text-anchor="end" >25%</text>
-<line x1="64" y1="196.0" x2="736" y2="196.0" stroke="#21262d" stroke-width="1"/>
+<line x1="64" y1="196.0" x2="686" y2="196.0" stroke="#21262d" stroke-width="1"/>
 <text x="56.0" y="200.0" class="tick" text-anchor="end" >50%</text>
-<line x1="64" y1="144.0" x2="736" y2="144.0" stroke="#21262d" stroke-width="1"/>
+<line x1="64" y1="144.0" x2="686" y2="144.0" stroke="#21262d" stroke-width="1"/>
 <text x="56.0" y="148.0" class="tick" text-anchor="end" >75%</text>
-<line x1="64" y1="92.0" x2="736" y2="92.0" stroke="#21262d" stroke-width="1"/>
+<line x1="64" y1="92.0" x2="686" y2="92.0" stroke="#21262d" stroke-width="1"/>
 <text x="56.0" y="96.0" class="tick" text-anchor="end" >100%</text>
 <text x="64.0" y="318.0" class="tick" text-anchor="middle" >top_k 1</text>
-<text x="232.0" y="318.0" class="tick" text-anchor="middle" >top_k 2</text>
-<text x="400.0" y="318.0" class="tick" text-anchor="middle" >top_k 3</text>
-<text x="568.0" y="318.0" class="tick" text-anchor="middle" >top_k 5</text>
-<text x="736.0" y="318.0" class="tick" text-anchor="middle" >top_k 8</text>
-<line x1="400.0" y1="92" x2="400.0" y2="300" stroke="#7d8590" stroke-width="1"/>
-<text x="406.0" y="292.0" class="dir" text-anchor="start" >used in the model benchmark</text>
-<polyline points="64.0,99.2 232.0,92.0 400.0,92.0 568.0,92.0 736.0,92.0" fill="none" stroke="#3987e5" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="64.0" cy="99.2" r="4.5" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>same language, top_k 1: 97%</title></circle>
-<circle cx="232.0" cy="92.0" r="4.5" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>same language, top_k 2: 100%</title></circle>
-<circle cx="400.0" cy="92.0" r="4.5" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>same language, top_k 3: 100%</title></circle>
-<circle cx="568.0" cy="92.0" r="4.5" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>same language, top_k 5: 100%</title></circle>
-<circle cx="736.0" cy="92.0" r="4.5" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>same language, top_k 8: 100%</title></circle>
-<line x1="750" y1="92.0" x2="762" y2="92.0" stroke="#3987e5" stroke-width="2"/>
-<text x="768.0" y="96.0" class="label" text-anchor="start" >same language (n=29)</text>
-<text x="400.0" y="82.0" class="val" text-anchor="middle" >100%</text>
-<polyline points="64.0,217.7 232.0,178.7 400.0,170.0 568.0,152.7 736.0,131.0" fill="none" stroke="#d95926" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="64.0" cy="217.7" r="4.5" fill="#d95926" stroke="#0d1117" stroke-width="2"><title>cross-language, top_k 1: 40%</title></circle>
-<circle cx="232.0" cy="178.7" r="4.5" fill="#d95926" stroke="#0d1117" stroke-width="2"><title>cross-language, top_k 2: 58%</title></circle>
-<circle cx="400.0" cy="170.0" r="4.5" fill="#d95926" stroke="#0d1117" stroke-width="2"><title>cross-language, top_k 3: 62%</title></circle>
-<circle cx="568.0" cy="152.7" r="4.5" fill="#d95926" stroke="#0d1117" stroke-width="2"><title>cross-language, top_k 5: 71%</title></circle>
-<circle cx="736.0" cy="131.0" r="4.5" fill="#d95926" stroke="#0d1117" stroke-width="2"><title>cross-language, top_k 8: 81%</title></circle>
-<line x1="750" y1="131.0" x2="762" y2="131.0" stroke="#d95926" stroke-width="2"/>
-<text x="768.0" y="135.0" class="label" text-anchor="start" >cross-language (n=48)</text>
-<text x="400.0" y="160.0" class="val" text-anchor="middle" >62%</text>
+<text x="219.5" y="318.0" class="tick" text-anchor="middle" >top_k 2</text>
+<text x="375.0" y="318.0" class="tick" text-anchor="middle" >top_k 3</text>
+<text x="530.5" y="318.0" class="tick" text-anchor="middle" >top_k 5</text>
+<text x="686.0" y="318.0" class="tick" text-anchor="middle" >top_k 8</text>
+<line x1="375.0" y1="92" x2="375.0" y2="300" stroke="#7d8590" stroke-width="1"/>
+<text x="381.0" y="292.0" class="dir" text-anchor="start" >used by the app</text>
+<polyline points="64.0,227.0 219.5,194.1 375.0,183.3 530.5,168.5 686.0,150.4" fill="none" stroke="#d95926" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="64.0" cy="227.0" r="4.5" fill="#d95926" stroke="#0d1117" stroke-width="2"><title>before: all-MiniLM-L6-v2, top_k 1: 35%</title></circle>
+<circle cx="219.5" cy="194.1" r="4.5" fill="#d95926" stroke="#0d1117" stroke-width="2"><title>before: all-MiniLM-L6-v2, top_k 2: 51%</title></circle>
+<circle cx="375.0" cy="183.3" r="4.5" fill="#d95926" stroke="#0d1117" stroke-width="2"><title>before: all-MiniLM-L6-v2, top_k 3: 56%</title></circle>
+<circle cx="530.5" cy="168.5" r="4.5" fill="#d95926" stroke="#0d1117" stroke-width="2"><title>before: all-MiniLM-L6-v2, top_k 5: 63%</title></circle>
+<circle cx="686.0" cy="150.4" r="4.5" fill="#d95926" stroke="#0d1117" stroke-width="2"><title>before: all-MiniLM-L6-v2, top_k 8: 72%</title></circle>
+<line x1="700" y1="150.4" x2="712" y2="150.4" stroke="#d95926" stroke-width="2"/>
+<text x="718.0" y="154.4" class="label" text-anchor="start" >before: all-MiniLM-L6-v2</text>
+<text x="375.0" y="173.3" class="val" text-anchor="middle" >56%</text>
+<polyline points="64.0,121.1 219.5,95.7 375.0,92.0 530.5,92.0 686.0,92.0" fill="none" stroke="#3987e5" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="64.0" cy="121.1" r="4.5" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>after: multilingual-MiniLM-L12, top_k 1: 86%</title></circle>
+<circle cx="219.5" cy="95.7" r="4.5" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>after: multilingual-MiniLM-L12, top_k 2: 98%</title></circle>
+<circle cx="375.0" cy="92.0" r="4.5" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>after: multilingual-MiniLM-L12, top_k 3: 100%</title></circle>
+<circle cx="530.5" cy="92.0" r="4.5" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>after: multilingual-MiniLM-L12, top_k 5: 100%</title></circle>
+<circle cx="686.0" cy="92.0" r="4.5" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>after: multilingual-MiniLM-L12, top_k 8: 100%</title></circle>
+<line x1="700" y1="92.0" x2="712" y2="92.0" stroke="#3987e5" stroke-width="2"/>
+<text x="718.0" y="96.0" class="label" text-anchor="start" >after: multilingual-MiniLM-L12</text>
+<text x="375.0" y="82.0" class="val" text-anchor="middle" >100%</text>
 </svg>

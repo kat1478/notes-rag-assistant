@@ -1,0 +1,30 @@
+{
+  "main_old": {
+    "n": 77,
+    "correct": 52,
+    "partial": 7,
+    "refused": 18,
+    "unfaithful": 7
+  },
+  "main_new": {
+    "n": 77,
+    "correct": 72,
+    "partial": 4,
+    "refused": 1,
+    "unfaithful": 4
+  },
+  "pl_old": {
+    "n": 20,
+    "correct": 11,
+    "partial": 1,
+    "refused": 8,
+    "unfaithful": 2
+  },
+  "pl_new": {
+    "n": 20,
+    "correct": 20,
+    "partial": 0,
+    "refused": 0,
+    "unfaithful": 1
+  }
+}

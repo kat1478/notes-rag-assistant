@@ -22,7 +22,8 @@ def get_model() -> SentenceTransformer:
 def embed_text(text: str) -> List[float]:
     """Generates an embedding for a single text string."""
     model = get_model()
-    embedding = model.encode(text)
+    # Normalised so Chroma's L2 ranking equals cosine ranking (the multilingual model doesn't normalise itself).
+    embedding = model.encode(text, normalize_embeddings=True)
     return embedding.tolist()
 
 def embed_texts(texts: List[str]) -> List[List[float]]:
@@ -30,5 +31,5 @@ def embed_texts(texts: List[str]) -> List[List[float]]:
     if not texts:
         return []
     model = get_model()
-    embeddings = model.encode(texts)
+    embeddings = model.encode(texts, normalize_embeddings=True)
     return embeddings.tolist()

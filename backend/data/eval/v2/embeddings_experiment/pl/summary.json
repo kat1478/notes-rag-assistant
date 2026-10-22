@@ -1,0 +1,72 @@
+{
+  "runs": {
+    "openrouter:anthropic/claude-haiku-5.5": {
+      "model_id": "openrouter:anthropic/claude-haiku-5.5",
+      "provider": "openrouter",
+      "model": "anthropic/claude-haiku-5.5",
+      "temperature_requested": 0.0,
+      "temperature_applied": null,
+      "n_questions": 23,
+      "n_in_scope": 20,
+      "n_out_of_scope": 3,
+      "answer_rate_in_scope": 1.0,
+      "n_supported": 20,
+      "answer_rate_supported": 1.0,
+      "n_unsupported": 0,
+      "refusal_rate_unsupported": null,
+      "refusal_rate_out_of_scope": 1.0,
+      "valid_citation_rate": 1.0,
+      "invalid_citations": 0,
+      "failures": 0,
+      "suspended_questions": 0,
+      "latency_mean_s": 1.51,
+      "latency_p50_s": 1.49,
+      "prompt_tokens_mean": 1427.7,
+      "completion_tokens_mean": 127.3,
+      "cost_per_1k_queries_usd": 0.2064,
+      "reasoning": "enabled=False",
+      "language_match_rate": 1.0,
+      "reasoning_tokens_mean": 0,
+      "retrieval_hit_rate": 1.0,
+      "by_category": {
+        "direct_fact": {
+          "n": 13,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "explanation": {
+          "n": 5,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "comparison": {
+          "n": 2,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "out_of_scope_trap": {
+          "n": 2,
+          "rate": 1.0,
+          "metric": "refused"
+        },
+        "out_of_scope": {
+          "n": 1,
+          "rate": 1.0,
+          "metric": "refused"
+        }
+      },
+      "dataset": "questions_pl_probe.json",
+      "corpus": "v2",
+      "prompt_version": "v3",
+      "embedding_model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+      "reasoning_mode": "off",
+      "top_k": 3,
+      "run_at": "2026-10-22T19:23:25+00:00",
+      "git_commit": "d6d66a2",
+      "judge_model": "openai/gpt-5.6-luna",
+      "judge_correct_rate_supported": 1.0,
+      "judge_key_point_recall": 1.0,
+      "judge_faithful_rate": 0.95
+    }
+  }
+}
