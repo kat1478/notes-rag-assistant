@@ -25,7 +25,7 @@ from typing import Dict, List, Optional
 import httpx
 
 from .answering import FALLBACK_PREFIX, PROMPT_VERSIONS, generate_answer_with_meta
-from .config import CORPORA, DATA_DIR, OPENROUTER_BASE_URL, PROMPT_VERSION, REASONING, TEMPERATURE
+from .config import CORPORA, DATA_DIR, EMBEDDING_MODEL, OPENROUTER_BASE_URL, PROMPT_VERSION, REASONING, TEMPERATURE
 from .language import detect_language
 from .evaluation import is_refusal_response, load_evaluation_dataset
 from .provider import get_provider, list_models
@@ -363,6 +363,7 @@ def main():
             "dataset": dataset_path.name,
             "corpus": args.corpus,
             "prompt_version": args.prompt,
+            "embedding_model": EMBEDDING_MODEL,
             "reasoning_mode": REASONING,
             "top_k": args.top_k,
             "run_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
