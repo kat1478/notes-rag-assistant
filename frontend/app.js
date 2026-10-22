@@ -1,7 +1,7 @@
 // notes-rag frontend — vanilla JS, talks to the FastAPI backend (/health, /ask).
 
 // Refusal sentence fixed by the grounding prompt in backend/app/answering.py.
-const REFUSAL_RE = /don['’]t have enough information/i;
+const REFUSAL_RE = /don['’]t have enough information|nie mam wystarczających informacji/i;
 const TOP_K_MIN = 1;
 const TOP_K_MAX = 10;
 const TEMP_MAX = 1.0;   // matches backend TEMPERATURE_MAX

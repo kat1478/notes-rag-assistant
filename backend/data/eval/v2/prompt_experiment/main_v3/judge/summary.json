@@ -1,0 +1,43 @@
+{
+  "judge_model": "openai/gpt-5.6-luna",
+  "judge_version": "v2",
+  "runs": {
+    "openrouter:anthropic/claude-haiku-5.5": {
+      "n_in_scope": 77,
+      "n_answered": 59,
+      "correct_rate_supported": 0.8814,
+      "correct_rate_answered": 0.8814,
+      "partial_rate_answered": 0.1186,
+      "incorrect_rate_answered": 0.0,
+      "key_point_recall_mean": 0.9463,
+      "faithful_rate_answered": 0.8814,
+      "n_answered_without_note": 1,
+      "faithful_rate_without_note": 0.0
+    },
+    "openrouter:meta-llama/llama-3.2-3b-instruct": {
+      "n_in_scope": 77,
+      "n_answered": 65,
+      "correct_rate_supported": 0.7288,
+      "correct_rate_answered": 0.7077,
+      "partial_rate_answered": 0.2308,
+      "incorrect_rate_answered": 0.0615,
+      "key_point_recall_mean": 0.8577,
+      "faithful_rate_answered": 0.7538,
+      "n_answered_without_note": 7,
+      "faithful_rate_without_note": 0.2857
+    },
+    "openrouter:qwen/qwen3-30b-a3b-instruct-2507": {
+      "n_in_scope": 77,
+      "n_answered": 62,
+      "correct_rate_supported": 0.8644,
+      "correct_rate_answered": 0.8548,
+      "partial_rate_answered": 0.1452,
+      "incorrect_rate_answered": 0.0,
+      "key_point_recall_mean": 0.9563,
+      "faithful_rate_answered": 0.6935,
+      "n_answered_without_note": 3,
+      "faithful_rate_without_note": 0.0
+    }
+  },
+  "run_at": "2026-10-22T18:19:39+00:00"
+}

@@ -1,0 +1,265 @@
+{
+  "runs": {
+    "openrouter:anthropic/claude-haiku-5.5": {
+      "model_id": "openrouter:anthropic/claude-haiku-5.5",
+      "provider": "openrouter",
+      "model": "anthropic/claude-haiku-5.5",
+      "temperature_requested": 0.0,
+      "temperature_applied": null,
+      "n_questions": 94,
+      "n_in_scope": 77,
+      "n_out_of_scope": 17,
+      "answer_rate_in_scope": 0.7662,
+      "n_supported": 59,
+      "answer_rate_supported": 0.9831,
+      "n_unsupported": 18,
+      "refusal_rate_unsupported": 0.9444,
+      "refusal_rate_out_of_scope": 0.9412,
+      "valid_citation_rate": 1.0,
+      "invalid_citations": 0,
+      "failures": 0,
+      "suspended_questions": 0,
+      "latency_mean_s": 1.36,
+      "latency_p50_s": 1.27,
+      "prompt_tokens_mean": 1383.6,
+      "completion_tokens_mean": 80.3,
+      "cost_per_1k_queries_usd": 0.1785,
+      "reasoning": "enabled=False",
+      "language_match_rate": 0.9894,
+      "reasoning_tokens_mean": 0,
+      "retrieval_hit_rate": 0.7662,
+      "by_category": {
+        "direct_fact": {
+          "n": 30,
+          "rate": 0.7333,
+          "metric": "answered"
+        },
+        "explanation": {
+          "n": 19,
+          "rate": 0.6842,
+          "metric": "answered"
+        },
+        "comparison": {
+          "n": 12,
+          "rate": 0.75,
+          "metric": "answered"
+        },
+        "example": {
+          "n": 4,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "paraphrase": {
+          "n": 3,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "out_of_scope": {
+          "n": 5,
+          "rate": 1.0,
+          "metric": "refused"
+        },
+        "distraction_resistance": {
+          "n": 3,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "multi_note": {
+          "n": 6,
+          "rate": 0.8333,
+          "metric": "answered"
+        },
+        "out_of_scope_trap": {
+          "n": 12,
+          "rate": 0.9167,
+          "metric": "refused"
+        }
+      },
+      "dataset": "questions.json",
+      "corpus": "v2",
+      "prompt_version": "v3",
+      "reasoning_mode": "off",
+      "top_k": 3,
+      "run_at": "2026-10-22T18:04:10+00:00",
+      "git_commit": "ba039a0",
+      "judge_model": "openai/gpt-5.6-luna",
+      "judge_correct_rate_supported": 0.8814,
+      "judge_key_point_recall": 0.9463,
+      "judge_faithful_rate": 0.8814
+    },
+    "openrouter:meta-llama/llama-3.2-3b-instruct": {
+      "model_id": "openrouter:meta-llama/llama-3.2-3b-instruct",
+      "provider": "openrouter",
+      "model": "meta-llama/llama-3.2-3b-instruct",
+      "temperature_requested": 0.0,
+      "temperature_applied": 0.0,
+      "n_questions": 94,
+      "n_in_scope": 77,
+      "n_out_of_scope": 17,
+      "answer_rate_in_scope": 0.8442,
+      "n_supported": 59,
+      "answer_rate_supported": 0.9831,
+      "n_unsupported": 18,
+      "refusal_rate_unsupported": 0.6111,
+      "refusal_rate_out_of_scope": 0.7059,
+      "valid_citation_rate": 0.9857,
+      "invalid_citations": 0,
+      "failures": 0,
+      "suspended_questions": 0,
+      "latency_mean_s": 1.08,
+      "latency_p50_s": 0.93,
+      "prompt_tokens_mean": 961.2,
+      "completion_tokens_mean": 60.9,
+      "cost_per_1k_queries_usd": 0.0693,
+      "reasoning": null,
+      "language_match_rate": 0.9032,
+      "reasoning_tokens_mean": 0,
+      "retrieval_hit_rate": 0.7662,
+      "by_category": {
+        "direct_fact": {
+          "n": 30,
+          "rate": 0.8333,
+          "metric": "answered"
+        },
+        "explanation": {
+          "n": 19,
+          "rate": 0.8421,
+          "metric": "answered"
+        },
+        "comparison": {
+          "n": 12,
+          "rate": 0.75,
+          "metric": "answered"
+        },
+        "example": {
+          "n": 4,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "paraphrase": {
+          "n": 3,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "out_of_scope": {
+          "n": 5,
+          "rate": 1.0,
+          "metric": "refused"
+        },
+        "distraction_resistance": {
+          "n": 3,
+          "rate": 0.6667,
+          "metric": "answered"
+        },
+        "multi_note": {
+          "n": 6,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "out_of_scope_trap": {
+          "n": 12,
+          "rate": 0.5833,
+          "metric": "refused"
+        }
+      },
+      "dataset": "questions.json",
+      "corpus": "v2",
+      "prompt_version": "v3",
+      "reasoning_mode": "off",
+      "top_k": 3,
+      "run_at": "2026-10-22T18:05:56+00:00",
+      "git_commit": "ba039a0",
+      "judge_model": "openai/gpt-5.6-luna",
+      "judge_correct_rate_supported": 0.7288,
+      "judge_key_point_recall": 0.8577,
+      "judge_faithful_rate": 0.7538
+    },
+    "openrouter:qwen/qwen3-30b-a3b-instruct-2507": {
+      "model_id": "openrouter:qwen/qwen3-30b-a3b-instruct-2507",
+      "provider": "openrouter",
+      "model": "qwen/qwen3-30b-a3b-instruct-2507",
+      "temperature_requested": 0.0,
+      "temperature_applied": 0.0,
+      "n_questions": 94,
+      "n_in_scope": 77,
+      "n_out_of_scope": 17,
+      "answer_rate_in_scope": 0.8052,
+      "n_supported": 59,
+      "answer_rate_supported": 1.0,
+      "n_unsupported": 18,
+      "refusal_rate_unsupported": 0.8333,
+      "refusal_rate_out_of_scope": 0.8824,
+      "valid_citation_rate": 0.9531,
+      "invalid_citations": 0,
+      "failures": 0,
+      "suspended_questions": 0,
+      "latency_mean_s": 2.04,
+      "latency_p50_s": 1.59,
+      "prompt_tokens_mean": 942.2,
+      "completion_tokens_mean": 62.4,
+      "cost_per_1k_queries_usd": 0.1035,
+      "reasoning": null,
+      "language_match_rate": 1.0,
+      "reasoning_tokens_mean": 0,
+      "retrieval_hit_rate": 0.7662,
+      "by_category": {
+        "direct_fact": {
+          "n": 30,
+          "rate": 0.7333,
+          "metric": "answered"
+        },
+        "explanation": {
+          "n": 19,
+          "rate": 0.7895,
+          "metric": "answered"
+        },
+        "comparison": {
+          "n": 12,
+          "rate": 0.75,
+          "metric": "answered"
+        },
+        "example": {
+          "n": 4,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "paraphrase": {
+          "n": 3,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "out_of_scope": {
+          "n": 5,
+          "rate": 1.0,
+          "metric": "refused"
+        },
+        "distraction_resistance": {
+          "n": 3,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "multi_note": {
+          "n": 6,
+          "rate": 1.0,
+          "metric": "answered"
+        },
+        "out_of_scope_trap": {
+          "n": 12,
+          "rate": 0.8333,
+          "metric": "refused"
+        }
+      },
+      "dataset": "questions.json",
+      "corpus": "v2",
+      "prompt_version": "v3",
+      "reasoning_mode": "off",
+      "top_k": 3,
+      "run_at": "2026-10-22T18:09:17+00:00",
+      "git_commit": "ba039a0",
+      "judge_model": "openai/gpt-5.6-luna",
+      "judge_correct_rate_supported": 0.8644,
+      "judge_key_point_recall": 0.9563,
+      "judge_faithful_rate": 0.6935
+    }
+  }
+}

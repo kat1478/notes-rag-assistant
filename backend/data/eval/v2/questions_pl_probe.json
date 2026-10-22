@@ -1,0 +1,359 @@
+[
+  {
+    "id": "pl-q001",
+    "question": "Do czego służy spadek gradientu?",
+    "category": "direct_fact",
+    "expected_file": "notatka_studenta_01_gradient.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "optimization algorithm",
+      "minimizes a cost function",
+      "iteratively moves toward a minimum"
+    ],
+    "notes": "Polish translation of q001",
+    "source": "v2-pl-probe",
+    "expected_files": [
+      "notatka_studenta_01_gradient.txt"
+    ]
+  },
+  {
+    "id": "pl-q006",
+    "question": "Dlaczego w TF-IDF potrzebny jest składnik IDF?",
+    "category": "explanation",
+    "expected_file": "student_note_02_tfidf.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "common words appear everywhere",
+      "IDF downweights common terms",
+      "helps identify important words"
+    ],
+    "notes": "Polish translation of q006",
+    "source": "v2-pl-probe",
+    "expected_files": [
+      "student_note_02_tfidf.txt"
+    ]
+  },
+  {
+    "id": "pl-q010",
+    "question": "Czym jest relaksacja krawędzi w algorytmie Dijkstry?",
+    "category": "direct_fact",
+    "expected_file": "notatka_studenta_03_dijkstra.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "if a shorter path to a vertex is found through another vertex",
+      "update the stored distance"
+    ],
+    "notes": "Polish translation of q010",
+    "source": "v2-pl-probe",
+    "expected_files": [
+      "notatka_studenta_03_dijkstra.txt"
+    ]
+  },
+  {
+    "id": "pl-q014",
+    "question": "Jaka jest złożoność czasowa wyszukiwania binarnego?",
+    "category": "direct_fact",
+    "expected_file": "student_note_04_binary_search.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "O(log n)"
+    ],
+    "notes": "Polish translation of q014",
+    "source": "v2-pl-probe",
+    "expected_files": [
+      "student_note_04_binary_search.txt"
+    ]
+  },
+  {
+    "id": "pl-q017",
+    "question": "Czym jest entropia w drzewach decyzyjnych?",
+    "category": "direct_fact",
+    "expected_file": "notatka_studenta_05_drzewa.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "measure of disorder or impurity in the data"
+    ],
+    "notes": "Polish translation of q017",
+    "source": "v2-pl-probe",
+    "expected_files": [
+      "notatka_studenta_05_drzewa.txt"
+    ]
+  },
+  {
+    "id": "pl-q021",
+    "question": "Jaki jest wzór funkcji aktywacji ReLU?",
+    "category": "direct_fact",
+    "expected_file": "student_note_06_relu.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "f(x) = max(0, x)"
+    ],
+    "notes": "Polish translation of q021",
+    "source": "v2-pl-probe",
+    "expected_files": [
+      "student_note_06_relu.txt"
+    ]
+  },
+  {
+    "id": "pl-q023",
+    "question": "Na czym polega problem umierającego ReLU?",
+    "category": "direct_fact",
+    "expected_file": "student_note_06_relu.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "neurons get stuck at zero",
+      "stop learning because the gradient is zero"
+    ],
+    "notes": "Polish translation of q023",
+    "source": "v2-pl-probe",
+    "expected_files": [
+      "student_note_06_relu.txt",
+      "syn_04_leaky_relu.txt"
+    ]
+  },
+  {
+    "id": "pl-val001",
+    "question": "Jaki jest cel uczenia indukcyjnego?",
+    "category": "direct_fact",
+    "expected_file": "notatka_11_indukcja.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "pozyskanie wiedzy lub umiejętności na podstawie zewnętrznej informacji trenującej",
+      "autonomiczna poprawa jakości wykonywania zadania"
+    ],
+    "notes": "Polish translation of val001",
+    "source": "v2-pl-probe",
+    "expected_files": [
+      "notatka_11_indukcja.txt"
+    ]
+  },
+  {
+    "id": "pl-val005",
+    "question": "Czym różni się k-krotna walidacja krzyżowa od metody holdout?",
+    "category": "comparison",
+    "expected_file": "notatka_12_jakosc.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "holdout dzieli dane raz na zbiór trenujący i testowy",
+      "k-krotna walidacja krzyżowa dzieli dane na k części i powtarza proces k razy"
+    ],
+    "notes": "Polish translation of val005",
+    "source": "v2-pl-probe",
+    "expected_files": [
+      "notatka_12_jakosc.txt"
+    ]
+  },
+  {
+    "id": "pl-val007",
+    "question": "Jakie jest kluczowe założenie naiwnego klasyfikatora bayesowskiego?",
+    "category": "direct_fact",
+    "expected_file": "notatka_13_bayes.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "naiwne założenie o niezależności atrybutów warunkowanej klasą"
+    ],
+    "notes": "Polish translation of val007",
+    "source": "v2-pl-probe",
+    "expected_files": [
+      "notatka_13_bayes.txt"
+    ]
+  },
+  {
+    "id": "pl-val011",
+    "question": "Czym jest własność Markowa?",
+    "category": "direct_fact",
+    "expected_file": "notatka_14_wzmacnianie.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "prawdopodobieństwa przejść i nagrody zależą wyłącznie od aktualnego stanu i akcji, a nie od historii"
+    ],
+    "notes": "Polish translation of val011",
+    "source": "v2-pl-probe",
+    "expected_files": [
+      "notatka_14_wzmacnianie.txt"
+    ]
+  },
+  {
+    "id": "pl-val013",
+    "question": "Dlaczego Q-Learning jest algorytmem off-policy?",
+    "category": "explanation",
+    "expected_file": "notatka_15_qlearning.txt",
+    "should_answer": true,
+    "expected_key_points": [
+      "w formule aktualizacji zakłada wybór akcji maksymalizującej Q w kolejnym stanie, niezależnie od strategii"
+    ],
+    "notes": "Polish translation of val013",
+    "source": "v2-pl-probe",
+    "expected_files": [
+      "notatka_15_qlearning.txt"
+    ]
+  },
+  {
+    "id": "pl-n002",
+    "question": "Jak algorytm Bellmana-Forda wykrywa ujemny cykl?",
+    "category": "explanation",
+    "should_answer": true,
+    "expected_file": "syn_01_bellman_ford.txt",
+    "expected_files": [
+      "syn_01_bellman_ford.txt"
+    ],
+    "expected_key_points": [
+      "one extra (V-th) pass",
+      "if a distance can still decrease there is a negative cycle"
+    ],
+    "notes": "Polish translation of n002",
+    "source": "v2-pl-probe"
+  },
+  {
+    "id": "pl-n004",
+    "question": "Co się dzieje z A*, gdy heurystyka wynosi zero dla każdego wierzchołka?",
+    "category": "explanation",
+    "should_answer": true,
+    "expected_file": "syn_02_a_star.txt",
+    "expected_files": [
+      "syn_02_a_star.txt"
+    ],
+    "expected_key_points": [
+      "it behaves like Dijkstra's algorithm"
+    ],
+    "notes": "Polish translation of n004",
+    "source": "v2-pl-probe"
+  },
+  {
+    "id": "pl-n006",
+    "question": "Dlaczego Adam potrzebuje korekty obciążenia?",
+    "category": "explanation",
+    "should_answer": true,
+    "expected_file": "syn_03_momentum_adam.txt",
+    "expected_files": [
+      "syn_03_momentum_adam.txt"
+    ],
+    "expected_key_points": [
+      "m and v are initialised with zeros",
+      "so they are biased low at the start",
+      "divide by 1 - beta^t"
+    ],
+    "notes": "Polish translation of n006",
+    "source": "v2-pl-probe"
+  },
+  {
+    "id": "pl-n009",
+    "question": "Co kontroluje parametr b w BM25?",
+    "category": "direct_fact",
+    "should_answer": true,
+    "expected_file": "syn_05_bm25.txt",
+    "expected_files": [
+      "syn_05_bm25.txt"
+    ],
+    "expected_key_points": [
+      "document length normalization",
+      "0.75 default",
+      "b = 0 turns it off"
+    ],
+    "notes": "Polish translation of n009",
+    "source": "v2-pl-probe"
+  },
+  {
+    "id": "pl-n012",
+    "question": "Czym jest błąd out-of-bag w lesie losowym?",
+    "category": "direct_fact",
+    "should_answer": true,
+    "expected_file": "syn_07_las_losowy.txt",
+    "expected_files": [
+      "syn_07_las_losowy.txt"
+    ],
+    "expected_key_points": [
+      "each bootstrap sample leaves out about 37% of examples",
+      "error estimated on them without a separate validation set"
+    ],
+    "notes": "Polish translation of n012",
+    "source": "v2-pl-probe"
+  },
+  {
+    "id": "pl-n014",
+    "question": "Jaki jest wzór na recall (czułość)?",
+    "category": "direct_fact",
+    "should_answer": true,
+    "expected_file": "syn_08_precision_recall.txt",
+    "expected_files": [
+      "syn_08_precision_recall.txt"
+    ],
+    "expected_key_points": [
+      "TP / (TP + FN)",
+      "also called sensitivity"
+    ],
+    "notes": "Polish translation of n014",
+    "source": "v2-pl-probe"
+  },
+  {
+    "id": "pl-n018",
+    "question": "Jakiej struktury danych używa BFS?",
+    "category": "direct_fact",
+    "should_answer": true,
+    "expected_file": "syn_10_bfs_dfs.txt",
+    "expected_files": [
+      "syn_10_bfs_dfs.txt"
+    ],
+    "expected_key_points": [
+      "a queue (FIFO)"
+    ],
+    "notes": "Polish translation of n018",
+    "source": "v2-pl-probe"
+  },
+  {
+    "id": "pl-n022",
+    "question": "Czym różni się regularyzacja L1 od L2?",
+    "category": "comparison",
+    "should_answer": true,
+    "expected_file": "syn_12_regularization.txt",
+    "expected_files": [
+      "syn_12_regularization.txt"
+    ],
+    "expected_key_points": [
+      "L2: squared weights, small but rarely exactly zero",
+      "L1: absolute weights, drives many to exactly zero",
+      "L1 works as feature selection"
+    ],
+    "notes": "Polish translation of n022",
+    "source": "v2-pl-probe"
+  },
+  {
+    "id": "pl-t002",
+    "question": "Kto wymyślił algorytm A*?",
+    "category": "out_of_scope_trap",
+    "should_answer": false,
+    "expected_file": "",
+    "expected_files": [],
+    "expected_key_points": [
+      "should refuse: the notes do not contain this"
+    ],
+    "notes": "near-topic trap: adjacent note exists, asked fact is absent (syn_02_a_star.txt); Polish translation of t002",
+    "source": "v2-pl-probe"
+  },
+  {
+    "id": "pl-t006",
+    "question": "Czym jest Expected Sarsa?",
+    "category": "out_of_scope_trap",
+    "should_answer": false,
+    "expected_file": "",
+    "expected_files": [],
+    "expected_key_points": [
+      "should refuse: the notes do not contain this"
+    ],
+    "notes": "near-topic trap: adjacent note exists, asked fact is absent (syn_06_sarsa.txt); Polish translation of t006",
+    "source": "v2-pl-probe"
+  },
+  {
+    "id": "pl-t013",
+    "question": "Kto wygrał mistrzostwa świata w piłce nożnej w 2018 roku?",
+    "category": "out_of_scope",
+    "should_answer": false,
+    "expected_file": "",
+    "expected_files": [],
+    "expected_key_points": [
+      "should refuse: the notes do not contain this"
+    ],
+    "notes": "Polish translation of t013",
+    "source": "v2-pl-probe"
+  }
+]
