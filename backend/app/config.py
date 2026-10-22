@@ -81,6 +81,10 @@ OPENROUTER_MODELS = [
     if m.strip()
 ]
 
+# LLM judge (internal, not selectable per request): grades saved benchmark answers for correctness and
+# faithfulness. Chosen 2026-10-22 as a cheap judge from a different family than the default model (Haiku).
+JUDGE_MODEL = os.getenv("JUDGE_MODEL", "openai/gpt-5.6-luna")
+
 # Model ids are "<provider>:<model>", e.g. "ollama:llama3.2:3b" or "openrouter:qwen/qwen3-30b-a3b-instruct-2507".
 # Default: Claude Haiku 5.5 — the most cost-effective model in the v2 benchmark (see README "Model benchmark").
 DEFAULT_MODEL_ID = os.getenv("DEFAULT_MODEL_ID", "openrouter:anthropic/claude-haiku-5.5")

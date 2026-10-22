@@ -130,7 +130,9 @@ class OpenRouterProvider(LLMProvider):
         params = _openrouter_supported_params().get(self.model)
         return None if params is None else "temperature" in params
 
-    def generate(self, prompt: str, temperature: Optional[float] = None) -> Generation:
+    def generate(self, prompt: str, temperature: Optional[float] = None,
+                 response_format: Optional[Dict] = None) -> Generation:
+        """response_format: optional OpenAI-style structured-output spec (used by the LLM judge)."""
         temperature = self.resolve_temperature(temperature)
         if not OPENROUTER_API_KEY:
             raise RuntimeError(
@@ -152,6 +154,8 @@ class OpenRouterProvider(LLMProvider):
         # so we don't send it and report temperature=None instead of claiming a value that wasn't applied.
         if temperature is not None:
             payload["temperature"] = temperature
+        if response_format:
+            payload["response_format"] = response_format
         reasoning = self.reasoning_off_payload()
         if reasoning:
             payload["reasoning"] = reasoning

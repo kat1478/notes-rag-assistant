@@ -46,6 +46,8 @@
                 <thead>
                     <tr>
                         <th scope="col">model</th>
+                        <th scope="col">correct (judge)</th>
+                        <th scope="col">faithful (judge)</th>
                         <th scope="col">answered (context has it)</th>
                         <th scope="col">refused (retrieval missed)</th>
                         <th scope="col">valid citation</th>
@@ -64,7 +66,7 @@
 
         <h2 class="section-title">Read with care</h2>
         <ul class="caveats">
-            <li><strong>Answered ≠ correct.</strong> "Answered" means a non-empty answer that is not a refusal; correctness is not judged automatically yet.</li>
+            <li><strong>Judge metrics</strong> come from an LLM judge (GPT-5.6 Luna) grading each answer against the dataset's expected key points and the retrieved context. Checked against 25 blind human labels: 84% agreement on correct vs. not, 84% on faithfulness; the judge is stricter than the human on both. "Answered" in the table only means a non-refusal.</li>
             <li><strong>Grounding split.</strong> When retrieval did not return the note that holds the answer, the correct grounded behaviour is to refuse — so those questions count as refusal tests, not answer tests.</li>
             <li><strong>Corpus v2</strong> = the 11 original notes + 12 <em>synthetic</em> near-topic notes written by an LLM, frozen for benchmarking. Results are only comparable within one corpus.</li>
             <li><strong>Valid citation</strong> = the answer contains at least one <code>[Source N]</code> pointing to a chunk that was actually in the context.</li>

@@ -1,0 +1,126 @@
+{
+  "n": 25,
+  "verdict_agreement": 0.76,
+  "verdict_kappa": 0.5,
+  "correct_vs_not_agreement": 0.84,
+  "faithful_agreement": 0.8,
+  "confusion_human_rows_judge_cols": {
+    "correct": {
+      "correct": 15,
+      "partially_correct": 4,
+      "incorrect": 0
+    },
+    "partially_correct": {
+      "correct": 0,
+      "partially_correct": 4,
+      "incorrect": 0
+    },
+    "incorrect": {
+      "correct": 0,
+      "partially_correct": 2,
+      "incorrect": 0
+    }
+  },
+  "disagreements": [
+    {
+      "item": 1,
+      "model": "openrouter:qwen/qwen3-30b-a3b-instruct-2507",
+      "question_id": "val004",
+      "human": "correct",
+      "judge": "correct",
+      "human_faithful": true,
+      "judge_faithful": false,
+      "note": ""
+    },
+    {
+      "item": 3,
+      "model": "openrouter:openai/gpt-5.6-sol",
+      "question_id": "q030",
+      "human": "partially_correct",
+      "judge": "partially_correct",
+      "human_faithful": true,
+      "judge_faithful": false,
+      "note": ""
+    },
+    {
+      "item": 7,
+      "model": "openrouter:meta-llama/llama-3.2-3b-instruct",
+      "question_id": "val016",
+      "human": "correct",
+      "judge": "partially_correct",
+      "human_faithful": true,
+      "judge_faithful": true,
+      "note": "odpowiedział poprawnie, ale to pyatnie poza zakresem - jest w notatce jako podkręcona piłka, ale jest"
+    },
+    {
+      "item": 8,
+      "model": "openrouter:anthropic/claude-sonnet-5.5",
+      "question_id": "q004",
+      "human": "correct",
+      "judge": "correct",
+      "human_faithful": true,
+      "judge_faithful": false,
+      "note": ""
+    },
+    {
+      "item": 10,
+      "model": "openrouter:openai/gpt-5.6-sol",
+      "question_id": "val016",
+      "human": "correct",
+      "judge": "partially_correct",
+      "human_faithful": true,
+      "judge_faithful": true,
+      "note": "nie zapisał że to pytanie poza zakresem"
+    },
+    {
+      "item": 13,
+      "model": "openrouter:anthropic/claude-sonnet-5.5",
+      "question_id": "val016",
+      "human": "correct",
+      "judge": "partially_correct",
+      "human_faithful": true,
+      "judge_faithful": true,
+      "note": "znowu pytanie poza zakresem - czego nie załapał. mysle, ze ten problem, który się powtarza, występuje, bo faktycznie w źródłowych plikach jest taki zapis."
+    },
+    {
+      "item": 14,
+      "model": "openrouter:qwen/qwen3-30b-a3b-instruct-2507",
+      "question_id": "q018",
+      "human": "correct",
+      "judge": "correct",
+      "human_faithful": true,
+      "judge_faithful": false,
+      "note": ""
+    },
+    {
+      "item": 18,
+      "model": "openrouter:anthropic/claude-haiku-5.5",
+      "question_id": "n024",
+      "human": "correct",
+      "judge": "partially_correct",
+      "human_faithful": true,
+      "judge_faithful": false,
+      "note": ""
+    },
+    {
+      "item": 21,
+      "model": "openrouter:meta-llama/llama-3.2-3b-instruct",
+      "question_id": "n007",
+      "human": "incorrect",
+      "judge": "partially_correct",
+      "human_faithful": true,
+      "judge_faithful": true,
+      "note": "technicznie dobrze, ale w złym języku. Pytanie po angielsku "
+    },
+    {
+      "item": 25,
+      "model": "openrouter:anthropic/claude-haiku-5.5",
+      "question_id": "q030",
+      "human": "incorrect",
+      "judge": "partially_correct",
+      "human_faithful": true,
+      "judge_faithful": true,
+      "note": ""
+    }
+  ]
+}
