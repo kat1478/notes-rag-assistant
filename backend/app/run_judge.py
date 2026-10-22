@@ -79,12 +79,19 @@ def main():
     parser.add_argument("--models", nargs="+", help="Run keys from data/eval/v2/models/summary.json (default: all).")
     parser.add_argument("--limit", type=int, help="Dry run: first N judgeable answers per model; nothing saved.")
     parser.add_argument("--max-cost-usd", type=float, default=2.0)
+    parser.add_argument("--results-dir", default=str(V2 / "models"),
+                        help="Benchmark results to grade (summary.json + CSVs); grades go to <results-dir>/judge/ "
+                             "unless it is the main v2 directory.")
+    parser.add_argument("--dataset-path", default=str(V2 / "questions.json"))
     args = parser.parse_args()
 
-    summary_path = V2 / "models" / "summary.json"
+    results_dir = Path(args.results_dir)
+    main_run = results_dir.resolve() == (V2 / "models").resolve()
+    judge_dir = JUDGE_DIR if main_run else results_dir / "judge"
+    summary_path = results_dir / "summary.json"
     runs = json.loads(summary_path.read_text(encoding="utf-8"))["runs"]
     keys = args.models or list(runs)
-    questions = {q["id"]: q for q in load_evaluation_dataset(V2 / "questions.json")}
+    questions = {q["id"]: q for q in load_evaluation_dataset(Path(args.dataset_path))}
     use_collection(CORPORA["v2"][1])
     price = fetch_openrouter_prices().get(JUDGE_MODEL)
     if not price:
@@ -98,7 +105,7 @@ def main():
     for key in keys:
         rows = []
         judged_now = 0
-        for r in csv.DictReader(open(V2 / "models" / f"{slug(key)}.csv", encoding="utf-8")):
+        for r in csv.DictReader(open(results_dir / f"{slug(key)}.csv", encoding="utf-8")):
             q = questions[r["question_id"]]
             if not q["should_answer"]:
                 continue
@@ -136,7 +143,7 @@ def main():
                 print(f"{key} {row['question_id']}: {row['verdict']} | recall {row['key_point_recall']} | "
                       f"unsupported: {row['unsupported_claims'] or '-'} | {row['reason']}")
             continue
-        write_csv(JUDGE_DIR / f"{slug(key)}.csv", rows)
+        write_csv(judge_dir / f"{slug(key)}.csv", rows)
         judge_summary["runs"][key] = summarize(rows)
         logger.info(f"{key}: {judge_summary['runs'][key]}")
 
@@ -145,7 +152,8 @@ def main():
         return
 
     judge_summary["run_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
-    (JUDGE_DIR / "summary.json").write_text(json.dumps(judge_summary, indent=2) + "\n", encoding="utf-8")
+    judge_dir.mkdir(parents=True, exist_ok=True)
+    (judge_dir / "summary.json").write_text(json.dumps(judge_summary, indent=2) + "\n", encoding="utf-8")
     # Merge headline judge metrics into the model summary so the charts and the Models page can show them.
     models_summary = json.loads(summary_path.read_text(encoding="utf-8"))
     for key, m in judge_summary["runs"].items():
@@ -156,7 +164,7 @@ def main():
             "judge_faithful_rate": m["faithful_rate_answered"],
         })
     summary_path.write_text(json.dumps(models_summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    logger.info(f"Saved {JUDGE_DIR / 'summary.json'} and merged judge metrics into {summary_path}")
+    logger.info(f"Saved {judge_dir / 'summary.json'} and merged judge metrics into {summary_path}")
 
 
 if __name__ == "__main__":
