@@ -8,7 +8,6 @@ import argparse
 import json
 import re
 import time
-from pathlib import Path
 
 import numpy as np
 from sentence_transformers import SentenceTransformer
