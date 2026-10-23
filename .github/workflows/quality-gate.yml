@@ -1,0 +1,38 @@
+name: Quality gate
+
+# Paid end-to-end check (~$0.07): default model answers the v2 questions + Polish probe, the LLM judge grades
+# them, and each metric must stay within tolerance of data/eval/v2/quality_baseline.json.
+on:
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    name: LLM answer quality vs baseline
+    # Secrets are not available to pull requests from forks; only run for branches of this repository.
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY_CI }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements*.txt
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-${{ hashFiles('backend/app/config.py') }}
+      - run: pip install torch==2.11.0 --index-url https://download.pytorch.org/whl/cpu && pip install -r requirements.txt
+      - run: python -m app.ingest_corpus --corpus v2
+      - run: python -m app.quality_gate --max-cost-usd 0.5
