@@ -1,0 +1,16 @@
+.git
+.github
+.claude
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+**/.ruff_cache
+backend/.env
+backend/tests
+backend/data/chroma
+backend/data/processed
+backend/data/raw
+backend/data/notes_v2
+docs
+*.md
+!backend/data/eval/**/*.md

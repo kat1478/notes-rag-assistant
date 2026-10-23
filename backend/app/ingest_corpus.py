@@ -14,9 +14,13 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 
-def ingest(corpus: str) -> int:
+def ingest(corpus: str, if_empty: bool = False) -> int:
     notes_dir, collection = CORPORA[corpus]
     use_collection(collection)
+    if if_empty and get_collection().count() > 0:
+        # Container restarts keep the vector store (volume) — including notes uploaded through /ingest.
+        logger.info(f"Collection '{collection}' already has {get_collection().count()} chunks — skipping ingest")
+        return 0
     try:
         get_client().delete_collection(collection)
     except Exception:
@@ -38,7 +42,9 @@ def ingest(corpus: str) -> int:
 def main():
     parser = argparse.ArgumentParser(description="Rebuild the Chroma collection of an evaluation corpus.")
     parser.add_argument("--corpus", choices=sorted(CORPORA), required=True)
-    ingest(parser.parse_args().corpus)
+    parser.add_argument("--if-empty", action="store_true", help="Only ingest when the collection is empty (container start).")
+    args = parser.parse_args()
+    ingest(args.corpus, args.if_empty)
 
 
 if __name__ == "__main__":
