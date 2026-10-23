@@ -1,7 +1,5 @@
 import json
-import os
 from typing import List
-from pathlib import Path
 from .schemas import ChunkResponse
 from .config import PROCESSED_DATA_DIR, RAW_DATA_DIR
 

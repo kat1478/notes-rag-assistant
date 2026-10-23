@@ -1,6 +1,6 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from typing import List, Optional
+from typing import List
 from .schemas import ChunkResponse, ChunkMetadata
 from .config import TOP_K
 from .vector_store import search_chunks, get_collection

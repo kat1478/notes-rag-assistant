@@ -2,7 +2,6 @@
 """Compares grounding prompt versions (v1/v2/v3) on the main v2 questions and the Polish probe set."""
 import csv
 import json
-from pathlib import Path
 
 from .language import detect_language
 
