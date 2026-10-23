@@ -284,6 +284,8 @@ def main():
                         help="Notes corpus / Chroma collection (v2: ingest first with python -m app.ingest_corpus --corpus v2).")
     parser.add_argument("--dataset-path", help="Questions JSON (default depends on --corpus).")
     parser.add_argument("--retrieval-only", action="store_true", help="Report retrieval hit rates and exit (no LLM calls).")
+    parser.add_argument("--min-hit-rate", type=float,
+                        help="With --retrieval-only: exit with an error if the hit rate is below this (CI gate).")
     parser.add_argument("--prompt", choices=PROMPT_VERSIONS, default=PROMPT_VERSION,
                         help=f"Grounding prompt version (default {PROMPT_VERSION}).")
     parser.add_argument("--run-tag", help="Suffix for repeated runs, saved as '<model>[@tT]#<tag>'.")
@@ -338,6 +340,9 @@ def main():
             if not hits[i["id"]]:
                 got = sorted({c.metadata.file_name for c in contexts[i["id"]]})
                 print(f"  MISS {i['id']}: expected {i.get('expected_files') or i['expected_file']} got {got}")
+        hit_rate = sum(hits[i["id"]] for i in in_scope) / len(in_scope)
+        if args.min_hit_rate is not None and hit_rate < args.min_hit_rate:
+            sys.exit(f"Retrieval gate FAILED: hit rate {hit_rate:.1%} < {args.min_hit_rate:.0%}")
         return
 
     prices = fetch_openrouter_prices() if any(m.startswith("openrouter:") for m in model_ids) else {}
