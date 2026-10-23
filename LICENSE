@@ -1,21 +1,25 @@
-MIT License
+Copyright (c) 2026 Katarzyna Kadyszewska. All rights reserved.
 
-Copyright (c) 2026 Katarzyna Kadyszewska
+This repository is published as a portfolio. It is made public for viewing and evaluation only.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Permitted without asking:
+  - viewing the source code, documentation, data and results on GitHub;
+  - cloning and running the software locally, solely to evaluate the author's work
+    (for example, as part of a recruitment process).
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+Everything else requires the prior written permission of the copyright holder. In particular, you may not
+copy, modify, merge, publish, distribute, sublicense or sell this software or any part of it, create
+derivative works from it, use it in any other project, product or service, or present it — in whole or in
+part — as your own work.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Versions released before this notice (tags v1.0.0 to v1.3.0) were published under the MIT License, which
+continues to apply to copies of those versions. This notice applies to all later versions.
+
+Third-party software, models and fonts used by this project remain under their own licenses.
+
+Permission requests: contact the author through GitHub (https://github.com/kat1478).
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR ITS USE.
