@@ -6,6 +6,8 @@
 ![FastAPI](https://img.shields.io/badge/FastAPI-backend-009688)
 ![ChromaDB](https://img.shields.io/badge/ChromaDB-vector%20store-ff6f00)
 ![LLM](https://img.shields.io/badge/LLM-OpenRouter%20%C2%B7%20Claude%20Haiku%205.5-7c3aed)
+[![CI](https://github.com/kat1478/notes-rag-assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/kat1478/notes-rag-assistant/actions/workflows/ci.yml)
+[![Quality gate](https://github.com/kat1478/notes-rag-assistant/actions/workflows/quality-gate.yml/badge.svg)](https://github.com/kat1478/notes-rag-assistant/actions/workflows/quality-gate.yml)
 
 Repository: https://github.com/kat1478/notes-rag-assistant
 
@@ -56,12 +58,13 @@ This repository contains a working MVP:
 - per-request model and temperature selection, with token usage reported per answer
 - static browser frontend linking each citation to its source chunk
 - answer status (grounded / refused / no citation), run statistics and backend status
-- smoke test for the Stage 4 application layer
+- Docker Compose setup; CI with lint, 36 offline tests, a retrieval gate, a container smoke test and a paid
+  LLM quality gate on release PRs
 - retrieval, answer-quality, and validation evaluation artifacts
 - a model benchmark (6 models, 94 questions, frozen corpus) with charts and an interactive comparison view
 - an LLM-as-judge for answer correctness and faithfulness, calibrated against blind human labels
 
-The next planned technical step is Docker Compose and CI with the judge as a quality gate.
+The next planned technical step is a public cloud deployment (AWS) of the containerised app.
 
 ---
 
@@ -104,6 +107,16 @@ flowchart LR
 ---
 
 ## Quickstart
+
+**With Docker** (one command; the image bundles the embedding model and indexes the sample notes on first start):
+
+```bash
+git clone https://github.com/kat1478/notes-rag-assistant.git && cd notes-rag-assistant
+cp backend/.env.example backend/.env      # set OPENROUTER_API_KEY=...
+docker compose up --build                 # → http://localhost:8000
+```
+
+**Without Docker** — the steps below.
 
 ### 1. Prerequisites
 
@@ -409,6 +422,24 @@ n is small: one question is 1.7–6 pp.
 
 ---
 
+## Tests and CI
+
+| Check | When | What it does |
+| :--- | :--- | :--- |
+| Lint + unit tests | every push / PR | `ruff` (pyflakes rules) and 36 offline `pytest` tests: chunking, language and refusal detection, citation parsing, prompt versions (v1 frozen by hash), allowlist / temperature / reasoning rules, API contract with retrieval and generation mocked |
+| Retrieval gate | every push / PR | indexes the v2 corpus and fails if the right note is in the top 3 for < 95% of questions (free — embeddings only) |
+| Docker smoke test | every push / PR | builds the image, starts the container and runs `smoke_test.py` against it |
+| **LLM quality gate** | PRs to `master` (releases) + manual | the default model answers the v2 questions and the Polish probe, the [calibrated judge](#is-the-judge-trustworthy) grades them, and each metric must stay within tolerance of [`quality_baseline.json`](backend/data/eval/v2/quality_baseline.json) (~$0.07 per run, budget-guarded, separate API key with a spend limit) |
+
+```bash
+cd backend
+pip install -r requirements-dev.txt
+ruff check app tests && pytest
+python -m app.quality_gate          # paid, needs OPENROUTER_API_KEY
+```
+
+---
+
 ## Known Limitations
 
 Based on validation run insights, the system has the following limitations:
@@ -438,12 +469,16 @@ backend/
     run_model_benchmark.py / render_benchmark_charts.py / ingest_corpus.py
     run_judge.py / judge.py / judge_calibration.py     # LLM-as-judge + human calibration
     compare_prompts.py / compare_embeddings.py         # prompt and embedding-model experiments
+    quality_gate.py                                    # end-to-end LLM quality gate (CI on release PRs)
+  tests/                 # offline pytest suite
   data/
     notes/             # sample study notes (corpus v1, indexed by the app)
     notes_v2/          # frozen benchmark corpus: v1 notes + 12 synthetic near-topic notes
     eval/              # evaluation datasets, results, and analysis (eval/v2/: model benchmark)
 frontend/              # vanilla HTML/CSS/JS UI (Ask + Models views)
 docs/benchmark/        # README charts + static interactive benchmark page (GitHub Pages)
+Dockerfile, docker-compose.yml, docker-entrypoint.sh
+.github/workflows/     # ci.yml (every push) and quality-gate.yml (release PRs)
 ```
 
 ---
@@ -466,13 +501,15 @@ docs/benchmark/        # README charts + static interactive benchmark page (GitH
 - [ ] **Reranking** — add a cross-encoder reranker over the top-k candidates to improve answer precision.
 - [ ] **Hybrid search** — combine dense (embeddings) with sparse (BM25) retrieval instead of TF-IDF fallback.
 - [x] **Multilingual embeddings** — cross-language retrieval 56% → 100% at top_k 3; correct answers 68% → 94% end to end ([details](#multilingual-embeddings-closing-the-cross-language-gap)).
-- [ ] **Docker Compose** — one-command, reproducible setup.
+- [x] **Docker Compose** — one-command setup; CPU-only PyTorch and the embedding model baked into the image.
 - [ ] **API authentication** — protect the endpoints for any non-local deployment.
 - [ ] **Deployment** — host the API + a small managed vector store.
-- [ ] **Unit tests** — `pytest` coverage for chunking and retrieval beyond the smoke test.
+- [x] **Tests and CI** — 36 offline tests, retrieval gate, container smoke test, LLM quality gate on release PRs ([details](#tests-and-ci)).
 
 ---
 
 ## License
 
-Released under the [MIT License](LICENSE).
+© 2026 Katarzyna Kadyszewska — **all rights reserved** (see [LICENSE](LICENSE)). The code is public as a portfolio:
+you may view it and run it locally to evaluate my work; copying, reuse in other projects, redistribution or
+presenting it as your own require my written permission. Versions up to `v1.3.0` were released under the MIT License.

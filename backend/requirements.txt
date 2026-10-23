@@ -1,9 +1,11 @@
-fastapi
-uvicorn
-scikit-learn
-numpy
-pydantic
-python-multipart
-sentence-transformers
-chromadb
-httpx
+# Pinned to the versions the app is developed and benchmarked with (Docker and CI install exactly these).
+# torch comes in via sentence-transformers; Docker/CI pre-install the CPU-only build to avoid ~2 GB of CUDA wheels.
+fastapi==0.136.1
+uvicorn==0.46.0
+scikit-learn==1.8.0
+numpy==2.4.3
+pydantic==2.13.4
+python-multipart==0.0.27
+sentence-transformers==5.4.1
+chromadb==1.5.9
+httpx==0.28.1

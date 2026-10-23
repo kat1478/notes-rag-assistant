@@ -12,6 +12,7 @@ import csv
 import hashlib
 import json
 import logging
+import os
 import statistics
 import sys
 from datetime import datetime, timezone
@@ -30,7 +31,8 @@ logger = logging.getLogger(__name__)
 
 V2 = DATA_DIR / "eval" / "v2"
 JUDGE_DIR = V2 / "judge"
-CACHE = JUDGE_DIR / "cache.jsonl"
+# JUDGE_CACHE lets the CI quality gate use a throwaway cache instead of the committed one.
+CACHE = Path(os.getenv("JUDGE_CACHE", str(JUDGE_DIR / "cache.jsonl")))
 
 
 def cache_key(model_id: str, qid: str, answer: str) -> str:

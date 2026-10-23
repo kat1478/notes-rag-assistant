@@ -1,0 +1,13 @@
+{
+  "model": "openrouter:anthropic/claude-haiku-5.5",
+  "prompt": "v3",
+  "embedding_model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+  "judge": "openai/gpt-5.6-luna",
+  "metrics": {
+    "main_correct_share": 0.9221,
+    "main_language_match": 1.0,
+    "main_refusal_out_of_scope": 0.9412,
+    "pl_probe_correct_share": 1.0,
+    "pl_probe_language_match": 1.0
+  }
+}

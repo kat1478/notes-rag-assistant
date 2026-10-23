@@ -1,0 +1,11 @@
+[tool.ruff]
+line-length = 130
+target-version = "py310"
+
+[tool.ruff.lint]
+# Pyflakes (unused/undefined names, broken f-strings) + syntax errors: catches real bugs without restyling the code.
+select = ["F", "E9"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
