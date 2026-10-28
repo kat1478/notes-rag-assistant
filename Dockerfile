@@ -41,6 +41,11 @@ ENTRYPOINT ["docker-entrypoint.sh"]
 # Lambda variant (docker build --target lambda .): same app behind the Lambda Web Adapter, which turns Function URL
 # events into plain HTTP requests, so FastAPI runs unchanged.
 FROM app AS lambda
+# boto3 only reads the OpenRouter key from SSM at cold start (lambda-entrypoint.sh); the app itself doesn't need it,
+# so it stays out of requirements.txt. Installed system-wide: Lambda's runtime uid can't see app's ~/.local.
+USER root
+RUN pip install boto3==1.43.109
+USER app
 # Index built into the image: Lambda can only write to /tmp, and embedding the notes on every cold start would be slow.
 RUN python -m app.ingest_corpus --corpus v1
 COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:1.1.0 /lambda-adapter /opt/extensions/lambda-adapter
