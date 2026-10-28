@@ -1,5 +1,5 @@
 # notes-rag-assistant: FastAPI backend + static frontend in one image.
-FROM python:3.12-slim
+FROM python:3.12-slim AS app
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -37,3 +37,34 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=4)"
 ENTRYPOINT ["docker-entrypoint.sh"]
+
+# Lambda variant (docker build --target lambda .): same app behind the Lambda Web Adapter, which turns Function URL
+# events into plain HTTP requests, so FastAPI runs unchanged.
+FROM app AS lambda
+# boto3 only reads the OpenRouter key from SSM at cold start (lambda-entrypoint.sh); the app itself doesn't need it,
+# so it stays out of requirements.txt. Installed system-wide: Lambda's runtime uid can't see app's ~/.local.
+USER root
+RUN pip install boto3==1.43.109
+USER app
+# Index built into the image: Lambda can only write to /tmp, and embedding the notes on every cold start would be slow.
+RUN python -m app.ingest_corpus --corpus v1
+COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:1.1.0 /lambda-adapter /opt/extensions/lambda-adapter
+COPY --chmod=755 lambda-entrypoint.sh /usr/local/bin/lambda-entrypoint.sh
+# Lambda runs the image as an arbitrary uid with no passwd entry and a read-only root: torch calls getpass.getuser()
+# at import time unless its cache dir is set, and libraries fall back to $HOME for caches.
+# Startup (~20 s: torch + sentence-transformers imports) exceeds the 10 s init phase; async init lets the first
+# request wait for readiness instead of Lambda failing and re-running init.
+ENV CHROMA_DIR=/tmp/chroma \
+    TORCHINDUCTOR_CACHE_DIR=/tmp/torchinductor \
+    USER=lambda \
+    HOME=/tmp \
+    DEMO_MODE=true \
+    ASK_RATE_LIMIT=10 \
+    AWS_LWA_PORT=8000 \
+    AWS_LWA_READINESS_CHECK_PATH=/health \
+    AWS_LWA_ASYNC_INIT=true \
+    ANONYMIZED_TELEMETRY=False
+ENTRYPOINT ["lambda-entrypoint.sh"]
+
+# Plain image stays the default target: Compose and CI build without --target.
+FROM app

@@ -38,3 +38,11 @@ backend/data/chroma/*
 # OS
 .DS_Store
 Thumbs.db
+
+# Terraform: state may contain secrets and account details; the provider lock file is committed.
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfplan
+crash.log

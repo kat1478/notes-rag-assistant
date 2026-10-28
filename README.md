@@ -11,6 +11,8 @@
 
 Repository: https://github.com/kat1478/notes-rag-assistant
 
+**Live demo:** https://iwpihtdkkdhsjuo5vinbtg6pty0dsvhz.lambda-url.eu-north-1.on.aws/ — serverless on AWS Lambda; the first question after a quiet period takes ~15 s while the function starts ([why](#deployment-aws-lambda)).
+
 ---
 
 ## Demo screenshots
@@ -426,7 +428,7 @@ n is small: one question is 1.7–6 pp.
 
 | Check | When | What it does |
 | :--- | :--- | :--- |
-| Lint + unit tests | every push / PR | `ruff` (pyflakes rules) and 36 offline `pytest` tests: chunking, language and refusal detection, citation parsing, prompt versions (v1 frozen by hash), allowlist / temperature / reasoning rules, API contract with retrieval and generation mocked |
+| Lint + unit tests | every push / PR | `ruff` (pyflakes rules) and 40 offline `pytest` tests: chunking, language and refusal detection, citation parsing, prompt versions (v1 frozen by hash), allowlist / temperature / reasoning rules, API contract with retrieval and generation mocked, demo-mode guards |
 | Retrieval gate | every push / PR | indexes the v2 corpus and fails if the right note is in the top 3 for < 95% of questions (free — embeddings only) |
 | Docker smoke test | every push / PR | builds the image, starts the container and runs `smoke_test.py` against it |
 | **LLM quality gate** | PRs to `master` (releases) + manual | the default model answers the v2 questions and the Polish probe, the [calibrated judge](#is-the-judge-trustworthy) grades them, and each metric must stay within tolerance of [`quality_baseline.json`](backend/data/eval/v2/quality_baseline.json) (~$0.07 per run, budget-guarded, separate API key with a spend limit) |
@@ -437,6 +439,56 @@ pip install -r requirements-dev.txt
 ruff check app tests && pytest
 python -m app.quality_gate          # paid, needs OPENROUTER_API_KEY
 ```
+
+---
+
+## Deployment (AWS Lambda)
+
+The [live demo](https://iwpihtdkkdhsjuo5vinbtg6pty0dsvhz.lambda-url.eu-north-1.on.aws/) runs the same Docker image as Compose, as a **container-image Lambda** behind a public
+**Function URL**. All infrastructure is Terraform ([`infra/`](infra/)); one command deploys it.
+
+```
+browser ──HTTPS──► Lambda Function URL ──► Lambda (3008 MB, eu-north-1)
+                                            ├─ Lambda Web Adapter → uvicorn/FastAPI (unchanged app)
+                                            ├─ Chroma index + embedding model baked into the image
+                                            └─ OpenRouter key read from SSM Parameter Store at start ──► Claude Haiku 5.5
+```
+
+**Why Lambda.** A portfolio demo is idle most of the time. Lambda scales to zero, so it costs ≈ $0 within the free
+allowance, against ~$40/month for an always-on container service (App Runner is closed to new customers, Fargate
+needs a load balancer). The price is the cold start, measured with [`scripts/measure_cold_start.sh`](scripts/measure_cold_start.sh):
+
+| Request | Time |
+| :--- | :--- |
+| Cold start (new instance, median of 5) | 11.9 s |
+| + first search (loads the embedding model) | 3.5 s |
+| Warm request | 0.3 s |
+| First start of a newly deployed image | ~65 s — paid by the deploy script's warm-up, not a visitor |
+
+**Making a FastAPI app fit Lambda** — the parts that were not obvious:
+- **Read-only filesystem.** Only `/tmp` is writable, so the vector index is built at image build time and copied to
+  `/tmp` on start (Chroma opens its SQLite file read-write).
+- **Unknown user.** Lambda runs the image as an arbitrary uid without a passwd entry; PyTorch crashed at import
+  (`getpass.getuser()`) until its cache dir and `HOME` pointed to `/tmp`. Caught locally with
+  `docker run --read-only --tmpfs /tmp --user 993:990` before any deploy.
+- **10 s init limit.** The app needs ~12 s to start, so the adapter runs with async init and the first request waits
+  for readiness instead of Lambda restarting the init.
+
+**Public endpoint safeguards.** Uploads are disabled (`DEMO_MODE`, 403), `/ask` is limited to 10 questions per hour
+per IP (best effort, per instance), and the demo uses its own OpenRouter key with a hard spend limit — the real cap.
+The key lives in SSM (encrypted), not in the image, the function config or Terraform state. The function's IAM role
+can only write its own logs and read that one parameter.
+
+**Deploy it yourself** (AWS CLI v2 with `aws login`, Docker, Terraform ≥ 1.10):
+
+```bash
+terraform -chdir=infra/bootstrap init && terraform -chdir=infra/bootstrap apply   # once: S3 bucket for state
+aws ssm put-parameter --name /notes-rag/openrouter-api-key --type SecureString --value <key>   # once
+scripts/deploy.sh   # build → push to ECR → terraform apply (shows the plan, asks first) → warm-up
+```
+
+Deploys run from a laptop rather than GitHub Actions: the AWS account type used here does not allow the OIDC
+identity provider that keyless CI deploys need, and a long-lived access key in CI was not worth the risk for a demo.
 
 ---
 
@@ -477,7 +529,9 @@ backend/
     eval/              # evaluation datasets, results, and analysis (eval/v2/: model benchmark)
 frontend/              # vanilla HTML/CSS/JS UI (Ask + Models views)
 docs/benchmark/        # README charts + static interactive benchmark page (GitHub Pages)
-Dockerfile, docker-compose.yml, docker-entrypoint.sh
+Dockerfile, docker-compose.yml, docker-entrypoint.sh   # `--target lambda` + lambda-entrypoint.sh for AWS
+infra/                 # Terraform: Lambda, Function URL, ECR, IAM, logs (bootstrap/: state bucket)
+scripts/               # deploy.sh, measure_cold_start.sh
 .github/workflows/     # ci.yml (every push) and quality-gate.yml (release PRs)
 ```
 
@@ -503,8 +557,8 @@ Dockerfile, docker-compose.yml, docker-entrypoint.sh
 - [x] **Multilingual embeddings** — cross-language retrieval 56% → 100% at top_k 3; correct answers 68% → 94% end to end ([details](#multilingual-embeddings-closing-the-cross-language-gap)).
 - [x] **Docker Compose** — one-command setup; CPU-only PyTorch and the embedding model baked into the image.
 - [ ] **API authentication** — protect the endpoints for any non-local deployment.
-- [ ] **Deployment** — host the API + a small managed vector store.
-- [x] **Tests and CI** — 36 offline tests, retrieval gate, container smoke test, LLM quality gate on release PRs ([details](#tests-and-ci)).
+- [x] **Deployment** — public demo on AWS Lambda (container image, Terraform, ~$0/month) ([details](#deployment-aws-lambda)).
+- [x] **Tests and CI** — 40 offline tests, retrieval gate, container smoke test, LLM quality gate on release PRs ([details](#tests-and-ci)).
 
 ---
 
