@@ -33,4 +33,8 @@ DIGEST=$(aws ecr describe-images --repository-name notes-rag --image-ids imageTa
 
 # 3. Function, URL, permissions — pinned to the digest, so a re-pushed tag can never change what runs.
 tf apply -var "image_digest=$DIGEST"
-echo "Deployed $TAG → $(tf output -raw function_url)"
+URL=$(tf output -raw function_url)
+
+# 4. Warm-up: the first start of a new image pulls it from ECR (~65 s, vs ~12 s later) — pay it here, not a visitor.
+curl -sf -o /dev/null --max-time 120 "${URL%/}/health" && echo "Warm-up OK"
+echo "Deployed $TAG → $URL"
