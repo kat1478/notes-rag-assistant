@@ -1,9 +1,11 @@
 import urllib.request
 import urllib.error
 import json
+import os
 import sys
 
-BASE_URL = "http://127.0.0.1:8000"
+# BASE_URL=<function url> python smoke_test.py runs the same checks against the deployed demo.
+BASE_URL = os.getenv("BASE_URL", "http://127.0.0.1:8000").rstrip("/")
 
 def log_test(name, success, message=""):
     status = "PASS" if success else "FAIL"
@@ -13,7 +15,8 @@ def test_health():
     try:
         url = f"{BASE_URL}/health"
         req = urllib.request.Request(url, method="GET")
-        with urllib.request.urlopen(req, timeout=5) as res:
+        # 60 s: the first request to a cold Lambda waits for the app to start (~25 s).
+        with urllib.request.urlopen(req, timeout=60) as res:
             if res.status != 200:
                 log_test("GET /health", False, f"Status: {res.status}")
                 return False
