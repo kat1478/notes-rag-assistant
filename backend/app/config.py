@@ -35,7 +35,8 @@ CHUNK_OVERLAP = 50
 TOP_K = 3
 
 # Chroma settings
-CHROMA_DIR = DATA_DIR / "chroma"
+# Overridable because Lambda's filesystem is read-only except /tmp: the baked index is copied there on cold start.
+CHROMA_DIR = Path(os.getenv("CHROMA_DIR", str(DATA_DIR / "chroma")))
 CHROMA_DIR.mkdir(parents=True, exist_ok=True)
 # Embedding settings. Since Stage 5B (2026-10-22) the default is multilingual: cross-language retrieval hit@3
 # went from 56% to 100% (research spike, README). The legacy English model stays selectable to reproduce
@@ -110,3 +111,9 @@ JUDGE_MODEL = os.getenv("JUDGE_MODEL", "openai/gpt-5.6-luna")
 # Model ids are "<provider>:<model>", e.g. "ollama:llama3.2:3b" or "openrouter:qwen/qwen3-30b-a3b-instruct-2507".
 # Default: Claude Haiku 5.5 — the most cost-effective model in the v2 benchmark (see README "Model benchmark").
 DEFAULT_MODEL_ID = os.getenv("DEFAULT_MODEL_ID", "openrouter:anthropic/claude-haiku-5.5")
+
+# Public demo (AWS Lambda): uploads off so strangers can't change the corpus, and a per-client cap on paid /ask
+# calls. The cap is best effort (counted per Lambda instance); the hard limit is the OpenRouter key's spend limit.
+DEMO_MODE = os.getenv("DEMO_MODE", "false").lower() == "true"
+ASK_RATE_LIMIT = int(os.getenv("ASK_RATE_LIMIT", "0"))  # requests per window and client; 0 = unlimited
+ASK_RATE_WINDOW_S = int(os.getenv("ASK_RATE_WINDOW_S", "3600"))

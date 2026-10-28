@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Depends, Request
 from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -14,8 +14,11 @@ from .schemas import (
 from .ingestion import process_upload
 from .retrieval import perform_search
 from .answering import generate_answer_with_meta
-from .config import TOP_K, OLLAMA_MODEL, DEFAULT_MODEL_ID, DATA_DIR, TEMPERATURE
+from .config import (
+    TOP_K, OLLAMA_MODEL, DEFAULT_MODEL_ID, DATA_DIR, TEMPERATURE, DEMO_MODE, ASK_RATE_LIMIT, ASK_RATE_WINDOW_S,
+)
 from .provider import list_models
+from .rate_limit import RateLimiter, client_id
 
 app = FastAPI(
     title="Notes RAG Assistant API",
@@ -36,6 +39,19 @@ app.add_middleware(
 frontend_dir = Path(__file__).resolve().parent.parent.parent / "frontend"
 if frontend_dir.exists():
     app.mount("/frontend", StaticFiles(directory=str(frontend_dir), html=True), name="frontend")
+
+ask_limiter = RateLimiter(ASK_RATE_LIMIT, ASK_RATE_WINDOW_S)
+
+
+def require_uploads_enabled():
+    if DEMO_MODE:
+        raise HTTPException(status_code=403, detail="Uploads are disabled in the public demo. Run the app locally to add notes.")
+
+
+def enforce_ask_rate_limit(request: Request):
+    peer = request.client.host if request.client else None
+    if not ask_limiter.allow(client_id(request.headers.get("x-forwarded-for"), peer)):
+        raise HTTPException(status_code=429, detail="Too many questions from this address — try again later.")
 
 @app.get("/")
 def read_root():
@@ -59,6 +75,7 @@ def health_check():
         "ollama_model": OLLAMA_MODEL,  # kept for older clients / smoke test
         "top_k_default": TOP_K,
         "temperature_default": TEMPERATURE,
+        "demo_mode": DEMO_MODE,
     }
 
 @app.get("/models", response_model=List[ModelInfo])
@@ -82,7 +99,7 @@ def benchmark(corpus: Optional[str] = None):
             return {"corpus": name, **json.loads(path.read_text(encoding="utf-8"))}
     raise HTTPException(status_code=404, detail="No benchmark yet. Run: python -m app.run_model_benchmark --corpus v2")
 
-@app.post("/ingest", response_model=IngestResponse)
+@app.post("/ingest", response_model=IngestResponse, dependencies=[Depends(require_uploads_enabled)])
 async def ingest_document(file: UploadFile = File(...)):
     """Ingest a single .txt or .md file. Use /ingest/batch for multiple files."""
     if not file.filename.endswith((".txt", ".md")):
@@ -107,7 +124,7 @@ async def ingest_document(file: UploadFile = File(...)):
         status="success"
     )
 
-@app.post("/ingest/batch", response_model=IngestResponse)
+@app.post("/ingest/batch", response_model=IngestResponse, dependencies=[Depends(require_uploads_enabled)])
 async def ingest_documents_batch(files: List[UploadFile] = File(...)):
     """Ingest multiple .txt/.md files at once."""
     total_chunks = 0
@@ -151,7 +168,7 @@ def search(request: SearchRequest):
         results=results
     )
 
-@app.post("/ask", response_model=AskResponse)
+@app.post("/ask", response_model=AskResponse, dependencies=[Depends(enforce_ask_rate_limit)])
 def ask(request: AskRequest):
     start_time = time.time()
     top_k = request.top_k if request.top_k is not None else TOP_K
