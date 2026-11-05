@@ -1,0 +1,602 @@
+[
+ {
+  "item": 1,
+  "bucket": "ans_plain",
+  "bucket_size": 1226,
+  "question_id": "q025",
+  "file": "models/openrouter_google_gemma-4-31b-it.csv",
+  "should_answer": true,
+  "retrieval_hit": "True",
+  "regex": false
+ },
+ {
+  "item": 2,
+  "bucket": "ans_cue",
+  "bucket_size": 25,
+  "question_id": "val009",
+  "file": "prompt_experiment/main_v3/openrouter_anthropic_claude-haiku-5.5.csv",
+  "should_answer": true,
+  "retrieval_hit": "True",
+  "regex": false
+ },
+ {
+  "item": 3,
+  "bucket": "oos_regex",
+  "bucket_size": 73,
+  "question_id": "t013",
+  "file": "prompt_experiment/main_v2/openrouter_meta-llama_llama-3.2-3b-instruct.csv",
+  "should_answer": false,
+  "retrieval_hit": "",
+  "regex": true
+ },
+ {
+  "item": 4,
+  "bucket": "ans_regex",
+  "bucket_size": 108,
+  "question_id": "pl-q021",
+  "file": "prompt_experiment/pl_v2/openrouter_anthropic_claude-haiku-5.5.csv",
+  "should_answer": true,
+  "retrieval_hit": "False",
+  "regex": true
+ },
+ {
+  "item": 5,
+  "bucket": "ans_plain",
+  "bucket_size": 1226,
+  "question_id": "n008",
+  "file": "temperature/openrouter_google_gemma-4-31b-it_t0.7_r2.csv",
+  "should_answer": true,
+  "retrieval_hit": "True",
+  "regex": false
+ },
+ {
+  "item": 6,
+  "bucket": "oos_noregex",
+  "bucket_size": 35,
+  "question_id": "t011",
+  "file": "temperature/openrouter_meta-llama_llama-3.2-3b-instruct_r1.csv",
+  "should_answer": false,
+  "retrieval_hit": "",
+  "regex": false
+ },
+ {
+  "item": 7,
+  "bucket": "ans_regex",
+  "bucket_size": 108,
+  "question_id": "pl-q014",
+  "file": "prompt_experiment/pl_v1/openrouter_meta-llama_llama-3.2-3b-instruct.csv",
+  "should_answer": true,
+  "retrieval_hit": "False",
+  "regex": true
+ },
+ {
+  "item": 8,
+  "bucket": "oos_noregex",
+  "bucket_size": 35,
+  "question_id": "t003",
+  "file": "temperature/openrouter_meta-llama_llama-3.2-3b-instruct_t0.7_r1.csv",
+  "should_answer": false,
+  "retrieval_hit": "",
+  "regex": false
+ },
+ {
+  "item": 9,
+  "bucket": "ans_regex",
+  "bucket_size": 108,
+  "question_id": "val001",
+  "file": "temperature/openrouter_meta-llama_llama-3.2-3b-instruct_t0.7_r2.csv",
+  "should_answer": true,
+  "retrieval_hit": "False",
+  "regex": true
+ },
+ {
+  "item": 10,
+  "bucket": "ans_plain",
+  "bucket_size": 1226,
+  "question_id": "n004",
+  "file": "prompt_experiment/main_v2/openrouter_anthropic_claude-haiku-5.5.csv",
+  "should_answer": true,
+  "retrieval_hit": "True",
+  "regex": false
+ },
+ {
+  "item": 11,
+  "bucket": "ans_cue",
+  "bucket_size": 25,
+  "question_id": "n002",
+  "file": "temperature/openrouter_meta-llama_llama-3.2-3b-instruct_t0.7_r1.csv",
+  "should_answer": true,
+  "retrieval_hit": "False",
+  "regex": false
+ },
+ {
+  "item": 12,
+  "bucket": "oos_noregex",
+  "bucket_size": 35,
+  "question_id": "t003",
+  "file": "prompt_experiment/main_v2/openrouter_meta-llama_llama-3.2-3b-instruct.csv",
+  "should_answer": false,
+  "retrieval_hit": "",
+  "regex": false
+ },
+ {
+  "item": 13,
+  "bucket": "oos_noregex",
+  "bucket_size": 35,
+  "question_id": "t002",
+  "file": "prompt_experiment/main_v3/openrouter_anthropic_claude-haiku-5.5.csv",
+  "should_answer": false,
+  "retrieval_hit": "",
+  "regex": false
+ },
+ {
+  "item": 14,
+  "bucket": "ans_regex",
+  "bucket_size": 108,
+  "question_id": "n010",
+  "file": "temperature/openrouter_meta-llama_llama-3.2-3b-instruct_t0.7_r2.csv",
+  "should_answer": true,
+  "retrieval_hit": "False",
+  "regex": true
+ },
+ {
+  "item": 15,
+  "bucket": "ans_cue",
+  "bucket_size": 25,
+  "question_id": "pl-val007",
+  "file": "prompt_experiment/pl_v2/openrouter_anthropic_claude-haiku-5.5.csv",
+  "should_answer": true,
+  "retrieval_hit": "True",
+  "regex": false
+ },
+ {
+  "item": 16,
+  "bucket": "ans_cue",
+  "bucket_size": 25,
+  "question_id": "q012",
+  "file": "models/openrouter_anthropic_claude-sonnet-5.5.csv",
+  "should_answer": true,
+  "retrieval_hit": "True",
+  "regex": false
+ },
+ {
+  "item": 17,
+  "bucket": "ans_regex",
+  "bucket_size": 108,
+  "question_id": "pl-n018",
+  "file": "prompt_experiment/pl_v1/openrouter_meta-llama_llama-3.2-3b-instruct.csv",
+  "should_answer": true,
+  "retrieval_hit": "False",
+  "regex": true
+ },
+ {
+  "item": 18,
+  "bucket": "ans_cue",
+  "bucket_size": 25,
+  "question_id": "q027",
+  "file": "models/openrouter_anthropic_claude-haiku-5.5.csv",
+  "should_answer": true,
+  "retrieval_hit": "True",
+  "regex": false
+ },
+ {
+  "item": 19,
+  "bucket": "oos_noregex",
+  "bucket_size": 35,
+  "question_id": "t009",
+  "file": "prompt_experiment/main_v2/openrouter_meta-llama_llama-3.2-3b-instruct.csv",
+  "should_answer": false,
+  "retrieval_hit": "",
+  "regex": false
+ },
+ {
+  "item": 20,
+  "bucket": "ans_cue",
+  "bucket_size": 25,
+  "question_id": "n001",
+  "file": "temperature/openrouter_meta-llama_llama-3.2-3b-instruct_r1.csv",
+  "should_answer": true,
+  "retrieval_hit": "False",
+  "regex": false
+ },
+ {
+  "item": 21,
+  "bucket": "ans_regex",
+  "bucket_size": 108,
+  "question_id": "pl-n006",
+  "file": "prompt_experiment/pl_v2/openrouter_anthropic_claude-haiku-5.5.csv",
+  "should_answer": true,
+  "retrieval_hit": "False",
+  "regex": true
+ },
+ {
+  "item": 22,
+  "bucket": "ans_cue",
+  "bucket_size": 25,
+  "question_id": "n012",
+  "file": "models/openrouter_qwen_qwen3-30b-a3b-instruct-2507.csv",
+  "should_answer": true,
+  "retrieval_hit": "True",
+  "regex": false
+ },
+ {
+  "item": 23,
+  "bucket": "oos_noregex",
+  "bucket_size": 35,
+  "question_id": "t010",
+  "file": "prompt_experiment/main_v2/openrouter_meta-llama_llama-3.2-3b-instruct.csv",
+  "should_answer": false,
+  "retrieval_hit": "",
+  "regex": false
+ },
+ {
+  "item": 24,
+  "bucket": "ans_cue",
+  "bucket_size": 25,
+  "question_id": "q027",
+  "file": "models/openrouter_anthropic_claude-sonnet-5.5.csv",
+  "should_answer": true,
+  "retrieval_hit": "True",
+  "regex": false
+ },
+ {
+  "item": 25,
+  "bucket": "oos_regex",
+  "bucket_size": 73,
+  "question_id": "t007",
+  "file": "prompt_experiment/main_v2/openrouter_meta-llama_llama-3.2-3b-instruct.csv",
+  "should_answer": false,
+  "retrieval_hit": "",
+  "regex": true
+ },
+ {
+  "item": 26,
+  "bucket": "ans_regex",
+  "bucket_size": 108,
+  "question_id": "val002",
+  "file": "temperature/openrouter_meta-llama_llama-3.2-3b-instruct_r3.csv",
+  "should_answer": true,
+  "retrieval_hit": "False",
+  "regex": true
+ },
+ {
+  "item": 27,
+  "bucket": "oos_noregex",
+  "bucket_size": 35,
+  "question_id": "pl-t006",
+  "file": "prompt_experiment/pl_v2/openrouter_qwen_qwen3-30b-a3b-instruct-2507.csv",
+  "should_answer": false,
+  "retrieval_hit": "",
+  "regex": false
+ },
+ {
+  "item": 28,
+  "bucket": "oos_regex",
+  "bucket_size": 73,
+  "question_id": "t014",
+  "file": "models/openrouter_anthropic_claude-haiku-5.5.csv",
+  "should_answer": false,
+  "retrieval_hit": "",
+  "regex": true
+ },
+ {
+  "item": 29,
+  "bucket": "oos_noregex",
+  "bucket_size": 35,
+  "question_id": "t005",
+  "file": "temperature/openrouter_meta-llama_llama-3.2-3b-instruct_t0.7_r3.csv",
+  "should_answer": false,
+  "retrieval_hit": "",
+  "regex": false
+ },
+ {
+  "item": 30,
+  "bucket": "ans_plain",
+  "bucket_size": 1226,
+  "question_id": "val011",
+  "file": "models/openrouter_qwen_qwen3-30b-a3b-instruct-2507.csv",
+  "should_answer": true,
+  "retrieval_hit": "True",
+  "regex": false
+ },
+ {
+  "item": 31,
+  "bucket": "ans_plain",
+  "bucket_size": 1226,
+  "question_id": "q028",
+  "file": "models/openrouter_anthropic_claude-haiku-5.5.csv",
+  "should_answer": true,
+  "retrieval_hit": "True",
+  "regex": false
+ },
+ {
+  "item": 32,
+  "bucket": "ans_plain",
+  "bucket_size": 1226,
+  "question_id": "q011",
+  "file": "prompt_experiment/main_v2/openrouter_meta-llama_llama-3.2-3b-instruct.csv",
+  "should_answer": true,
+  "retrieval_hit": "False",
+  "regex": false
+ },
+ {
+  "item": 33,
+  "bucket": "oos_regex",
+  "bucket_size": 73,
+  "question_id": "t005",
+  "file": "models/openrouter_anthropic_claude-haiku-5.5.csv",
+  "should_answer": false,
+  "retrieval_hit": "",
+  "regex": true
+ },
+ {
+  "item": 34,
+  "bucket": "ans_plain",
+  "bucket_size": 1226,
+  "question_id": "n026",
+  "file": "models/openrouter_anthropic_claude-haiku-5.5.csv",
+  "should_answer": true,
+  "retrieval_hit": "True",
+  "regex": false
+ },
+ {
+  "item": 35,
+  "bucket": "ans_cue",
+  "bucket_size": 25,
+  "question_id": "pl-val007",
+  "file": "prompt_experiment/pl_v3/openrouter_anthropic_claude-haiku-5.5.csv",
+  "should_answer": true,
+  "retrieval_hit": "True",
+  "regex": false
+ },
+ {
+  "item": 36,
+  "bucket": "ans_plain",
+  "bucket_size": 1226,
+  "question_id": "q001",
+  "file": "models/openrouter_meta-llama_llama-3.2-3b-instruct.csv",
+  "should_answer": true,
+  "retrieval_hit": "True",
+  "regex": false
+ },
+ {
+  "item": 37,
+  "bucket": "oos_noregex",
+  "bucket_size": 35,
+  "question_id": "t006",
+  "file": "prompt_experiment/main_v3/openrouter_qwen_qwen3-30b-a3b-instruct-2507.csv",
+  "should_answer": false,
+  "retrieval_hit": "",
+  "regex": false
+ },
+ {
+  "item": 38,
+  "bucket": "oos_regex",
+  "bucket_size": 73,
+  "question_id": "t014",
+  "file": "temperature/openrouter_meta-llama_llama-3.2-3b-instruct_t0.7_r1.csv",
+  "should_answer": false,
+  "retrieval_hit": "",
+  "regex": true
+ },
+ {
+  "item": 39,
+  "bucket": "ans_regex",
+  "bucket_size": 108,
+  "question_id": "n010",
+  "file": "temperature/openrouter_meta-llama_llama-3.2-3b-instruct_t0.7_r1.csv",
+  "should_answer": true,
+  "retrieval_hit": "False",
+  "regex": true
+ },
+ {
+  "item": 40,
+  "bucket": "oos_noregex",
+  "bucket_size": 35,
+  "question_id": "t010",
+  "file": "prompt_experiment/main_v3/openrouter_qwen_qwen3-30b-a3b-instruct-2507.csv",
+  "should_answer": false,
+  "retrieval_hit": "",
+  "regex": false
+ },
+ {
+  "item": 41,
+  "bucket": "ans_plain",
+  "bucket_size": 1226,
+  "question_id": "q006",
+  "file": "temperature/openrouter_google_gemma-4-31b-it_t0.7_r1.csv",
+  "should_answer": true,
+  "retrieval_hit": "True",
+  "regex": false
+ },
+ {
+  "item": 42,
+  "bucket": "ans_plain",
+  "bucket_size": 1226,
+  "question_id": "n028",
+  "file": "temperature/openrouter_meta-llama_llama-3.2-3b-instruct_r1.csv",
+  "should_answer": true,
+  "retrieval_hit": "True",
+  "regex": false
+ },
+ {
+  "item": 43,
+  "bucket": "ans_plain",
+  "bucket_size": 1226,
+  "question_id": "n027",
+  "file": "temperature/openrouter_meta-llama_llama-3.2-3b-instruct_t0.7_r3.csv",
+  "should_answer": true,
+  "retrieval_hit": "True",
+  "regex": false
+ },
+ {
+  "item": 44,
+  "bucket": "ans_plain",
+  "bucket_size": 1226,
+  "question_id": "n026",
+  "file": "temperature/openrouter_google_gemma-4-31b-it_r2.csv",
+  "should_answer": true,
+  "retrieval_hit": "True",
+  "regex": false
+ },
+ {
+  "item": 45,
+  "bucket": "ans_regex",
+  "bucket_size": 108,
+  "question_id": "n029",
+  "file": "temperature/openrouter_meta-llama_llama-3.2-3b-instruct_t0.7_r1.csv",
+  "should_answer": true,
+  "retrieval_hit": "True",
+  "regex": true
+ },
+ {
+  "item": 46,
+  "bucket": "ans_cue",
+  "bucket_size": 25,
+  "question_id": "n029",
+  "file": "embeddings_experiment/main/openrouter_anthropic_claude-haiku-5.5.csv",
+  "should_answer": true,
+  "retrieval_hit": "True",
+  "regex": false
+ },
+ {
+  "item": 47,
+  "bucket": "oos_regex",
+  "bucket_size": 73,
+  "question_id": "t004",
+  "file": "prompt_experiment/main_v2/openrouter_meta-llama_llama-3.2-3b-instruct.csv",
+  "should_answer": false,
+  "retrieval_hit": "",
+  "regex": true
+ },
+ {
+  "item": 48,
+  "bucket": "ans_regex",
+  "bucket_size": 108,
+  "question_id": "pl-n018",
+  "file": "prompt_experiment/pl_v3/openrouter_meta-llama_llama-3.2-3b-instruct.csv",
+  "should_answer": true,
+  "retrieval_hit": "False",
+  "regex": true
+ },
+ {
+  "item": 49,
+  "bucket": "ans_regex",
+  "bucket_size": 108,
+  "question_id": "pl-n004",
+  "file": "prompt_experiment/pl_v1/openrouter_anthropic_claude-haiku-5.5.csv",
+  "should_answer": true,
+  "retrieval_hit": "False",
+  "regex": true
+ },
+ {
+  "item": 50,
+  "bucket": "oos_regex",
+  "bucket_size": 73,
+  "question_id": "t003",
+  "file": "embeddings_experiment/main/openrouter_anthropic_claude-haiku-5.5.csv",
+  "should_answer": false,
+  "retrieval_hit": "",
+  "regex": true
+ },
+ {
+  "item": 51,
+  "bucket": "ans_plain",
+  "bucket_size": 1226,
+  "question_id": "q025",
+  "file": "models/openrouter_anthropic_claude-haiku-5.5.csv",
+  "should_answer": true,
+  "retrieval_hit": "True",
+  "regex": false
+ },
+ {
+  "item": 52,
+  "bucket": "ans_regex",
+  "bucket_size": 108,
+  "question_id": "q020",
+  "file": "models/openrouter_anthropic_claude-haiku-5.5.csv",
+  "should_answer": true,
+  "retrieval_hit": "False",
+  "regex": true
+ },
+ {
+  "item": 53,
+  "bucket": "ans_cue",
+  "bucket_size": 25,
+  "question_id": "n012",
+  "file": "prompt_experiment/main_v2/openrouter_qwen_qwen3-30b-a3b-instruct-2507.csv",
+  "should_answer": true,
+  "retrieval_hit": "True",
+  "regex": false
+ },
+ {
+  "item": 54,
+  "bucket": "oos_noregex",
+  "bucket_size": 35,
+  "question_id": "t006",
+  "file": "temperature/openrouter_meta-llama_llama-3.2-3b-instruct_t0.7_r1.csv",
+  "should_answer": false,
+  "retrieval_hit": "",
+  "regex": false
+ },
+ {
+  "item": 55,
+  "bucket": "oos_noregex",
+  "bucket_size": 35,
+  "question_id": "t005",
+  "file": "prompt_experiment/main_v2/openrouter_meta-llama_llama-3.2-3b-instruct.csv",
+  "should_answer": false,
+  "retrieval_hit": "",
+  "regex": false
+ },
+ {
+  "item": 56,
+  "bucket": "ans_plain",
+  "bucket_size": 1226,
+  "question_id": "n008",
+  "file": "temperature/openrouter_meta-llama_llama-3.2-3b-instruct_r1.csv",
+  "should_answer": true,
+  "retrieval_hit": "True",
+  "regex": false
+ },
+ {
+  "item": 57,
+  "bucket": "ans_plain",
+  "bucket_size": 1226,
+  "question_id": "q013",
+  "file": "prompt_experiment/main_v3/openrouter_qwen_qwen3-30b-a3b-instruct-2507.csv",
+  "should_answer": true,
+  "retrieval_hit": "True",
+  "regex": false
+ },
+ {
+  "item": 58,
+  "bucket": "oos_regex",
+  "bucket_size": 73,
+  "question_id": "t013",
+  "file": "models/openrouter_meta-llama_llama-3.2-3b-instruct.csv",
+  "should_answer": false,
+  "retrieval_hit": "",
+  "regex": true
+ },
+ {
+  "item": 59,
+  "bucket": "ans_cue",
+  "bucket_size": 25,
+  "question_id": "val009",
+  "file": "models/openrouter_anthropic_claude-sonnet-5.5.csv",
+  "should_answer": true,
+  "retrieval_hit": "True",
+  "regex": false
+ },
+ {
+  "item": 60,
+  "bucket": "ans_plain",
+  "bucket_size": 1226,
+  "question_id": "n017",
+  "file": "embeddings_experiment/main/openrouter_anthropic_claude-haiku-5.5.csv",
+  "should_answer": true,
+  "retrieval_hit": "True",
+  "regex": false
+ }
+]

@@ -108,6 +108,12 @@ PROMPT_VERSION = os.getenv("PROMPT_VERSION", "v3")
 # faithfulness. Chosen 2026-10-22 as a cheap judge from a different family than the default model (Haiku).
 JUDGE_MODEL = os.getenv("JUDGE_MODEL", "openai/gpt-5.6-luna")
 
+# Refusal detection in evaluation: "llm" (default since 2026-11-05) classifies each answer as refusal / partial /
+# answer — recall 1.00 vs 0.79 for the phrase-list regex on 60 human labels (README "Refusal detection");
+# "regex" is the old detector, also used automatically when no API key is set.
+REFUSAL_DETECTOR = os.getenv("REFUSAL_DETECTOR", "llm")
+REFUSAL_MODEL = os.getenv("REFUSAL_MODEL", "anthropic/claude-haiku-5.5")
+
 # Model ids are "<provider>:<model>", e.g. "ollama:llama3.2:3b" or "openrouter:qwen/qwen3-30b-a3b-instruct-2507".
 # Default: Claude Haiku 5.5 — the most cost-effective model in the v2 benchmark (see README "Model benchmark").
 DEFAULT_MODEL_ID = os.getenv("DEFAULT_MODEL_ID", "openrouter:anthropic/claude-haiku-5.5")

@@ -315,6 +315,35 @@ grades) in a small labelling page, then compared:
 
 Judge cost for all 359 graded answers: about $0.18.
 
+### Refusal detection: from a phrase list to a classifier
+
+Every refusal metric above depends on deciding whether an answer *is* a refusal. That used to be a phrase list plus a
+Polish regex, which misses soft refusals ("Bellman-Ford nie jest opisany w kontekście", "The notes do not state who
+invented A*") and can't tell a refusal from an answer that mentions a gap. I labelled a **blind, stratified sample of
+60 of the 1467 saved answers** as *refusal*, *partial* (answers part, says the rest is not in the notes) or *answer*
+(no caveat — even if wrong), then compared detectors ([calibration set](backend/data/eval/v2/refusal_calibration/),
+[results](backend/data/eval/v2/refusal_detectors.json)):
+
+| Detector | Precision | Recall | Accuracy | Missed refusals | Error over all answers* |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| Phrase list + regex (before) | 0.95 | 0.79 | 0.90 | 5 / 24 | 1.4% |
+| Embedding similarity to refusal examples | 0.92 | 0.96 | 0.95 | 1 / 24 | 0.9% |
+| **Claude Haiku 5.5 classifier (now)** | **0.96** | **1.00** | **0.98** | **0 / 24** | **0.6%** |
+
+\*re-weighted from the stratified sample to the full pool of saved answers.
+
+- **Three classes:** the classifier agrees with me on 56 of 60 (κ 0.88). My first pass scored 49/60: re-checking the
+  7 disputed items, I had labelled *wrong* answers as "partial" — the classifier was applying the definition more
+  consistently than I was. Both label sets are kept; the classifier also wins on the first pass (recall 1.00).
+- **Effect on the published benchmark:** small — the model ranking does not change (Sonnet's out-of-scope refusals
+  100% → 94%, Llama's refusals when retrieval missed 56% → 61%). The published tables stay as they were scored
+  (regex); new runs record `refusal_detector`.
+- **Effect on experiments:** larger. Haiku's apparent refusal dip under prompt v3 (94%) was a measurement artefact —
+  100% with the classifier; Llama under prompt v2 refuses 44% of unanswerable questions, not 22%. The quality gate's
+  out-of-scope metric moved from 94% to 100% for the same model.
+- **Cost:** ~$0.00005 per answer, cached by prompt hash, so re-scoring is free; ~$0.006 per quality-gate run.
+  Without an API key the regex is used as before.
+
 ### Prompt iteration: answering in the question's language
 
 The original grounding prompt told the model *"the question is in English"*. Claude Haiku obeyed it and answered
@@ -335,7 +364,8 @@ English questions. I measured three prompt versions on the 94 benchmark question
 
 Haiku's faithfulness and refusal scores dip slightly under v3, but on inspection those are measurement artefacts:
 the judge counts hedges such as *"the notes do not explicitly state…"* as claims, and soft refusals (*"the notes do not
-mention who invented A\*"*) don't match the fixed refusal sentence the scorer looks for. The published model table
+mention who invented A\*"*) don't match the fixed refusal sentence the scorer looks for — later confirmed: with the
+[refusal classifier](#refusal-detection-from-a-phrase-list-to-a-classifier) Haiku refuses 100% under v3. The published model table
 above still uses prompt v1, so all six models stay comparable. Experiment cost: about $0.30. Reproduce with
 `python -m app.compare_prompts` after running `run_model_benchmark --prompt v1|v2|v3`.
 
@@ -428,7 +458,7 @@ n is small: one question is 1.7–6 pp.
 
 | Check | When | What it does |
 | :--- | :--- | :--- |
-| Lint + unit tests | every push / PR | `ruff` (pyflakes rules) and 40 offline `pytest` tests: chunking, language and refusal detection, citation parsing, prompt versions (v1 frozen by hash), allowlist / temperature / reasoning rules, API contract with retrieval and generation mocked, demo-mode guards |
+| Lint + unit tests | every push / PR | `ruff` (pyflakes rules) and 48 offline `pytest` tests: chunking, language and refusal detection, citation parsing, prompt versions (v1 frozen by hash), allowlist / temperature / reasoning rules, API contract with retrieval and generation mocked, demo-mode guards |
 | Retrieval gate | every push / PR | indexes the v2 corpus and fails if the right note is in the top 3 for < 95% of questions (free — embeddings only) |
 | Docker smoke test | every push / PR | builds the image, starts the container and runs `smoke_test.py` against it |
 | **LLM quality gate** | PRs to `master` (releases) + manual | the default model answers the v2 questions and the Polish probe, the [calibrated judge](#is-the-judge-trustworthy) grades them, and each metric must stay within tolerance of [`quality_baseline.json`](backend/data/eval/v2/quality_baseline.json) (~$0.07 per run, budget-guarded, separate API key with a spend limit) |
@@ -558,7 +588,7 @@ scripts/               # deploy.sh, measure_cold_start.sh
 - [x] **Docker Compose** — one-command setup; CPU-only PyTorch and the embedding model baked into the image.
 - [ ] **API authentication** — protect the endpoints for any non-local deployment.
 - [x] **Deployment** — public demo on AWS Lambda (container image, Terraform, ~$0/month) ([details](#deployment-aws-lambda)).
-- [x] **Tests and CI** — 40 offline tests, retrieval gate, container smoke test, LLM quality gate on release PRs ([details](#tests-and-ci)).
+- [x] **Tests and CI** — 48 offline tests, retrieval gate, container smoke test, LLM quality gate on release PRs ([details](#tests-and-ci)).
 
 ---
 
