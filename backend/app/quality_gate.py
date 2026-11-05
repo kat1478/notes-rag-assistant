@@ -16,7 +16,8 @@ import sys
 import tempfile
 from pathlib import Path
 
-from .config import DATA_DIR, DEFAULT_MODEL_ID, EMBEDDING_MODEL, JUDGE_MODEL, PROMPT_VERSION
+from .config import DATA_DIR, DEFAULT_MODEL_ID, EMBEDDING_MODEL, JUDGE_MODEL, PROMPT_VERSION, REFUSAL_MODEL
+from .refusal import detector
 from .run_model_benchmark import slug
 
 V2 = DATA_DIR / "eval" / "v2"
@@ -30,8 +31,10 @@ TOLERANCE = {"main_correct_share": 0.05, "pl_probe_correct_share": 0.10,
 
 def run(cmd: list, work: Path) -> None:
     print("$", " ".join(cmd), flush=True)
-    # Fresh judge cache: grades must come from this run, and the committed cache must stay untouched.
-    subprocess.run([sys.executable, "-m", *cmd], check=True, env={**os.environ, "JUDGE_CACHE": str(work / "judge_cache.jsonl")})
+    # Fresh judge and refusal-classifier caches: labels must come from this run, and the committed caches must
+    # stay untouched.
+    env = {**os.environ, "JUDGE_CACHE": str(work / "judge_cache.jsonl"), "REFUSAL_CACHE": str(work / "refusal_cache.jsonl")}
+    subprocess.run([sys.executable, "-m", *cmd], check=True, env=env)
 
 
 def measure(work: Path, max_cost: float) -> dict:
@@ -61,7 +64,8 @@ def report(metrics: dict, baseline: dict) -> bool:
         rows.append(f"| {key} | {fmt(base)} | {fmt(now)} | ≥ {fmt(None if base is None else base - tol)} | {'✅' if passed else '❌'} |")
     text = "\n".join([
         f"### Quality gate {'passed ✅' if ok else 'FAILED ❌'}",
-        f"Model `{DEFAULT_MODEL_ID}` · prompt `{PROMPT_VERSION}` · embeddings `{EMBEDDING_MODEL}` · judge `{JUDGE_MODEL}`",
+        f"Model `{DEFAULT_MODEL_ID}` · prompt `{PROMPT_VERSION}` · embeddings `{EMBEDDING_MODEL}` · judge `{JUDGE_MODEL}`"
+        f" · refusals `{detector()}` (baseline: `{baseline.get('refusal_detector', 'regex')}`)",
         "",
         "| metric | baseline | this run | required | |",
         "| :--- | ---: | ---: | ---: | :---: |",
@@ -88,7 +92,8 @@ def main():
         metrics = measure(Path(tmp), args.max_cost_usd)
     if args.write_baseline:
         BASELINE.write_text(json.dumps({"model": DEFAULT_MODEL_ID, "prompt": PROMPT_VERSION, "embedding_model": EMBEDDING_MODEL,
-                                        "judge": JUDGE_MODEL, "metrics": metrics}, indent=2) + "\n", encoding="utf-8")
+                                        "judge": JUDGE_MODEL, "refusal_detector": detector(), "refusal_model": REFUSAL_MODEL,
+                                        "metrics": metrics}, indent=2) + "\n", encoding="utf-8")
         print(f"Baseline written to {BASELINE}: {metrics}")
         return
     baseline = json.loads(BASELINE.read_text(encoding="utf-8"))
