@@ -1,0 +1,900 @@
+{
+  "classifier_model": "anthropic/claude-haiku-5.5",
+  "prompt_hash": "b3265977e2b7",
+  "calibration": {
+    "labels": {
+      "n": 60,
+      "human": {
+        "answer": 32,
+        "refusal": 23,
+        "partial": 5
+      },
+      "regex": {
+        "precision": 0.95,
+        "recall": 0.826,
+        "accuracy": 0.917,
+        "false_positives": 1,
+        "missed_refusals": 4,
+        "pool_weighted_error": 0.0124
+      },
+      "llm": {
+        "precision": 0.92,
+        "recall": 1.0,
+        "accuracy": 0.967,
+        "false_positives": 2,
+        "missed_refusals": 0,
+        "pool_weighted_error": 0.0081,
+        "three_class_agreement": 49,
+        "kappa": 0.676
+      }
+    },
+    "labels_revised": {
+      "n": 60,
+      "human": {
+        "answer": 33,
+        "partial": 3,
+        "refusal": 24
+      },
+      "regex": {
+        "precision": 0.95,
+        "recall": 0.792,
+        "accuracy": 0.9,
+        "false_positives": 1,
+        "missed_refusals": 5,
+        "pool_weighted_error": 0.0144
+      },
+      "llm": {
+        "precision": 0.96,
+        "recall": 1.0,
+        "accuracy": 0.983,
+        "false_positives": 1,
+        "missed_refusals": 0,
+        "pool_weighted_error": 0.0061,
+        "three_class_agreement": 56,
+        "kappa": 0.88
+      }
+    }
+  },
+  "runs": {
+    "embeddings_experiment/main/openrouter_anthropic_claude-haiku-5.5.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 17,
+        "regex": 0.9412,
+        "llm": 1.0
+      },
+      "refusal_rate_unsupported": {
+        "n": 1,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "answer_rate_supported": {
+        "n": 76,
+        "regex": 1.0,
+        "llm": 0.9868
+      },
+      "partial_rate_in_scope": {
+        "n": 77,
+        "regex": 0.0,
+        "llm": 0.039
+      },
+      "disagreements": 2,
+      "n_answers": 94
+    },
+    "embeddings_experiment/pl/openrouter_anthropic_claude-haiku-5.5.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 3,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "refusal_rate_unsupported": {
+        "n": 0,
+        "regex": null,
+        "llm": null
+      },
+      "answer_rate_supported": {
+        "n": 20,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "partial_rate_in_scope": {
+        "n": 20,
+        "regex": 0.0,
+        "llm": 0.0
+      },
+      "disagreements": 0,
+      "n_answers": 23
+    },
+    "models/openrouter_anthropic_claude-haiku-5.5.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 17,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "refusal_rate_unsupported": {
+        "n": 18,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "answer_rate_supported": {
+        "n": 59,
+        "regex": 0.9661,
+        "llm": 0.9831
+      },
+      "partial_rate_in_scope": {
+        "n": 77,
+        "regex": 0.0,
+        "llm": 0.026
+      },
+      "disagreements": 1,
+      "n_answers": 94
+    },
+    "models/openrouter_anthropic_claude-sonnet-5.5.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 17,
+        "regex": 1.0,
+        "llm": 0.9412
+      },
+      "refusal_rate_unsupported": {
+        "n": 18,
+        "regex": 0.9444,
+        "llm": 0.9444
+      },
+      "answer_rate_supported": {
+        "n": 59,
+        "regex": 0.9831,
+        "llm": 0.9661
+      },
+      "partial_rate_in_scope": {
+        "n": 77,
+        "regex": 0.0,
+        "llm": 0.0519
+      },
+      "disagreements": 2,
+      "n_answers": 94
+    },
+    "models/openrouter_google_gemma-4-31b-it.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 17,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "refusal_rate_unsupported": {
+        "n": 18,
+        "regex": 0.9444,
+        "llm": 0.9444
+      },
+      "answer_rate_supported": {
+        "n": 59,
+        "regex": 0.9661,
+        "llm": 0.9661
+      },
+      "partial_rate_in_scope": {
+        "n": 77,
+        "regex": 0.0,
+        "llm": 0.0
+      },
+      "disagreements": 0,
+      "n_answers": 94
+    },
+    "models/openrouter_meta-llama_llama-3.2-3b-instruct.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 17,
+        "regex": 0.8824,
+        "llm": 0.8824
+      },
+      "refusal_rate_unsupported": {
+        "n": 18,
+        "regex": 0.5556,
+        "llm": 0.6111
+      },
+      "answer_rate_supported": {
+        "n": 59,
+        "regex": 0.9661,
+        "llm": 0.9661
+      },
+      "partial_rate_in_scope": {
+        "n": 77,
+        "regex": 0.0,
+        "llm": 0.013
+      },
+      "disagreements": 1,
+      "n_answers": 94
+    },
+    "models/openrouter_openai_gpt-5.6-sol.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 17,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "refusal_rate_unsupported": {
+        "n": 18,
+        "regex": 0.9444,
+        "llm": 0.9444
+      },
+      "answer_rate_supported": {
+        "n": 59,
+        "regex": 0.9831,
+        "llm": 0.9661
+      },
+      "partial_rate_in_scope": {
+        "n": 77,
+        "regex": 0.0,
+        "llm": 0.0
+      },
+      "disagreements": 1,
+      "n_answers": 94
+    },
+    "models/openrouter_qwen_qwen3-30b-a3b-instruct-2507.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 17,
+        "regex": 0.9412,
+        "llm": 0.9412
+      },
+      "refusal_rate_unsupported": {
+        "n": 18,
+        "regex": 0.8333,
+        "llm": 0.8333
+      },
+      "answer_rate_supported": {
+        "n": 59,
+        "regex": 0.9831,
+        "llm": 0.9831
+      },
+      "partial_rate_in_scope": {
+        "n": 77,
+        "regex": 0.0,
+        "llm": 0.0
+      },
+      "disagreements": 0,
+      "n_answers": 94
+    },
+    "prompt_experiment/main_v2/openrouter_anthropic_claude-haiku-5.5.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 17,
+        "regex": 0.9412,
+        "llm": 1.0
+      },
+      "refusal_rate_unsupported": {
+        "n": 18,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "answer_rate_supported": {
+        "n": 59,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "partial_rate_in_scope": {
+        "n": 77,
+        "regex": 0.0,
+        "llm": 0.0519
+      },
+      "disagreements": 1,
+      "n_answers": 94
+    },
+    "prompt_experiment/main_v2/openrouter_meta-llama_llama-3.2-3b-instruct.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 17,
+        "regex": 0.6471,
+        "llm": 0.7059
+      },
+      "refusal_rate_unsupported": {
+        "n": 18,
+        "regex": 0.2222,
+        "llm": 0.4444
+      },
+      "answer_rate_supported": {
+        "n": 59,
+        "regex": 0.9661,
+        "llm": 0.9661
+      },
+      "partial_rate_in_scope": {
+        "n": 77,
+        "regex": 0.0,
+        "llm": 0.0
+      },
+      "disagreements": 5,
+      "n_answers": 94
+    },
+    "prompt_experiment/main_v2/openrouter_qwen_qwen3-30b-a3b-instruct-2507.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 17,
+        "regex": 0.8824,
+        "llm": 0.8824
+      },
+      "refusal_rate_unsupported": {
+        "n": 18,
+        "regex": 0.7222,
+        "llm": 0.7222
+      },
+      "answer_rate_supported": {
+        "n": 59,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "partial_rate_in_scope": {
+        "n": 77,
+        "regex": 0.0,
+        "llm": 0.0
+      },
+      "disagreements": 0,
+      "n_answers": 94
+    },
+    "prompt_experiment/main_v3/openrouter_anthropic_claude-haiku-5.5.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 17,
+        "regex": 0.9412,
+        "llm": 1.0
+      },
+      "refusal_rate_unsupported": {
+        "n": 18,
+        "regex": 0.9444,
+        "llm": 1.0
+      },
+      "answer_rate_supported": {
+        "n": 59,
+        "regex": 0.9831,
+        "llm": 0.9831
+      },
+      "partial_rate_in_scope": {
+        "n": 77,
+        "regex": 0.0,
+        "llm": 0.039
+      },
+      "disagreements": 4,
+      "n_answers": 94
+    },
+    "prompt_experiment/main_v3/openrouter_meta-llama_llama-3.2-3b-instruct.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 17,
+        "regex": 0.7059,
+        "llm": 0.7647
+      },
+      "refusal_rate_unsupported": {
+        "n": 18,
+        "regex": 0.6111,
+        "llm": 0.6111
+      },
+      "answer_rate_supported": {
+        "n": 59,
+        "regex": 0.9831,
+        "llm": 0.9831
+      },
+      "partial_rate_in_scope": {
+        "n": 77,
+        "regex": 0.0,
+        "llm": 0.0649
+      },
+      "disagreements": 1,
+      "n_answers": 94
+    },
+    "prompt_experiment/main_v3/openrouter_qwen_qwen3-30b-a3b-instruct-2507.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 17,
+        "regex": 0.8824,
+        "llm": 0.8824
+      },
+      "refusal_rate_unsupported": {
+        "n": 18,
+        "regex": 0.8333,
+        "llm": 0.8333
+      },
+      "answer_rate_supported": {
+        "n": 59,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "partial_rate_in_scope": {
+        "n": 77,
+        "regex": 0.0,
+        "llm": 0.0
+      },
+      "disagreements": 0,
+      "n_answers": 94
+    },
+    "prompt_experiment/pl_v1/openrouter_anthropic_claude-haiku-5.5.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 3,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "refusal_rate_unsupported": {
+        "n": 9,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "answer_rate_supported": {
+        "n": 11,
+        "regex": 0.9091,
+        "llm": 0.9091
+      },
+      "partial_rate_in_scope": {
+        "n": 20,
+        "regex": 0.0,
+        "llm": 0.0
+      },
+      "disagreements": 0,
+      "n_answers": 23
+    },
+    "prompt_experiment/pl_v1/openrouter_meta-llama_llama-3.2-3b-instruct.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 3,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "refusal_rate_unsupported": {
+        "n": 9,
+        "regex": 0.7778,
+        "llm": 0.7778
+      },
+      "answer_rate_supported": {
+        "n": 11,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "partial_rate_in_scope": {
+        "n": 20,
+        "regex": 0.0,
+        "llm": 0.0
+      },
+      "disagreements": 0,
+      "n_answers": 23
+    },
+    "prompt_experiment/pl_v1/openrouter_qwen_qwen3-30b-a3b-instruct-2507.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 3,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "refusal_rate_unsupported": {
+        "n": 9,
+        "regex": 0.8889,
+        "llm": 0.8889
+      },
+      "answer_rate_supported": {
+        "n": 11,
+        "regex": 0.9091,
+        "llm": 0.9091
+      },
+      "partial_rate_in_scope": {
+        "n": 20,
+        "regex": 0.0,
+        "llm": 0.0
+      },
+      "disagreements": 0,
+      "n_answers": 23
+    },
+    "prompt_experiment/pl_v2/openrouter_anthropic_claude-haiku-5.5.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 3,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "refusal_rate_unsupported": {
+        "n": 9,
+        "regex": 0.8889,
+        "llm": 1.0
+      },
+      "answer_rate_supported": {
+        "n": 11,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "partial_rate_in_scope": {
+        "n": 20,
+        "regex": 0.0,
+        "llm": 0.05
+      },
+      "disagreements": 1,
+      "n_answers": 23
+    },
+    "prompt_experiment/pl_v2/openrouter_meta-llama_llama-3.2-3b-instruct.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 3,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "refusal_rate_unsupported": {
+        "n": 9,
+        "regex": 0.5556,
+        "llm": 0.6667
+      },
+      "answer_rate_supported": {
+        "n": 11,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "partial_rate_in_scope": {
+        "n": 20,
+        "regex": 0.0,
+        "llm": 0.0
+      },
+      "disagreements": 1,
+      "n_answers": 23
+    },
+    "prompt_experiment/pl_v2/openrouter_qwen_qwen3-30b-a3b-instruct-2507.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 3,
+        "regex": 0.6667,
+        "llm": 0.6667
+      },
+      "refusal_rate_unsupported": {
+        "n": 9,
+        "regex": 0.7778,
+        "llm": 0.7778
+      },
+      "answer_rate_supported": {
+        "n": 11,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "partial_rate_in_scope": {
+        "n": 20,
+        "regex": 0.0,
+        "llm": 0.0
+      },
+      "disagreements": 0,
+      "n_answers": 23
+    },
+    "prompt_experiment/pl_v3/openrouter_anthropic_claude-haiku-5.5.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 3,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "refusal_rate_unsupported": {
+        "n": 9,
+        "regex": 0.8889,
+        "llm": 0.8889
+      },
+      "answer_rate_supported": {
+        "n": 11,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "partial_rate_in_scope": {
+        "n": 20,
+        "regex": 0.0,
+        "llm": 0.1
+      },
+      "disagreements": 0,
+      "n_answers": 23
+    },
+    "prompt_experiment/pl_v3/openrouter_meta-llama_llama-3.2-3b-instruct.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 3,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "refusal_rate_unsupported": {
+        "n": 9,
+        "regex": 0.7778,
+        "llm": 0.7778
+      },
+      "answer_rate_supported": {
+        "n": 11,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "partial_rate_in_scope": {
+        "n": 20,
+        "regex": 0.0,
+        "llm": 0.0
+      },
+      "disagreements": 0,
+      "n_answers": 23
+    },
+    "prompt_experiment/pl_v3/openrouter_qwen_qwen3-30b-a3b-instruct-2507.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 3,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "refusal_rate_unsupported": {
+        "n": 9,
+        "regex": 0.8889,
+        "llm": 0.8889
+      },
+      "answer_rate_supported": {
+        "n": 11,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "partial_rate_in_scope": {
+        "n": 20,
+        "regex": 0.0,
+        "llm": 0.0
+      },
+      "disagreements": 0,
+      "n_answers": 23
+    },
+    "temperature/openrouter_google_gemma-4-31b-it_r1.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 17,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "refusal_rate_unsupported": {
+        "n": 18,
+        "regex": 0.9444,
+        "llm": 0.9444
+      },
+      "answer_rate_supported": {
+        "n": 59,
+        "regex": 0.9661,
+        "llm": 0.9661
+      },
+      "partial_rate_in_scope": {
+        "n": 77,
+        "regex": 0.0,
+        "llm": 0.0
+      },
+      "disagreements": 0,
+      "n_answers": 94
+    },
+    "temperature/openrouter_google_gemma-4-31b-it_r2.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 17,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "refusal_rate_unsupported": {
+        "n": 18,
+        "regex": 0.9444,
+        "llm": 0.9444
+      },
+      "answer_rate_supported": {
+        "n": 59,
+        "regex": 0.9661,
+        "llm": 0.9661
+      },
+      "partial_rate_in_scope": {
+        "n": 77,
+        "regex": 0.0,
+        "llm": 0.0
+      },
+      "disagreements": 0,
+      "n_answers": 94
+    },
+    "temperature/openrouter_google_gemma-4-31b-it_r3.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 17,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "refusal_rate_unsupported": {
+        "n": 18,
+        "regex": 0.9444,
+        "llm": 0.9444
+      },
+      "answer_rate_supported": {
+        "n": 59,
+        "regex": 0.9661,
+        "llm": 0.9661
+      },
+      "partial_rate_in_scope": {
+        "n": 77,
+        "regex": 0.0,
+        "llm": 0.0
+      },
+      "disagreements": 0,
+      "n_answers": 94
+    },
+    "temperature/openrouter_google_gemma-4-31b-it_t0.7_r1.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 17,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "refusal_rate_unsupported": {
+        "n": 18,
+        "regex": 0.9444,
+        "llm": 0.9444
+      },
+      "answer_rate_supported": {
+        "n": 59,
+        "regex": 0.9661,
+        "llm": 0.9661
+      },
+      "partial_rate_in_scope": {
+        "n": 77,
+        "regex": 0.0,
+        "llm": 0.0
+      },
+      "disagreements": 0,
+      "n_answers": 94
+    },
+    "temperature/openrouter_google_gemma-4-31b-it_t0.7_r2.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 17,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "refusal_rate_unsupported": {
+        "n": 18,
+        "regex": 0.9444,
+        "llm": 1.0
+      },
+      "answer_rate_supported": {
+        "n": 59,
+        "regex": 0.9661,
+        "llm": 0.9661
+      },
+      "partial_rate_in_scope": {
+        "n": 77,
+        "regex": 0.0,
+        "llm": 0.0
+      },
+      "disagreements": 1,
+      "n_answers": 94
+    },
+    "temperature/openrouter_google_gemma-4-31b-it_t0.7_r3.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 17,
+        "regex": 1.0,
+        "llm": 1.0
+      },
+      "refusal_rate_unsupported": {
+        "n": 18,
+        "regex": 0.9444,
+        "llm": 0.9444
+      },
+      "answer_rate_supported": {
+        "n": 59,
+        "regex": 0.9661,
+        "llm": 0.9661
+      },
+      "partial_rate_in_scope": {
+        "n": 77,
+        "regex": 0.0,
+        "llm": 0.0
+      },
+      "disagreements": 0,
+      "n_answers": 94
+    },
+    "temperature/openrouter_meta-llama_llama-3.2-3b-instruct_r1.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 17,
+        "regex": 0.8235,
+        "llm": 0.8235
+      },
+      "refusal_rate_unsupported": {
+        "n": 18,
+        "regex": 0.6111,
+        "llm": 0.6667
+      },
+      "answer_rate_supported": {
+        "n": 59,
+        "regex": 0.9831,
+        "llm": 0.9831
+      },
+      "partial_rate_in_scope": {
+        "n": 77,
+        "regex": 0.0,
+        "llm": 0.013
+      },
+      "disagreements": 1,
+      "n_answers": 94
+    },
+    "temperature/openrouter_meta-llama_llama-3.2-3b-instruct_r2.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 17,
+        "regex": 0.8824,
+        "llm": 0.8824
+      },
+      "refusal_rate_unsupported": {
+        "n": 18,
+        "regex": 0.6111,
+        "llm": 0.6667
+      },
+      "answer_rate_supported": {
+        "n": 59,
+        "regex": 0.9831,
+        "llm": 0.9831
+      },
+      "partial_rate_in_scope": {
+        "n": 77,
+        "regex": 0.0,
+        "llm": 0.026
+      },
+      "disagreements": 1,
+      "n_answers": 94
+    },
+    "temperature/openrouter_meta-llama_llama-3.2-3b-instruct_r3.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 17,
+        "regex": 0.8824,
+        "llm": 0.8824
+      },
+      "refusal_rate_unsupported": {
+        "n": 18,
+        "regex": 0.6111,
+        "llm": 0.7222
+      },
+      "answer_rate_supported": {
+        "n": 59,
+        "regex": 0.9661,
+        "llm": 0.9661
+      },
+      "partial_rate_in_scope": {
+        "n": 77,
+        "regex": 0.0,
+        "llm": 0.039
+      },
+      "disagreements": 2,
+      "n_answers": 94
+    },
+    "temperature/openrouter_meta-llama_llama-3.2-3b-instruct_t0.7_r1.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 17,
+        "regex": 0.7647,
+        "llm": 0.8235
+      },
+      "refusal_rate_unsupported": {
+        "n": 18,
+        "regex": 0.5556,
+        "llm": 0.6667
+      },
+      "answer_rate_supported": {
+        "n": 59,
+        "regex": 0.9831,
+        "llm": 0.9831
+      },
+      "partial_rate_in_scope": {
+        "n": 77,
+        "regex": 0.0,
+        "llm": 0.0
+      },
+      "disagreements": 3,
+      "n_answers": 94
+    },
+    "temperature/openrouter_meta-llama_llama-3.2-3b-instruct_t0.7_r2.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 17,
+        "regex": 0.8235,
+        "llm": 0.8235
+      },
+      "refusal_rate_unsupported": {
+        "n": 18,
+        "regex": 0.7778,
+        "llm": 0.7778
+      },
+      "answer_rate_supported": {
+        "n": 59,
+        "regex": 0.9661,
+        "llm": 0.9492
+      },
+      "partial_rate_in_scope": {
+        "n": 77,
+        "regex": 0.0,
+        "llm": 0.013
+      },
+      "disagreements": 1,
+      "n_answers": 94
+    },
+    "temperature/openrouter_meta-llama_llama-3.2-3b-instruct_t0.7_r3.csv": {
+      "refusal_rate_out_of_scope": {
+        "n": 17,
+        "regex": 0.8824,
+        "llm": 0.8824
+      },
+      "refusal_rate_unsupported": {
+        "n": 18,
+        "regex": 0.7222,
+        "llm": 0.7222
+      },
+      "answer_rate_supported": {
+        "n": 59,
+        "regex": 0.9661,
+        "llm": 0.9661
+      },
+      "partial_rate_in_scope": {
+        "n": 77,
+        "regex": 0.0,
+        "llm": 0.026
+      },
+      "disagreements": 0,
+      "n_answers": 94
+    }
+  }
+}

@@ -1,0 +1,302 @@
+[
+ {
+  "item": 1,
+  "question": "Which optimization algorithm iteratively moves in the opposite direction of the gradient?",
+  "answer": "Gradient descent is the optimization algorithm used in machine learning to minimize the cost function by iteratively moving down the slope of the function in the opposite direction of the gradient [Source 1]."
+ },
+ {
+  "item": 2,
+  "question": "Compare naive Bayes with decision trees.",
+  "answer": "The provided notes do not contain a direct comparison of naive Bayes and decision trees. They describe each method separately: naive Bayes is a probabilistic classifier based on Bayes' theorem that assumes attributes are independent given the class, and it can be applied to cases like text classification or predicting a game decision from weather attributes, with Laplace smoothing used for zero probabilities [Source 1][Source 2]. Decision trees split data into groups based on questions about features, choosing splits by information gain derived from entropy, and they tend to overfit, which is why they are often combined into random forests [Source 3][Source 4]. Based only on these notes, the main contrast is that naive Bayes relies on a probabilistic independence assumption, whereas decision trees learn a sequence of feature-based splits."
+ },
+ {
+  "item": 3,
+  "question": "Who won the 2018 FIFA World Cup?",
+  "answer": "Nie mam wystarczających informacji, aby odpowiedzieć na podstawie notatek."
+ },
+ {
+  "item": 4,
+  "question": "Jaki jest wzór funkcji aktywacji ReLU?",
+  "answer": "Nie mam wystarczających informacji, aby odpowiedzieć na podstawie notatek."
+ },
+ {
+  "item": 5,
+  "question": "With alpha = 0.01, what does Leaky ReLU return for an input of -5?",
+  "answer": "With alpha = 0.01, an input of -5 gives -0.05 [Source 4]."
+ },
+ {
+  "item": 6,
+  "question": "What is label smoothing in cross-entropy loss?",
+  "answer": "Label smoothing to zmiana wejściowych labeli w warstwie wyjściowej klasyfikatora wieloklasowego, w którym dodaje się do każdego logarytmu prawdopodobieństwa mały iloraz (np. 1/number_of_classes), co spowalnia maksymalizację logarytmu i zmniejsza różnicę między logitami. [Source 7]"
+ },
+ {
+  "item": 7,
+  "question": "Jaka jest złożoność czasowa wyszukiwania binarnego?",
+  "answer": "Nie ma w tym tekście informacji o wyszukiwaniu binarnym."
+ },
+ {
+  "item": 8,
+  "question": "How does AdamW differ from Adam?",
+  "answer": "AdamW jest wersją Adama z wykorzystaniem learning rate scheduler. Podobnie jak Adam, AdamW korzysta z mechanicznej zapomnianki (forgetting mechanism), ale zamiast wykorzystać 2α * (1 - βt)^p * m_t jako stopień zapomnienia, AdamW wykorzystuje 2α * (1 - βt)^p * m_t + β * βt * m_t-1. [Source 1]"
+ },
+ {
+  "item": 9,
+  "question": "What is the goal of inductive learning?",
+  "answer": "Nie ma w tym tekście informacji o definicji badań indukcyjnych."
+ },
+ {
+  "item": 10,
+  "question": "What happens to A* if the heuristic is zero for every node?",
+  "answer": "If the heuristic is zero for every node, A* behaves exactly like Dijkstra's algorithm [Source 3]."
+ },
+ {
+  "item": 11,
+  "question": "How does Bellman-Ford detect a negative cycle?",
+  "answer": "Bellman-Ford nie jest opisany w zapisanych notatkach."
+ },
+ {
+  "item": 12,
+  "question": "How does AdamW differ from Adam?",
+  "answer": "AdamW jest odmianą algoritmu Adam, która korzysta z wychodzących z niewykluczających warunków, co oznacza, że nie ma konieczności określania stałego wartości beta (β1 i β2). [Source 1]"
+ },
+ {
+  "item": 13,
+  "question": "Who invented the A* algorithm?",
+  "answer": "The provided notes do not state who invented the A* algorithm. They describe how A* works, including its evaluation function f(n) = g(n) + h(n) [Source 1], but they do not mention its inventor."
+ },
+ {
+  "item": 14,
+  "question": "Jakie typowe wartości ma parametr k1 w BM25?",
+  "answer": "Nie ma w treści danych informacji o parametrze k1 w BM25."
+ },
+ {
+  "item": 15,
+  "question": "Jakie jest kluczowe założenie naiwnego klasyfikatora bayesowskiego?",
+  "answer": "Kluczowym założeniem naiwnego klasyfikatora bayesowskiego jest niezależność atrybutów (cech) od siebie przy danej klasie. Notatki wspominają jedynie o tym, że klasyfikator bayesowski oblicza iloczyn prawdopodobieństw dla atrybutów, co zakłada ich niezależność [Source 1], jednak nie podają tego założenia wprost jako definicji."
+ },
+ {
+  "item": 16,
+  "question": "How is Dijkstra different from A*?",
+  "answer": "The notes only describe how the two relate, not a full comparison. A* computes f(n) = g(n) + h(n), where g(n) is the real cost from the start and h(n) is a heuristic estimate of the remaining cost to the goal. It always expands the node with the lowest f [Source 1]. Dijkstra's algorithm corresponds to A* with h(n) = 0 for every node, so it uses no heuristic guidance [Source 3].  A better heuristic means A* expands fewer nodes, which is why A* is popular in game pathfinding and robot navigation [Source 3]. If the heuristic is admissible (never overestimates the true remaining cost), A* is guaranteed to return an optimal path [Source 2].  The notes do not say anything else about how Dijkstra works."
+ },
+ {
+  "item": 17,
+  "question": "Jakiej struktury danych używa BFS?",
+  "answer": "Nie ma w tym tekście informacji o strukturze danych, której używa BFS. Tekst dotyczy algorytmów Dijkstra i A*, a także naiwnego klasyfikatora bayesowskiego."
+ },
+ {
+  "item": 18,
+  "question": "Which search algorithm repeatedly halves the search space?",
+  "answer": "Binary search is the algorithm that repeatedly halves the search space. It looks at the middle element of a sorted array and discards the half that cannot contain the target, repeating on the remaining half [Source 1]. Because the search space is halved each time, its time complexity is O(log n) [Source 2]."
+ },
+ {
+  "item": 19,
+  "question": "How is a KD-tree built to speed up k-NN search?",
+  "answer": "KD-tree jest budowany w sposób, aby poszukiwać najbliższych sąsiadów wokół każdego węzła, z wykorzystaniem podziału na kwadraty [Source 1]."
+ },
+ {
+  "item": 20,
+  "question": "Why does Bellman-Ford run V-1 iterations?",
+  "answer": "Bellman-Ford nie jest opisany w kontekście."
+ },
+ {
+  "item": 21,
+  "question": "Dlaczego Adam potrzebuje korekty obciążenia?",
+  "answer": "Nie mam wystarczających informacji, aby odpowiedzieć na podstawie notatek."
+ },
+ {
+  "item": 22,
+  "question": "What is the out-of-bag error in a random forest?",
+  "answer": "The out-of-bag (OOB) error in a random forest is an estimate of the model's error rate obtained by using the data points that were not included in the bootstrap sample for each tree. Since each bootstrap sample leaves out about 37% of the original data, these excluded examples can be used to evaluate the performance of the corresponding tree, providing an unbiased estimate of the error without needing a separate validation set [Source 5]."
+ },
+ {
+  "item": 23,
+  "question": "What is iterative deepening depth-first search?",
+  "answer": "Iteracyjna głębokość szukania w głębi (iterative deepening depth-first search, IDDFS) jest algorytmem szukania, który jest pośrednią formą szukania w głębkości. Jest to algorytm, który zamiast wykonywać pełne szukanie w głębkości, zamiast to, że wykonywałby pełne szukanie w głębkości, zaczyna od szukania w głębkości z wyższej granicy, aż do osiągnięcia celu, a potem przechodzi do następnej granicy i powtarza ten proces, aż do osiągnięcia celu."
+ },
+ {
+  "item": 24,
+  "question": "Which search algorithm repeatedly halves the search space?",
+  "answer": "Binary search is the algorithm that repeatedly halves the search space. It works on a sorted list: it checks the middle element, discards the half that cannot contain the target, and repeats on the remaining half. Because the search space is halved each time, its time complexity is O(log n) [Source 1][Source 2]."
+ },
+ {
+  "item": 25,
+  "question": "What does the eta parameter control in XGBoost?",
+  "answer": "Nie ma informacji o parametrze eta w dostępnych notatkach."
+ },
+ {
+  "item": 26,
+  "question": "What is the difference between representation bias and preference bias?",
+  "answer": "Nie ma w tym tekście informacji o pojęciach \"representation bias\" i \"preference bias\"."
+ },
+ {
+  "item": 27,
+  "question": "Czym jest Expected Sarsa?",
+  "answer": "Expected Sarsa to wariant algorytmu Sarsa w uczeniu ze wzmocnieniem, który różni się od standardowego Sarsa tym, że zamiast używać wartości konkretnej akcji a' wybranej w stanie s', oblicza oczekiwaną wartość Q(s', a') po wszystkich możliwych akcjach w stanie s', ważoną prawdopodobieństwem ich wyboru zgodnie z aktualną strategią agenta. Dzięki temu Expected Sarsa lepiej uwzględnia efekty eksploracji i może być bardziej stabilny niż standardowy Sarsa, który opiera się na rzeczywistej akcji a' wykonanej przez agenta. [Source 3]"
+ },
+ {
+  "item": 28,
+  "question": "Jak przygotować pierogi ruskie?",
+  "answer": "I don't have enough information to answer that based on the notes."
+ },
+ {
+  "item": 29,
+  "question": "What is BM25F and how does it handle document fields?",
+  "answer": "BM25F (BM25 with field normalization) is an extension of the BM25 ranking function that normalizes the term frequencies by document field. It handles document fields by scaling the term frequency by the length of the field, rather than the entire document. This helps to reduce the impact of longer fields on the overall ranking. [Source 2]"
+ },
+ {
+  "item": 30,
+  "question": "What is the Markov property?",
+  "answer": "The Markov property states that the probabilities of transitions and rewards depend solely on the current state and the action taken, and not on the sequence of previous states or actions. [Source 4]"
+ },
+ {
+  "item": 31,
+  "question": "Compare batch gradient descent and SGD based on the notes.",
+  "answer": "Based on the notes, batch gradient descent computes the gradient over the entire dataset before each parameter update, which makes it slow [Source 2]. SGD (stochastic gradient descent) instead updates the parameters after each individual example, which introduces some noise but allows faster progress and helps escape local minima [Source 2]. Both use the same update rule: the current theta minus the product of alpha (learning rate) and the gradient [Source 3]."
+ },
+ {
+  "item": 32,
+  "question": "Why does Dijkstra’s algorithm require non-negative edge weights?",
+  "answer": "Dijkstra’s algorithm requires non-negative edge weights because if the edge weights can be negative, it would allow the algorithm to \"short-cut\" the path by always choosing the edge with the negative weight, even if it leads to a longer path in the long run, which would not be the shortest path. [Source 1]"
+ },
+ {
+  "item": 33,
+  "question": "What is BM25F and how does it handle document fields?",
+  "answer": "I don't have enough information to answer that based on the notes. The notes describe BM25 and its parameters (k1 and b), but they do not mention BM25F or how it handles document fields."
+ },
+ {
+  "item": 34,
+  "question": "Compare Sarsa and Q-Learning in the cliff walking example.",
+  "answer": "In the cliff walking example, Q-Learning learns the optimal path right along the edge of the cliff, but during learning it often falls off due to exploration. Sarsa, being on-policy, learns a safer path farther from the cliff because it accounts for the random exploratory moves its strategy may take. As a result, Sarsa typically collects a higher total reward during training, while Q-Learning finds the better final path if exploration is turned off [Source 4][Source 5]. Q-Learning is off-policy, using the maximizing action in its update, whereas Sarsa is on-policy, using the action actually selected by its strategy [Source 2][Source 3]."
+ },
+ {
+  "item": 35,
+  "question": "Jakie jest kluczowe założenie naiwnego klasyfikatora bayesowskiego?",
+  "answer": "Kluczowym założeniem naiwnego klasyfikatora bayesowskiego jest niezależność atrybutów (cech) od siebie. Choć kontekst nie opisuje tego założenia wprost jako definicji, wynika ono z faktu, że klasyfikator oblicza iloczyn prawdopodobieństw poszczególnych atrybutów, co zakłada ich wzajemną niezależność [Source 1]."
+ },
+ {
+  "item": 36,
+  "question": "What is gradient descent used for?",
+  "answer": "Spadek gradientu to w sumie najważniejszy algorytm optymalizacyjny, jakiego używamy w uczeniu maszynowym do minimalizacji funkcji kosztu."
+ },
+ {
+  "item": 37,
+  "question": "What is Expected Sarsa?",
+  "answer": "Expected Sarsa is a variant of the Sarsa algorithm in reinforcement learning that, like Sarsa, operates in an on-policy manner but differs in how it updates the action-value function. Instead of using the maximum Q-value for the next state (as in Q-Learning) or the actual next action's Q-value (as in standard Sarsa), Expected Sarsa uses the expected value of the next state's Q-values, weighted by the probabilities of taking each action according to the current policy. This approach reduces variance in the updates and can lead to more stable learning compared to standard Sarsa. It is particularly useful in environments where the policy is stochastic, as it accounts for the full distribution of possible next actions rather than relying on a single sampled action. [Source 4]"
+ },
+ {
+  "item": 38,
+  "question": "Jak przygotować pierogi ruskie?",
+  "answer": "Nie ma w treści zapytania informacji o przygotowaniu pieróg ruskie."
+ },
+ {
+  "item": 39,
+  "question": "Jakie typowe wartości ma parametr k1 w BM25?",
+  "answer": "Nie ma w tym tekście informacji o parametrze k1 w BM25."
+ },
+ {
+  "item": 40,
+  "question": "What is iterative deepening depth-first search?",
+  "answer": "Iterative deepening depth-first search (IDDFS) is a hybrid search algorithm that combines the space efficiency of depth-first search (DFS) with the completeness and optimality of breadth-first search (BFS). It works by performing a series of depth-limited DFS searches, starting with a depth limit of 0 and incrementally increasing the limit by 1 in each iteration until the goal is found. This approach ensures that the algorithm explores all nodes at depth 1, then all nodes at depth 2, and so on, similar to BFS, but uses only O(d) memory, where d is the depth of the solution, rather than the potentially large memory required by BFS. IDDFS is particularly useful in large or infinite search spaces where the depth of the solution is unknown. [Source 4]"
+ },
+ {
+  "item": 41,
+  "question": "Why is IDF needed in TF-IDF?",
+  "answer": "IDF (Inverse Document Frequency) is needed because simply counting how many times a word appears (Term Frequency) is not enough, as common words such as 'the' or 'and' appear everywhere [Source 1]."
+ },
+ {
+  "item": 42,
+  "question": "How does momentum change the plain gradient descent update?",
+  "answer": "Momentum zmienia zwykły spadek gradientu (stochastyczny spadek gradientu) poprzez dodanie \"pędu\" do kroków. Zamiast iść tylko w bieżącym kierunku gradientu, trzymamy wykładniczo ważoną średnią poprzednich gradientów, v = beta * v + gradient, a potem robimy krok w = w - lr * v. Typowa wartość beta to 0.9. Dzięki temu oscylacje się wygaszają, a w spójnym kierunku krok przyspiesza. [Source 4]"
+ },
+ {
+  "item": 43,
+  "question": "How do ReLU and Leaky ReLU differ for negative inputs?",
+  "answer": "Leaky ReLU and ReLU differ for negative inputs because Leaky ReLU returns a small slope (alpha * x) for negative inputs, whereas ReLU returns 0. This allows Leaky ReLU to avoid the 'dying ReLU' problem, where neurons get stuck at zero and stop learning. [Source 2, Source 4]"
+ },
+ {
+  "item": 44,
+  "question": "Compare Sarsa and Q-Learning in the cliff walking example.",
+  "answer": "In the cliff walking example, Q-Learning learns the optimal path right along the edge of the cliff, although it often falls during the learning process due to exploration [Source 4]. In contrast, Sarsa learns a safer path further away from the cliff because it \"knows\" that it will occasionally perform a random move [Source 4]. Consequently, Sarsa typically collects a higher sum of rewards during the learning process, while Q-Learning finds a better final path if exploration is disabled [Source 5]."
+ },
+ {
+  "item": 45,
+  "question": "Czym różni się BFS od algorytmu Dijkstry przy szukaniu najkrótszej ścieżki?",
+  "answer": "Nie ma informacji w kontekście o algorytmach szukania najkrótszej ścieżki w grafie, w tym o BFS (Breadth-First Search) i Dijkstrze. [nie ma informacji]"
+ },
+ {
+  "item": 46,
+  "question": "Czym różni się BFS od algorytmu Dijkstry przy szukaniu najkrótszej ścieżki?",
+  "answer": "Notatki nie zawierają informacji porównującej BFS z algorytmem Dijkstry. Opisują jedynie sam algorytm Dijkstry (wybór najbliższego sąsiada, kolejka priorytetowa, relaksację krawędzi, wymóg nieujemnych wag) oraz jego różnice względem A* i Bellmana-Forda [Source 1][Source 2][Source 3]. Nie ma w nich jednak opisu BFS, dlatego nie mogę wskazać różnic między tymi algorytmami na podstawie podanego kontekstu."
+ },
+ {
+  "item": 47,
+  "question": "What is the formula of the Swish activation function?",
+  "answer": "Nie ma informacji o funkcji Swish w dostarczonych notatkach."
+ },
+ {
+  "item": 48,
+  "question": "Jakiej struktury danych używa BFS?",
+  "answer": "Nie ma w kontekście danych informacji o strukturze danych, która jest używana w BFS."
+ },
+ {
+  "item": 49,
+  "question": "Co się dzieje z A*, gdy heurystyka wynosi zero dla każdego wierzchołka?",
+  "answer": "The provided notes do not describe what happens to A* when the heuristic is zero for every vertex. Source 5 only states that Dijkstra differs from A* in that A* uses a heuristic to guide the search toward the goal, while Dijkstra searches systematically without one. That comparison does not address the zero-heuristic case, so I don't have enough information to answer that based on the notes."
+ },
+ {
+  "item": 50,
+  "question": "How does AdamW differ from Adam?",
+  "answer": "The notes do not mention AdamW, so I don't have enough information to answer that based on the notes."
+ },
+ {
+  "item": 51,
+  "question": "Which optimization algorithm iteratively moves in the opposite direction of the gradient?",
+  "answer": "The optimization algorithm that iteratively moves in the opposite direction of the gradient is gradient descent (spadek gradientu). It moves down the slope of the function step by step to find its minimum, with the minus sign in the update formula pointing against the direction of steepest increase [Source 1]. A stochastic variant, SGD, is also mentioned, which updates parameters after each example [Source 2]."
+ },
+ {
+  "item": 52,
+  "question": "Why can a single decision tree overfit?",
+  "answer": "I don't have enough information to answer that based on the notes."
+ },
+ {
+  "item": 53,
+  "question": "What is the out-of-bag error in a random forest?",
+  "answer": "The out-of-bag (OOB) error in a random forest is an estimate of the model's error rate obtained by using the data points that were not included in the bootstrap sample for each tree. Since each bootstrap sample leaves out about 37% of the original data, these excluded examples can be used to evaluate the performance of the corresponding tree, providing an unbiased error estimate without needing a separate validation set [Source 5]."
+ },
+ {
+  "item": 54,
+  "question": "What is Expected Sarsa?",
+  "answer": "Nie ma w treści dany definicja \"Expected Sarsa\"."
+ },
+ {
+  "item": 55,
+  "question": "What is BM25F and how does it handle document fields?",
+  "answer": "BM25F is a variant of the BM25 ranking function that handles document fields by treating them as separate documents, and then applying the BM25 function to each field separately. [Source 1]"
+ },
+ {
+  "item": 56,
+  "question": "With alpha = 0.01, what does Leaky ReLU return for an input of -5?",
+  "answer": "Leaky ReLU returns -0.05 for an input of -5, because it returns alpha * x for x <= 0, where alpha is0.01and x is -5. [Source 4]"
+ },
+ {
+  "item": 57,
+  "question": "How does binary search work on a sorted array?",
+  "answer": "Binary search works on a sorted array by repeatedly dividing the search space in half. It starts by examining the middle element of the array. If the middle element is equal to the target value, the search is complete. If the target is smaller than the middle element, the search continues in the left half of the array; if the target is larger, it continues in the right half. This process repeats until the target is found or the search space is empty. The algorithm uses a divide-and-conquer strategy, which ensures a time complexity of O(log n) [Source 1]."
+ },
+ {
+  "item": 58,
+  "question": "Who won the 2018 FIFA World Cup?",
+  "answer": "Nie ma w tym tekście informacji o wygranej FIFA World Cup w 2018 roku. [Source 5]"
+ },
+ {
+  "item": 59,
+  "question": "Compare naive Bayes with decision trees.",
+  "answer": "**Naive Bayes** - It is a probabilistic classifier based on Bayes' theorem. It classifies objects by computing the posterior probability of each class [Source 1]. - Its key feature is the naive assumption that attributes are independent given the class. The probability of the combined attributes is the product of the individual probabilities P(a_i=v_i | c=d) [Source 1]. - Instead of looking for an identical case, it examines each feature separately and multiplies their contributions [Source 2]. - Typical uses are text classification and predicting a decision to play based on the weather. Zero probabilities are handled with Laplace smoothing [Source 2].  **Decision trees** - They split data into smaller groups by asking questions about specific features. Each split is a node, and the final outcome (a class or value) is a leaf [Source 3]. - Entropy, which measures disorder in the data, is used to decide what to ask first [Source 3]. The split with the greatest Information Gain, meaning the largest drop in entropy, is chosen [Source 4]. - Trees are easy to understand, but they tend to overfit. They are often combined into Random Forests, which build many trees and average or vote over them. A forest is more stable and more resistant to the errors of a single tree [Source 4][Source 5].  **Comparison** - Naive Bayes is probabilistic, multiplies per-feature probabilities, and assumes independence of attributes. A decision tree is a hierarchical model that splits data using entropy and information gain. - The notes mention overfitting and the ensemble remedy (Random Forest) only for trees. They do not say how naive Bayes compares on this point [Source 4]."
+ },
+ {
+  "item": 60,
+  "question": "Dlaczego w klasyfikacji binarnej k-NN wybiera się nieparzyste k?",
+  "answer": "W klasyfikacji binarnej wybiera się nieparzyste k, żeby uniknąć remisów w głosowaniu [Source 5]."
+ }
+]

@@ -25,9 +25,12 @@ from typing import Dict, List, Optional
 import httpx
 
 from .answering import FALLBACK_PREFIX, PROMPT_VERSIONS, generate_answer_with_meta
-from .config import CORPORA, DATA_DIR, EMBEDDING_MODEL, OPENROUTER_BASE_URL, PROMPT_VERSION, REASONING, TEMPERATURE
+from .config import (
+    CORPORA, DATA_DIR, EMBEDDING_MODEL, OPENROUTER_BASE_URL, PROMPT_VERSION, REASONING, REFUSAL_MODEL, TEMPERATURE,
+)
 from .language import detect_language
-from .evaluation import is_refusal_response, load_evaluation_dataset
+from .evaluation import load_evaluation_dataset
+from . import refusal
 from .provider import get_provider, list_models
 from .retrieval import perform_search
 from .vector_store import get_collection, use_collection
@@ -105,7 +108,7 @@ def run_key(model_id: str, temperature: float) -> str:
 
 def run_model(model_id: str, items: List[dict], contexts: Dict[str, list], prices,
               temperature: float, budget: Dict[str, float], hits: Dict[str, Optional[bool]],
-              prompt_version: str = PROMPT_VERSION) -> List[dict]:
+              prompt_version: str = PROMPT_VERSION, refusal_mode: Optional[str] = None) -> List[dict]:
     warm_up(model_id)
     rows = []
     for i, item in enumerate(items, 1):
@@ -119,7 +122,12 @@ def run_model(model_id: str, items: List[dict], contexts: Dict[str, list], price
             logger.warning(f"{item['id']}: host was suspended during the request — latency excluded")
 
         failed = gen.error is not None or gen.text.startswith(FALLBACK_PREFIX)
-        refused = is_refusal_response(gen.text)
+        refusal_class, cls_cost = "", 0.0
+        if not failed and gen.text.strip():
+            refusal_class, pt, ct = refusal.classify(item["question"], gen.text, refusal_mode)
+            if pt is not None:  # None = cache hit or regex: nothing billed
+                cls_cost = query_cost(f"openrouter:{REFUSAL_MODEL}", pt, ct, prices) or 0.0
+        refused = refusal_class == "refusal"
         cites = parse_citations(gen.text, len(sources))
         should_answer = bool(item.get("should_answer", True))
         q_lang, a_lang = detect_language(item["question"]), detect_language(gen.text)
@@ -129,6 +137,7 @@ def run_model(model_id: str, items: List[dict], contexts: Dict[str, list], price
             "should_answer": should_answer,
             "answered": (not failed) and (not refused) and bool(gen.text.strip()),
             "refused": refused,
+            "refusal_class": refusal_class,
             "failed": failed,
             "valid_citations": cites["valid"],
             "invalid_citations": cites["invalid"],
@@ -149,7 +158,7 @@ def run_model(model_id: str, items: List[dict], contexts: Dict[str, list], price
         })
         logger.info(f"[{model_id}] {i}/{len(items)} {item['id']}: "
                     f"{'FAIL' if failed else 'refused' if refused else 'answered'}, {latency_ms / 1000:.1f}s")
-        budget["spent"] += rows[-1]["cost_usd"] or 0.0
+        budget["spent"] += (rows[-1]["cost_usd"] or 0.0) + cls_cost
         if budget["spent"] > budget["max"]:
             write_csv(budget["partial_dir"] / f"{slug(model_id)}.partial.csv", rows)
             raise BudgetExceeded(f"spent ${budget['spent']:.4f} > --max-cost-usd {budget['max']} "
@@ -188,6 +197,8 @@ def summarize(model_id: str, rows: List[dict], temperature_requested: float = TE
         "n_unsupported": len(unsupported),
         "refusal_rate_unsupported": rate(sum(r["refused"] for r in unsupported), len(unsupported)),
         "refusal_rate_out_of_scope": rate(sum(r["refused"] for r in oos), len(oos)),
+        # Answered part of an in-scope question and said the rest is not in the notes (LLM detector only).
+        "partial_rate_in_scope": rate(sum(r.get("refusal_class") == "partial" for r in in_scope), len(in_scope)),
         "valid_citation_rate": rate(sum(r["valid_citations"] > 0 for r in answered), len(answered)),
         "invalid_citations": sum(r["invalid_citations"] for r in rows),
         "failures": sum(r["failed"] for r in rows),
@@ -234,10 +245,21 @@ def retrieval_hits(items: List[dict], contexts: Dict[str, list]) -> Dict[str, Op
     return hits
 
 
-def rescore(out_dir: Path) -> None:
-    """Re-derives refused/answered from the saved answer texts and rewrites CSVs + summary metrics."""
+def rescore(out_dir: Path, dataset_path: Path, switch_detector: bool = False) -> None:
+    """Re-derives refused/answered from the saved answer texts and rewrites CSVs + summary metrics.
+
+    Runs scored by another refusal detector are refused unless switch_detector is set: rescoring rewrites files in
+    place, and committed results must not silently change meaning (copy the directory first)."""
     summary_path = out_dir / "summary.json"
     summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    mode = refusal.detector()
+    # Runs saved before 2026-11-05 carry no refusal_detector field: they were scored by the regex.
+    other = sorted(k for k, run in summary["runs"].items() if run.get("refusal_detector", "regex") != mode)
+    if other and not switch_detector:
+        sys.exit(f"{len(other)} run(s) in {summary_path} were scored with another refusal detector than '{mode}' "
+                 f"(e.g. {other[0]}). Rescoring would rewrite them in place: copy the directory and pass "
+                 f"--switch-detector, or set REFUSAL_DETECTOR to match.")
+    questions = {i["id"]: i["question"] for i in load_evaluation_dataset(dataset_path)}
     as_bool = lambda v: {"True": True, "False": False}.get(v)
     as_num = lambda v, f: f(v) if v not in ("", "None", None) else None
     for key, old in summary["runs"].items():
@@ -251,13 +273,17 @@ def rescore(out_dir: Path) -> None:
                      prompt_tokens=as_num(r["prompt_tokens"], int), completion_tokens=as_num(r["completion_tokens"], int),
                      reasoning_tokens=as_num(r.get("reasoning_tokens"), int), cost_usd=as_num(r["cost_usd"], float),
                      temperature=as_num(r.get("temperature"), float))
-            r["refused"] = is_refusal_response(r["answer_text"])
+            r["refusal_class"] = ""
+            if not r["failed"] and r["answer_text"].strip():
+                r["refusal_class"] = refusal.classify(questions[r["question_id"]], r["answer_text"], mode)[0]
+            r["refused"] = r["refusal_class"] == "refusal"
             r["answered"] = (not r["failed"]) and (not r["refused"]) and bool(r["answer_text"].strip())
             rows.append(r)
         write_csv(path, rows)
         new = summarize(old["model_id"], rows, old.get("temperature_requested", TEMPERATURE))
         changed = {k: (old.get(k), v) for k, v in new.items() if old.get(k) != v and k != "by_category"}
-        summary["runs"][key] = {**old, **new, "rescored_at": datetime.now(timezone.utc).isoformat(timespec="seconds")}
+        summary["runs"][key] = {**old, **new, "refusal_detector": mode,
+                                "rescored_at": datetime.now(timezone.utc).isoformat(timespec="seconds")}
         logger.info(f"rescored {key}: {changed or 'no change'}")
     summary_path.write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
@@ -290,7 +316,9 @@ def main():
                         help=f"Grounding prompt version (default {PROMPT_VERSION}).")
     parser.add_argument("--run-tag", help="Suffix for repeated runs, saved as '<model>[@tT]#<tag>'.")
     parser.add_argument("--rescore", action="store_true",
-                        help="Recompute metrics from saved CSVs (e.g. after a refusal-detector fix); no LLM calls.")
+                        help="Recompute metrics from saved CSVs (e.g. after a refusal-detector fix); no answer generation.")
+    parser.add_argument("--switch-detector", action="store_true",
+                        help="With --rescore: allow re-scoring runs saved with another refusal detector (use on a copy).")
     parser.add_argument("--max-cost-usd", type=float, default=5.0, help="Abort when the run's estimated spend exceeds this.")
     parser.add_argument("--top-k", type=int, default=3)
     parser.add_argument("--limit", type=int, help="Only the first N questions (quick check; not saved to summary).")
@@ -310,7 +338,7 @@ def main():
 
     default_dataset, default_out = DEFAULTS[args.corpus]
     if args.rescore:
-        rescore(Path(args.out_dir or default_out))
+        rescore(Path(args.out_dir or default_out), Path(args.dataset_path or default_dataset), args.switch_detector)
         return
     dataset_path = Path(args.dataset_path or default_dataset)
     notes_dir, collection = CORPORA[args.corpus]
@@ -345,14 +373,16 @@ def main():
             sys.exit(f"Retrieval gate FAILED: hit rate {hit_rate:.1%} < {args.min_hit_rate:.0%}")
         return
 
-    prices = fetch_openrouter_prices() if any(m.startswith("openrouter:") for m in model_ids) else {}
+    refusal_mode = refusal.detector()
+    needs_prices = refusal_mode == "llm" or any(m.startswith("openrouter:") for m in model_ids)
+    prices = fetch_openrouter_prices() if needs_prices else {}
     out_dir = Path(args.out_dir or default_out)
     budget = {"spent": 0.0, "max": args.max_cost_usd, "partial_dir": out_dir}
     summary_path = out_dir / "summary.json"
     for model_id in model_ids:
         logger.info(f"=== {model_id} ===")
         try:
-            rows = run_model(model_id, items, contexts, prices, args.temperature, budget, hits, args.prompt)
+            rows = run_model(model_id, items, contexts, prices, args.temperature, budget, hits, args.prompt, refusal_mode)
         except BudgetExceeded as e:
             sys.exit(f"Budget guard: {e}")
         result = summarize(model_id, rows, args.temperature)
@@ -370,6 +400,7 @@ def main():
             "prompt_version": args.prompt,
             "embedding_model": EMBEDDING_MODEL,
             "reasoning_mode": REASONING,
+            "refusal_detector": refusal_mode,
             "top_k": args.top_k,
             "run_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "git_commit": git_commit(),
