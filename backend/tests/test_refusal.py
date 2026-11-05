@@ -60,3 +60,32 @@ def test_falls_back_to_regex_without_a_key(calls, monkeypatch):
     # the soft refusal the regex misses — the reason for the LLM detector
     assert refusal.classify("q", "Bellman-Ford nie jest opisany w kontekście.")[0] == "answer"
     assert calls["prompts"] == []
+
+
+def _row(qid, should_answer, refusal_class, hit=True):
+    refused = refusal_class == "refusal"
+    return {"question_id": qid, "category": "c", "should_answer": should_answer, "retrieval_hit": hit,
+            "answered": not refused, "refused": refused, "refusal_class": refusal_class, "failed": False,
+            "suspended": False, "latency_ms": 1000.0, "cost_usd": 0.0, "prompt_tokens": 10, "completion_tokens": 5,
+            "reasoning": "", "reasoning_tokens": None, "language_match": True, "valid_citations": 1,
+            "invalid_citations": 0}
+
+
+def test_partial_counts_as_answered_and_is_reported():
+    from app.run_model_benchmark import summarize
+    rows = [_row("a", True, "answer"), _row("b", True, "partial"), _row("c", True, "refusal", hit=False),
+            _row("d", False, "refusal")]
+    s = summarize("openrouter:x/y", rows)
+    assert s["partial_rate_in_scope"] == round(1 / 3, 4)
+    assert s["answer_rate_supported"] == 1.0          # answer + partial, both with the note retrieved
+    assert s["refusal_rate_unsupported"] == 1.0
+    assert s["refusal_rate_out_of_scope"] == 1.0
+
+
+def test_rescore_refuses_to_switch_detector_in_place(tmp_path, monkeypatch):
+    import json
+    from app import run_model_benchmark as bench
+    (tmp_path / "summary.json").write_text(json.dumps({"runs": {"openrouter:x/y": {"model_id": "openrouter:x/y"}}}))
+    monkeypatch.setattr(refusal, "detector", lambda: "llm")
+    with pytest.raises(SystemExit, match="another refusal detector"):
+        bench.rescore(tmp_path, tmp_path / "questions.json")
