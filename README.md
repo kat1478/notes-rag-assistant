@@ -524,11 +524,33 @@ identity provider that keyless CI deploys need, and a long-lived access key in C
 
 ## Known Limitations
 
-Based on validation run insights, the system has the following limitations:
+**Retrieval**
+- **Small corpus.** The benchmark covers 23 notes and 94 questions (+ 23 Polish probes). Cross-language retrieval went
+  from 56% to 100% at top_k 3 with multilingual embeddings, but a larger, real corpus is needed to show it holds
+  ([details](#multilingual-embeddings-closing-the-cross-language-gap)).
+- **Context fragmentation.** The ±1 neighbour expansion misses relevant text lying 2+ chunks away from the hit.
+- **No hybrid search or reranking yet.** Dense retrieval with a TF-IDF fallback; BM25 fusion and a cross-encoder
+  are on the roadmap, worth adding only once a larger corpus shows misses they would fix.
 
-- **Cross-lingual retrieval (largely fixed):** the original English-only embedding model missed Polish notes for English questions (56% found at top_k 3). The multilingual model finds them 100% of the time on the v2 benchmark; a larger, real corpus would be needed to confirm this holds beyond 23 notes ([details](#multilingual-embeddings-closing-the-cross-language-gap)).
-- **Context fragmentation:** The 1-hop neighbor expansion (±1 chunk) misses relevant information lying 2+ chunks away from the primary hit.
-- **Latency / model limitations (local mode):** The small model (`llama3.2:3b`) running on CPU is slow (averaging ~39.0 seconds per response) and sensitive to prompt/context size. Under large context sizes, it can become overly cautious and refuse to answer even when the answer is present in the context. Note: The first query after startup may take 30-45+ seconds as Ollama loads the model into memory; subsequent queries are faster.
+**Evaluation**
+- **Small human calibration sets.** The judge was checked against 25 human labels, the refusal classifier against 60
+  (only 3 of them "partial") — enough to catch systematic errors, not to give tight error bars.
+- **One judge.** GPT-5.6 Luna grades every model, including its sibling GPT-5.6 Sol; no sign of family bias in the
+  results, but a second judge would be needed to rule it out.
+- **LLM runs are not bit-deterministic.** The same model and prompt scored 91–95% correct on separate quality-gate
+  runs, so the gate's tolerances are sized to a few questions, not to zero.
+- **The published model table** uses prompt v1 and regex-scored refusals, so all six models stay comparable; newer
+  runs use prompt v3 and the refusal classifier (each run records which).
+
+**Public demo**
+- **Cold start.** It scales to zero: the first question after a quiet period takes ~15 s
+  ([measurements](#deployment-aws-lambda)); the UI says so while it waits.
+- **Fixed corpus, no accounts.** Uploads are disabled and there is no authentication; the per-IP limit
+  (10 questions/hour) is best effort, counted per Lambda instance — the demo key's spend limit is the hard cap.
+
+**Local mode (Ollama)**
+- `llama3.2:3b` on CPU takes ~39 s per answer (30–45 s more for the first one while the model loads) and becomes
+  overly cautious with large contexts, refusing answers that are present.
 
 For a full failure analysis, see [`validation_summary.md`](backend/data/eval/validation_summary.md) and the Stage 3D comparison docs in [`backend/data/eval/`](backend/data/eval/).
 
