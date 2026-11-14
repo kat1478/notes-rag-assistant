@@ -40,6 +40,8 @@ const el = {
     },
     elapsed: $('elapsed'),
     errorDetail: $('error-detail'),
+    errorTitle: $('error-title'),
+    errorHelp: $('error-help'),
     question: $('answer-question'),
     answer: $('answer-text'),
     sources: $('sources-list'),
@@ -64,7 +66,14 @@ const state = {
     defaultModel: null,
     pinned: null,   // source number kept highlighted after a click
     timer: null,
+    demoMode: false,   // public demo on AWS Lambda (from /health): cold starts after idle, rate-limited /ask
 };
+
+// The serverless demo needs ~12 s to start after a quiet period, plus ~3 s to load the embedding model.
+const SLOW_HEALTH_MS = 3000;
+const COLD_START_NOTE_MS = 5000;
+const COLD_START_NOTE = 'The public demo runs on AWS Lambda and scales to zero when idle — the first question '
+    + 'after a quiet period takes ~15 s while it starts. Later questions take a few seconds.';
 
 // ── Backend status ─────────────────────────────────────────
 
@@ -74,18 +83,23 @@ function setBackend(stateName, label) {
 }
 
 async function checkHealth() {
+    // A cold start makes the first health check slow; say so instead of looking stuck on "connecting…".
+    const slow = setTimeout(() => setBackend('waking', 'waking up…'), SLOW_HEALTH_MS);
     try {
         const res = await fetch(`${API_BASE}/health`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         state.defaultModel = data.default_model_id || `ollama:${data.ollama_model}`;
-        setBackend('up', 'backend ready');
+        state.demoMode = data.demo_mode === true;
+        setBackend('up', state.demoMode ? 'demo ready' : 'backend ready');
         if (Number.isInteger(data.top_k_default) && !state.lastQuestion) setTopK(data.top_k_default);
         if (typeof data.temperature_default === 'number' && !state.lastQuestion) setTemperature(data.temperature_default);
         return true;
     } catch {
         setBackend('down', 'backend offline');
         return false;
+    } finally {
+        clearTimeout(slow);
     }
 }
 
@@ -123,7 +137,11 @@ function startTimer() {
     const t0 = performance.now();
     el.elapsed.textContent = '0.0 s';
     state.timer = setInterval(() => {
-        el.elapsed.textContent = `${((performance.now() - t0) / 1000).toFixed(1)} s`;
+        const ms = performance.now() - t0;
+        el.elapsed.textContent = `${(ms / 1000).toFixed(1)} s`;
+        if (state.demoMode && ms > COLD_START_NOTE_MS && el.loadingNote.textContent !== COLD_START_NOTE) {
+            el.loadingNote.textContent = COLD_START_NOTE;
+        }
     }, 100);
 }
 
@@ -167,6 +185,12 @@ async function ask(question) {
                 model: el.model.value || undefined,
             }),
         });
+        if (res.status === 429) {
+            showError('Question limit reached',
+                'The public demo allows 10 questions per hour from one address, to keep its API costs bounded. '
+                + 'Try again later, or run the app locally (see the README).', false);
+            return;
+        }
         if (!res.ok) {
             const detail = await res.text().catch(() => '');
             throw new Error(`HTTP ${res.status}${detail ? ` — ${detail.slice(0, 200)}` : ''}`);
@@ -178,15 +202,21 @@ async function ask(question) {
     } catch (err) {
         console.error('Ask failed:', err);
         const up = await checkHealth();
-        el.errorDetail.textContent = up
+        showError(up ? 'Request failed' : 'Backend not reachable', up
             ? `The backend is up but the request failed: ${err.message}`
-            : `No response from ${API_BASE || window.location.origin}. (${err.message})`;
-        el.sources.innerHTML = '<li class="sources-empty">No context — the request did not complete.</li>';
-        show('error');
+            : `No response from ${API_BASE || window.location.origin}. (${err.message})`, !up && !state.demoMode);
     } finally {
         stopTimer();
         el.submit.disabled = false;
     }
+}
+
+function showError(title, detail, showStartHelp) {
+    el.errorTitle.textContent = title;
+    el.errorDetail.textContent = detail;
+    el.errorHelp.hidden = !showStartHelp;   // "start uvicorn" only helps when running locally
+    el.sources.innerHTML = '<li class="sources-empty">No context — the request did not complete.</li>';
+    show('error');
 }
 
 // ── Rendering ──────────────────────────────────────────────
