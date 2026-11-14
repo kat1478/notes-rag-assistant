@@ -97,10 +97,12 @@
             </div>
 
             <div id="view-error" class="panel-body" hidden>
-                <p class="error-title">Backend not reachable</p>
+                <p id="error-title" class="error-title">Backend not reachable</p>
                 <p id="error-detail" class="note"></p>
-                <p class="note">Start it from <code>backend/</code>:</p>
-                <pre class="cmd">python -m uvicorn app.main:app --host 127.0.0.1 --port 8000</pre>
+                <div id="error-help">
+                    <p class="note">Start it from <code>backend/</code>:</p>
+                    <pre class="cmd">python -m uvicorn app.main:app --host 127.0.0.1 --port 8000</pre>
+                </div>
                 <button type="button" id="retry-btn" class="ghost-btn">Retry</button>
             </div>
 

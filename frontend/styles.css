@@ -110,6 +110,9 @@ code, pre, kbd, output, .mono { font-family: var(--mono); }
 .backend-status[data-state="up"] .dot { background: var(--ok); }
 .backend-status[data-state="down"] .dot { background: var(--bad); }
 .backend-status[data-state="down"] { color: var(--bad); }
+.backend-status[data-state="waking"] .dot { background: var(--warn); animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: 0.3; } }
+@media (prefers-reduced-motion: reduce) { .backend-status[data-state="waking"] .dot { animation: none; } }
 
 .topbar-links { margin-left: auto; display: flex; gap: 16px; }
 .topbar-links a { color: var(--text-2); text-decoration: none; font-size: 13px; }
