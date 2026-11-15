@@ -509,11 +509,22 @@ per IP (best effort, per instance), and the demo uses its own OpenRouter key wit
 The key lives in SSM (encrypted), not in the image, the function config or Terraform state. The function's IAM role
 can only write its own logs and read that one parameter.
 
+**AWS cost guardrails** ([`infra/alerts.tf`](infra/alerts.tf)). The AWS account has no spend limit, so overspend
+has to be visible:
+- **Concurrency is capped by the account quota.** At most 10 instances run at once; a per-function reserved limit
+  is not possible on a 10-execution quota (AWS keeps 10 unreserved).
+- **Monthly budget ($5)** emails at 80 % and 100 % of actual spend and when the forecast crosses 100 %. Billing
+  data lags by hours, so this is the slow signal.
+- **Traffic alarm.** More than 200 invocations in an hour (normal use is a handful) emails via SNS within the hour.
+
+Both are created only when `alert_email` is set in the git-ignored `infra/terraform.tfvars`.
+
 **Deploy it yourself** (AWS CLI v2 with `aws login`, Docker, Terraform ≥ 1.10):
 
 ```bash
 terraform -chdir=infra/bootstrap init && terraform -chdir=infra/bootstrap apply   # once: S3 bucket for state
 aws ssm put-parameter --name /notes-rag/openrouter-api-key --type SecureString --value <key>   # once
+echo 'alert_email = "you@example.com"' > infra/terraform.tfvars   # optional: cost and traffic alerts
 scripts/deploy.sh   # build → push to ECR → terraform apply (shows the plan, asks first) → warm-up
 ```
 
@@ -547,6 +558,8 @@ identity provider that keyless CI deploys need, and a long-lived access key in C
   ([measurements](#deployment-aws-lambda)); the UI says so while it waits.
 - **Fixed corpus, no accounts.** Uploads are disabled and there is no authentication; the per-IP limit
   (10 questions/hour) is best effort, counted per Lambda instance — the demo key's spend limit is the hard cap.
+- **AWS spend is alerted, not capped.** Budgets and the traffic alarm send emails; nothing stops the function
+  automatically, so a sustained flood costs Lambda time until someone acts (bounded by 10 concurrent instances).
 
 **Local mode (Ollama)**
 - `llama3.2:3b` on CPU takes ~39 s per answer (30–45 s more for the first one while the model loads) and becomes
