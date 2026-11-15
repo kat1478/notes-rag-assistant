@@ -31,3 +31,21 @@ variable "ask_rate_limit" {
   type        = number
   default     = 10
 }
+
+variable "alert_email" {
+  description = "Where cost and traffic alerts go. Set in the git-ignored infra/terraform.tfvars; empty = no alerts."
+  type        = string
+  default     = ""
+}
+
+variable "monthly_budget_usd" {
+  description = "Monthly AWS cost budget; the demo normally costs ~$0, so any real spend is a signal."
+  type        = number
+  default     = 5
+}
+
+variable "invocations_alarm_per_hour" {
+  description = "Lambda invocations per hour that trigger the traffic alarm (normal use is a handful)."
+  type        = number
+  default     = 200
+}
