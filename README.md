@@ -526,6 +526,12 @@ retrieval and LLM latency, tokens, the cost OpenRouter actually billed, a refusa
 CloudWatch Logs turns those fields into metrics, so there is no metrics client, no extra IAM permission and no
 network call on the request path. A Terraform-managed dashboard shows questions per hour, p50/p95 latency split
 by stage, daily LLM cost, refusal rate and the last 20 requests.
+
+![CloudWatch dashboard of the live demo: 9 test questions in 3 hours, $0.0019 total LLM cost, p50 latency 2 s](docs/screenshots/cloudwatch_dashboard.png)
+
+*Test traffic right after deploy. The first question's 30 s is a cold start, and retrieval dominates it (loading the
+embedding model takes 14 s, the LLM 2.6 s). The high refusal rate is deliberate: several questions were outside the notes.*
+
 - **No question text is stored.** The demo is public, so the log keeps only the question's length and a short hash.
 - **Live refusals use the regex detector** (recall 0.79): the [LLM classifier](#refusal-detection-from-a-phrase-list-to-a-classifier)
   would add a paid call and ~1 s per answer, and Lambda freezes after the response, so it cannot run in the background.
