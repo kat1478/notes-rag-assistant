@@ -298,18 +298,27 @@ The judge (GPT-5.6 Luna, structured JSON, reasoning off) grades each answer agai
 and the retrieved context. I labelled a **blind, stratified sample of 25 answers** myself (no model names, no judge
 grades) in a small labelling page, then compared:
 
-| | Judge v1 | Judge v2 (final) |
-| :--- | ---: | ---: |
-| Correct vs. not correct — agreement | 84% | 84% |
-| 3-class verdict — agreement (Cohen's κ) | 76% (0.50) | 76% (0.50) |
-| Faithfulness — agreement | 80% | 84% |
+| | Judge v1 | Judge v2 (final) | Judge v2, dataset v2.1 |
+| :--- | ---: | ---: | ---: |
+| Correct vs. not correct — agreement | 84% | 84% | **96%** |
+| 3-class verdict — agreement (Cohen's κ) | 76% (0.50) | 76% (0.50) | **88% (0.71)** |
+| Faithfulness — agreement | 80% | 84% | 84% |
 
 - **v1 → v2:** every answer the v1 judge flagged as unfaithful was a false alarm — English claims vs. Polish evidence.
   v2 must quote the supporting passage for each claim (in any language) or leave it empty; 97% of its quotes occur
   verbatim in the context, so it isn't inventing evidence. I stopped there rather than tune the prompt to 25 examples.
 - **Direction of errors:** the judge is *stricter* than me — it never called an answer correct that I rated lower.
-  Several disagreements trace back to the dataset, not the judge (e.g. a question whose key points require saying
-  "this is outside the notes"), and one to a rubric gap: an answer in the wrong language isn't penalised.
+  One rubric gap remains: an answer in the wrong language isn't penalised.
+- **Half of the verdict disagreements were the dataset's fault, not the judge's.** *"Who wrote Pan Tadeusz?"* expected
+  two key points: the author, and that the topic "lies outside the scope of inductive learning". Every model answered
+  just "Adam Mickiewicz [Source 2]", which the note supports, so I had rated it correct while the judge gave partial
+  credit. Dataset **v2.1** ([`questions_v2_1.json`](backend/data/eval/v2/questions_v2_1.json)) drops the second key
+  point; nothing else changes and v2 stays frozen. With the same judge, only the 3 affected items re-graded, agreement
+  rose to 96% (κ 0.71). Each model gains 1.7 pp of correctness (one question of 59) and the ranking is unchanged; the
+  table above stays on v2 so it matches the charts. Two traps surfaced on the way: the judge's cache now includes the
+  expected key points (otherwise a corrected dataset silently reuses old grades), and re-grading the published runs
+  requires the embedding model they were answered with — with another one, the retrieved sources are numbered
+  differently and correct citations look unfaithful.
 - **Bias:** GPT-5.6 Luna (OpenAI) also grades GPT-5.6 Sol; Sol scoring *below* Claude here suggests no strong
   family preference, but a second judge would be needed to rule it out.
 
@@ -448,7 +457,7 @@ python -m app.compare_embeddings                                     # free: emb
 python -m app.render_benchmark_charts                                # charts + interactive page → docs/benchmark/
 ```
 
-**Limits.** Correctness comes from an LLM judge with 84% agreement to one human labeller on 25 answers — good enough
+**Limits.** Correctness comes from an LLM judge with 96% correct-vs-not agreement (dataset v2.1) to one human labeller on 25 answers — good enough
 to rank models that differ by ~10 pp, not to separate Haiku from Sonnet (2 pp). The 12 added notes are synthetic, and
 n is small: one question is 1.7–6 pp.
 
@@ -461,7 +470,7 @@ n is small: one question is 1.7–6 pp.
 | Lint + unit tests | every push / PR | `ruff` (pyflakes rules) and 52 offline `pytest` tests: chunking, language and refusal detection, citation parsing, prompt versions (v1 frozen by hash), allowlist / temperature / reasoning rules, API contract with retrieval and generation mocked, demo-mode guards, telemetry format and privacy |
 | Retrieval gate | every push / PR | indexes the v2 corpus and fails if the right note is in the top 3 for < 95% of questions (free — embeddings only) |
 | Docker smoke test | every push / PR | builds the image, starts the container and runs `smoke_test.py` against it |
-| **LLM quality gate** | PRs to `master` (releases) + manual | the default model answers the v2 questions and the Polish probe, the [calibrated judge](#is-the-judge-trustworthy) grades them, and each metric must stay within tolerance of [`quality_baseline.json`](backend/data/eval/v2/quality_baseline.json) (~$0.07 per run, budget-guarded, separate API key with a spend limit) |
+| **LLM quality gate** | PRs to `master` (releases) + manual | the default model answers the v2.1 questions and the Polish probe, the [calibrated judge](#is-the-judge-trustworthy) grades them, and each metric must stay within tolerance of [`quality_baseline.json`](backend/data/eval/v2/quality_baseline.json) (~$0.07 per run, budget-guarded, separate API key with a spend limit) |
 
 ```bash
 cd backend
