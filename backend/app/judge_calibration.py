@@ -2,6 +2,7 @@
 #   python -m app.judge_calibration build [--size 25]          # sample judged answers → label.html (blind)
 #   python -m app.judge_calibration score <labels.json> [--key key.json]  # human vs judge agreement → results.json
 #   python -m app.judge_calibration rejudge                  # re-grade the sample with the current judge → key_<version>.json
+#   python -m app.judge_calibration rejudge --dataset-path <v2.1> --base-key <key_judge_v2.json>  # only items whose key points changed
 #
 # Measures how far to trust the LLM judge: a person labels a stratified sample of judged answers without
 # seeing the model or the judge's grade; we then compare verdicts and faithfulness.
@@ -91,26 +92,38 @@ def cohen_kappa(a, b, labels) -> float:
     return round((po - pe) / (1 - pe), 3) if pe < 1 else 1.0
 
 
-def rejudge() -> None:
-    """Re-grades the calibration items with the current judge (prompt iteration without new human labels)."""
+def rejudge(dataset_path: Path = None, base_key: Path = None) -> None:
+    """Re-grades the calibration items with the current judge (prompt iteration without new human labels).
+    With a corrected dataset and a base key, only items whose expected key points changed are re-graded; the
+    rest keep the base grades, so the comparison is not blurred by judge run-to-run noise."""
     from .judge import JUDGE_VERSION, judge_answer
     from .retrieval import perform_search
+    from .run_judge import require_published_embeddings
     from .vector_store import use_collection
+    require_published_embeddings()
     use_collection(CORPORA["v2"][1])
-    questions = {q["id"]: q for q in load_evaluation_dataset(V2 / "questions.json")}
+    questions = {q["id"]: q for q in load_evaluation_dataset(dataset_path or V2 / "questions.json")}
     items = {i["item"]: i for i in json.loads((CAL_DIR / "items.json").read_text(encoding="utf-8"))}
+    base = {k["item"]: k for k in json.loads(base_key.read_text(encoding="utf-8"))} if base_key else {}
     out, verified = [], []
     for k in json.loads((CAL_DIR / "key.json").read_text(encoding="utf-8")):
         q = questions[k["question_id"]]
+        if k["item"] in base and q["expected_key_points"] == items[k["item"]]["key_points"]:
+            out.append(base[k["item"]])
+            continue
+        print(f"item {k['item']} ({q['id']}): key points changed, re-grading")
         g = judge_answer(q["question"], q["expected_key_points"], perform_search(q["question"], top_k=3),
                          items[k["item"]]["answer"])
         out.append({**k, "judge_verdict": g["verdict"], "judge_faithful": g["faithful"],
                     "unsupported_claims": g["unsupported_claims"]})
         if g.get("evidence_verified_rate") is not None:
             verified.append(g["evidence_verified_rate"])
-    path = CAL_DIR / f"key_judge_{JUDGE_VERSION}.json"
+    suffix = f"_{Path(dataset_path).stem}" if dataset_path else ""
+    path = CAL_DIR / f"key_judge_{JUDGE_VERSION}{suffix}.json"
     path.write_text(json.dumps(out, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    print(f"→ {path}; evidence quotes found verbatim in context: {sum(verified) / len(verified):.0%} (mean per item)")
+    if verified:
+        print(f"evidence quotes found verbatim in context: {sum(verified) / len(verified):.0%} (mean per re-graded item)")
+    print(f"→ {path}")
 
 
 def score(labels_path: Path, key_path: Path = None) -> None:
@@ -153,12 +166,14 @@ def main():
     sub = parser.add_subparsers(dest="cmd", required=True)
     b = sub.add_parser("build"); b.add_argument("--size", type=int, default=25)
     s = sub.add_parser("score"); s.add_argument("labels"); s.add_argument("--key")
-    sub.add_parser("rejudge")
+    r = sub.add_parser("rejudge")
+    r.add_argument("--dataset-path", help="Corrected dataset (e.g. data/eval/v2/questions_v2_1.json).")
+    r.add_argument("--base-key", help="Grades to keep for items whose key points did not change.")
     args = parser.parse_args()
     if args.cmd == "build":
         build(args.size)
     elif args.cmd == "rejudge":
-        rejudge()
+        rejudge(Path(args.dataset_path) if args.dataset_path else None, Path(args.base_key) if args.base_key else None)
     else:
         score(Path(args.labels), Path(args.key) if args.key else None)
 
