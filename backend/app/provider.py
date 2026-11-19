@@ -42,6 +42,7 @@ class Generation:
     temperature: Optional[float] = None  # value actually sent; None = the model does not accept temperature
     reasoning_tokens: Optional[int] = None  # hidden reasoning tokens (billed as output), when reported
     reasoning: Optional[str] = None  # reasoning setting actually sent, e.g. 'effort=none'
+    cost_usd: Optional[float] = None  # billed cost reported by the provider (OpenRouter usage.cost)
 
 
 class LLMProvider:
@@ -184,6 +185,7 @@ class OpenRouterProvider(LLMProvider):
             temperature=temperature,
             reasoning_tokens=(usage.get("completion_tokens_details") or {}).get("reasoning_tokens"),
             reasoning=",".join(f"{k}={v}" for k, v in payload.get("reasoning", {}).items()) or None,
+            cost_usd=usage.get("cost"),
         )
 
     def reasoning_off_payload(self) -> Optional[Dict]:

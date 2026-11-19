@@ -19,6 +19,8 @@ from .config import (
 )
 from .provider import list_models
 from .rate_limit import RateLimiter, client_id
+from .evaluation import is_refusal_response
+from . import telemetry
 
 app = FastAPI(
     title="Notes RAG Assistant API",
@@ -170,15 +172,26 @@ def search(request: SearchRequest):
 
 @app.post("/ask", response_model=AskResponse, dependencies=[Depends(enforce_ask_rate_limit)])
 def ask(request: AskRequest):
-    start_time = time.time()
+    start_time = time.perf_counter()
     top_k = request.top_k if request.top_k is not None else TOP_K
     results = perform_search(request.query, top_k)
+    retrieved_at = time.perf_counter()
     try:
         generation = generate_answer_with_meta(request.query, results, request.model, request.temperature)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-    elapsed_ms = (time.time() - start_time) * 1000
+    done_at = time.perf_counter()
+    elapsed_ms = (done_at - start_time) * 1000
     provider, model = generation.model_id.split(":", 1)
+    # Live refusals use the free regex (recall 0.79 on the human labels): the LLM classifier would add a paid call
+    # and ~1 s to every answer, and Lambda freezes after the response, so it cannot run in the background.
+    telemetry.emit(telemetry.ask_event(
+        question=request.query, model_id=generation.model_id,
+        retrieval_ms=(retrieved_at - start_time) * 1000, generation_ms=(done_at - retrieved_at) * 1000,
+        n_sources=len(results), refused=is_refusal_response(generation.text),
+        generation_error=generation.error is not None, prompt_tokens=generation.prompt_tokens,
+        completion_tokens=generation.completion_tokens, cost_usd=generation.cost_usd,
+    ))
 
     return AskResponse(
         answer=generation.text,
@@ -194,6 +207,7 @@ def ask(request: AskRequest):
             completion_tokens=generation.completion_tokens,
             generation_error=generation.error,
             temperature=generation.temperature,
+            cost_usd=generation.cost_usd,
         )
     )
 
