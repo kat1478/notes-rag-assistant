@@ -37,6 +37,7 @@ class AskResponseMetadata(BaseModel):
     completion_tokens: Optional[int] = None
     generation_error: Optional[str] = None
     temperature: Optional[float] = None  # applied value; null = model ignores temperature
+    cost_usd: Optional[float] = None  # billed by the provider; null = unknown or local model
 
 class ModelInfo(BaseModel):
     id: str

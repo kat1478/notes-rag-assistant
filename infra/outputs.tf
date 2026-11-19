@@ -5,3 +5,7 @@ output "repository_url" {
 output "function_url" {
   value = local.deploy_function ? aws_lambda_function_url.app[0].function_url : null
 }
+
+output "dashboard_url" {
+  value = "https://${var.region}.console.aws.amazon.com/cloudwatch/home?region=${var.region}#dashboards/dashboard/${aws_cloudwatch_dashboard.demo.dashboard_name}"
+}

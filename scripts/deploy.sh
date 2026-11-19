@@ -36,5 +36,10 @@ tf apply -var "image_digest=$DIGEST"
 URL=$(tf output -raw function_url)
 
 # 4. Warm-up: the first start of a new image pulls it from ECR (~65 s, vs ~12 s later) — pay it here, not a visitor.
-curl -sf -o /dev/null --max-time 120 "${URL%/}/health" && echo "Warm-up OK"
+# That can exceed the 60 s function timeout, so the first attempts may return 502; retry instead of failing the deploy.
+for attempt in 1 2 3 4; do
+    if curl -sf -o /dev/null --max-time 120 "${URL%/}/health"; then echo "Warm-up OK (attempt $attempt)"; break; fi
+    [ "$attempt" = 4 ] && { echo "Warm-up failed after 4 attempts — check the function logs" >&2; exit 1; }
+    echo "Warm-up attempt $attempt failed (first image pull?), retrying"
+done
 echo "Deployed $TAG → $URL"

@@ -458,7 +458,7 @@ n is small: one question is 1.7–6 pp.
 
 | Check | When | What it does |
 | :--- | :--- | :--- |
-| Lint + unit tests | every push / PR | `ruff` (pyflakes rules) and 48 offline `pytest` tests: chunking, language and refusal detection, citation parsing, prompt versions (v1 frozen by hash), allowlist / temperature / reasoning rules, API contract with retrieval and generation mocked, demo-mode guards |
+| Lint + unit tests | every push / PR | `ruff` (pyflakes rules) and 52 offline `pytest` tests: chunking, language and refusal detection, citation parsing, prompt versions (v1 frozen by hash), allowlist / temperature / reasoning rules, API contract with retrieval and generation mocked, demo-mode guards, telemetry format and privacy |
 | Retrieval gate | every push / PR | indexes the v2 corpus and fails if the right note is in the top 3 for < 95% of questions (free — embeddings only) |
 | Docker smoke test | every push / PR | builds the image, starts the container and runs `smoke_test.py` against it |
 | **LLM quality gate** | PRs to `master` (releases) + manual | the default model answers the v2 questions and the Polish probe, the [calibrated judge](#is-the-judge-trustworthy) grades them, and each metric must stay within tolerance of [`quality_baseline.json`](backend/data/eval/v2/quality_baseline.json) (~$0.07 per run, budget-guarded, separate API key with a spend limit) |
@@ -518,6 +518,25 @@ has to be visible:
 - **Traffic alarm.** More than 200 invocations in an hour (normal use is a handful) emails via SNS within the hour.
 
 Both are created only when `alert_email` is set in the git-ignored `infra/terraform.tfvars`.
+
+**Observability** ([`telemetry.py`](backend/app/telemetry.py), [`infra/dashboard.tf`](infra/dashboard.tf)). Every
+question writes one JSON log line in CloudWatch's
+[Embedded Metric Format](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Embedded_Metric_Format.html):
+retrieval and LLM latency, tokens, the cost OpenRouter actually billed, a refusal flag and generation errors.
+CloudWatch Logs turns those fields into metrics, so there is no metrics client, no extra IAM permission and no
+network call on the request path. A Terraform-managed dashboard shows questions per hour, p50/p95 latency split
+by stage, daily LLM cost, refusal rate and the last 20 requests.
+
+![CloudWatch dashboard of the live demo: 9 test questions in 3 hours, $0.0019 total LLM cost, p50 latency 2 s](docs/screenshots/cloudwatch_dashboard.png)
+
+*Test traffic right after deploy. The first question's 30 s is a cold start, and retrieval dominates it (loading the
+embedding model takes 14 s, the LLM 2.6 s). The high refusal rate is deliberate: several questions were outside the notes.*
+
+- **No question text is stored.** The demo is public, so the log keeps only the question's length and a short hash.
+- **Live refusals use the regex detector** (recall 0.79): the [LLM classifier](#refusal-detection-from-a-phrase-list-to-a-classifier)
+  would add a paid call and ~1 s per answer, and Lambda freezes after the response, so it cannot run in the background.
+- **Within the free tier:** 8 metrics without dimensions (the free allowance is 10; a per-model dimension would
+  multiply them), and the dashboard is one of three free ones.
 
 **Deploy it yourself** (AWS CLI v2 with `aws login`, Docker, Terraform ≥ 1.10):
 
@@ -623,7 +642,7 @@ scripts/               # deploy.sh, measure_cold_start.sh
 - [x] **Docker Compose** — one-command setup; CPU-only PyTorch and the embedding model baked into the image.
 - [ ] **API authentication** — protect the endpoints for any non-local deployment.
 - [x] **Deployment** — public demo on AWS Lambda (container image, Terraform, ~$0/month) ([details](#deployment-aws-lambda)).
-- [x] **Tests and CI** — 48 offline tests, retrieval gate, container smoke test, LLM quality gate on release PRs ([details](#tests-and-ci)).
+- [x] **Tests and CI** — 52 offline tests, retrieval gate, container smoke test, LLM quality gate on release PRs ([details](#tests-and-ci)).
 
 ---
 
