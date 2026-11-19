@@ -2,7 +2,7 @@
 #   python -m app.quality_gate                 # compare with data/eval/v2/quality_baseline.json
 #   python -m app.quality_gate --write-baseline
 #
-# End-to-end quality gate used in CI on pull requests to master: the default model answers the v2 questions
+# End-to-end quality gate used in CI on pull requests to master: the default model answers the v2.1 questions
 # and the Polish probe with the app's current prompt and embeddings, the LLM judge grades the answers, and each
 # metric must stay within a tolerance of the committed baseline. LLM runs are not bit-deterministic, so the
 # tolerances are sized to a few questions, not to zero.
@@ -22,7 +22,8 @@ from .run_model_benchmark import slug
 
 V2 = DATA_DIR / "eval" / "v2"
 BASELINE = V2 / "quality_baseline.json"
-SETS = {"main": V2 / "questions.json", "pl_probe": V2 / "questions_pl_probe.json"}
+# v2.1 = v2 with corrected key points for val016 (2026-11-19); the corpus is unchanged.
+SETS = {"main": V2 / "questions_v2_1.json", "pl_probe": V2 / "questions_pl_probe.json"}
 # Allowed drop below the baseline, as a share (0.05 = 5 pp). Sized to the set: 0.05 of 77 questions ≈ 4,
 # 0.10 of 20 ≈ 2, 0.12 of 17 out-of-scope ≈ 2.
 TOLERANCE = {"main_correct_share": 0.05, "pl_probe_correct_share": 0.10,
@@ -93,6 +94,7 @@ def main():
     if args.write_baseline:
         BASELINE.write_text(json.dumps({"model": DEFAULT_MODEL_ID, "prompt": PROMPT_VERSION, "embedding_model": EMBEDDING_MODEL,
                                         "judge": JUDGE_MODEL, "refusal_detector": detector(), "refusal_model": REFUSAL_MODEL,
+                                        "datasets": {k: v.name for k, v in SETS.items()},
                                         "metrics": metrics}, indent=2) + "\n", encoding="utf-8")
         print(f"Baseline written to {BASELINE}: {metrics}")
         return
