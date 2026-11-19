@@ -19,7 +19,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List
 
-from .config import CORPORA, DATA_DIR, JUDGE_MODEL
+from .config import CORPORA, DATA_DIR, EMBEDDING_MODEL_KEY, JUDGE_MODEL, LEGACY_EMBEDDING_KEY
 from .evaluation import load_evaluation_dataset
 from .judge import JUDGE_VERSION, judge_answer
 from .retrieval import perform_search
@@ -35,8 +35,21 @@ JUDGE_DIR = V2 / "judge"
 CACHE = Path(os.getenv("JUDGE_CACHE", str(JUDGE_DIR / "cache.jsonl")))
 
 
-def cache_key(model_id: str, qid: str, answer: str) -> str:
-    return hashlib.sha256(f"{JUDGE_MODEL}|{JUDGE_VERSION}|{model_id}|{qid}|{answer}".encode("utf-8")).hexdigest()[:24]
+def cache_key(model_id: str, qid: str, answer: str, key_points: List[str]) -> str:
+    """The expected key points are part of the key: a corrected dataset (v2.1) must not reuse grades given
+    against the old key points. Entries cached before 2026-11-19 were re-keyed with the v2 key points."""
+    points = hashlib.sha256(json.dumps(key_points, ensure_ascii=False).encode("utf-8")).hexdigest()[:12]
+    raw = f"{JUDGE_MODEL}|{JUDGE_VERSION}|{model_id}|{qid}|{answer}|{points}"
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:24]
+
+
+def require_published_embeddings() -> None:
+    """The published v2 runs (data/eval/v2/models) were answered with the legacy embedding model. The judge rebuilds
+    the context by retrieval, so another model numbers the sources differently and correct citations look
+    unfaithful (seen 2026-11-19: 4 of 6 val016 answers)."""
+    if EMBEDDING_MODEL_KEY != LEGACY_EMBEDDING_KEY:
+        sys.exit(f"The published v2 runs were answered with EMBEDDING_MODEL_KEY={LEGACY_EMBEDDING_KEY}; "
+                 f"set it to grade them (now {EMBEDDING_MODEL_KEY}).")
 
 
 def load_cache() -> Dict[str, dict]:
@@ -89,11 +102,17 @@ def main():
 
     results_dir = Path(args.results_dir)
     main_run = results_dir.resolve() == (V2 / "models").resolve()
-    judge_dir = JUDGE_DIR if main_run else results_dir / "judge"
+    dataset = Path(args.dataset_path)
+    default_dataset = dataset.resolve() == (V2 / "questions.json").resolve()
+    if main_run:
+        require_published_embeddings()
+    # Grading the published runs against another dataset version (e.g. v2.1) writes next to the v2 grades and
+    # leaves both them and the model summary (README charts) untouched.
+    judge_dir = (JUDGE_DIR if default_dataset else JUDGE_DIR / dataset.stem) if main_run else results_dir / "judge"
     summary_path = results_dir / "summary.json"
     runs = json.loads(summary_path.read_text(encoding="utf-8"))["runs"]
     keys = args.models or list(runs)
-    questions = {q["id"]: q for q in load_evaluation_dataset(Path(args.dataset_path))}
+    questions = {q["id"]: q for q in load_evaluation_dataset(dataset)}
     use_collection(CORPORA["v2"][1])
     price = fetch_openrouter_prices().get(JUDGE_MODEL)
     if not price:
@@ -102,7 +121,7 @@ def main():
     cache = load_cache()
     contexts: Dict[str, list] = {}
     spent = 0.0
-    judge_summary = {"judge_model": JUDGE_MODEL, "judge_version": JUDGE_VERSION, "runs": {}}
+    judge_summary = {"judge_model": JUDGE_MODEL, "judge_version": JUDGE_VERSION, "dataset": dataset.name, "runs": {}}
 
     for key in keys:
         rows = []
@@ -120,7 +139,7 @@ def main():
                 continue
             if args.limit and judged_now >= args.limit:
                 continue
-            ck = cache_key(key, q["id"], r["answer_text"])
+            ck = cache_key(key, q["id"], r["answer_text"], q["expected_key_points"])
             grade = cache.get(ck)
             if grade is None:
                 if q["id"] not in contexts:
@@ -156,6 +175,9 @@ def main():
     judge_summary["run_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
     judge_dir.mkdir(parents=True, exist_ok=True)
     (judge_dir / "summary.json").write_text(json.dumps(judge_summary, indent=2) + "\n", encoding="utf-8")
+    if main_run and not default_dataset:
+        logger.info(f"Saved {judge_dir / 'summary.json'} (model summary not updated: not the v2 dataset)")
+        return
     # Merge headline judge metrics into the model summary so the charts and the Models page can show them.
     models_summary = json.loads(summary_path.read_text(encoding="utf-8"))
     for key, m in judge_summary["runs"].items():

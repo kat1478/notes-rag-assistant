@@ -5,8 +5,12 @@
   "judge": "openai/gpt-5.6-luna",
   "refusal_detector": "llm",
   "refusal_model": "anthropic/claude-haiku-5.5",
+  "datasets": {
+    "main": "questions_v2_1.json",
+    "pl_probe": "questions_pl_probe.json"
+  },
   "metrics": {
-    "main_correct_share": 0.9481,
+    "main_correct_share": 0.9351,
     "main_language_match": 1.0,
     "main_refusal_out_of_scope": 1.0,
     "pl_probe_correct_share": 1.0,
