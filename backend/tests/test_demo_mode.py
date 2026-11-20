@@ -4,6 +4,7 @@ from fastapi.testclient import TestClient
 
 from app import main, provider
 from app.provider import Generation
+from app.retrieval import Retrieval
 from app.rate_limit import RateLimiter, client_id
 
 from .conftest import chunk
@@ -12,7 +13,7 @@ from .conftest import chunk
 @pytest.fixture
 def client(monkeypatch):
     monkeypatch.setattr(provider, "_openrouter_supported_params", lambda: {})
-    monkeypatch.setattr(main, "perform_search", lambda query, top_k: [chunk("Dijkstra relaxes edges.", "d.txt", 0, 0.4)])
+    monkeypatch.setattr(main, "retrieve", lambda query, top_k: Retrieval([chunk("Dijkstra relaxes edges.", "d.txt", 0, 0.4)], "semantic"))
     monkeypatch.setattr(main, "generate_answer_with_meta", lambda *a: Generation(
         text="ok [Source 1].", model_id="openrouter:anthropic/claude-haiku-5.5", temperature=None))
     return TestClient(main.app)
@@ -33,6 +34,15 @@ def test_ask_returns_429_after_the_limit(client, monkeypatch):
     assert codes == [200, 200, 429]
     # another client is counted separately
     assert client.post("/ask", json={"query": "q"}, headers={"x-forwarded-for": "198.51.100.1"}).status_code == 200
+
+
+def test_search_has_its_own_limit(client, monkeypatch):
+    monkeypatch.setattr(main, "search_limiter", RateLimiter(limit=1, window_s=3600))
+    headers = {"x-forwarded-for": "203.0.113.8"}
+    codes = [client.post("/search", json={"query": "q"}, headers=headers).status_code for _ in range(2)]
+    assert codes == [200, 429]
+    # /ask is counted separately
+    assert client.post("/ask", json={"query": "q"}, headers=headers).status_code == 200
 
 
 def test_window_expires_and_zero_means_unlimited():
