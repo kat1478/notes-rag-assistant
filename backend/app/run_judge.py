@@ -3,8 +3,9 @@
 #   python -m app.run_judge --max-cost-usd 2          # judge every saved v2 answer (cached: re-runs are free)
 #
 # Grades the saved v2 benchmark answers (data/eval/v2/models/*.csv) with an LLM judge (config.JUDGE_MODEL):
-# key-point correctness + faithfulness to the retrieved context. No answers are regenerated; the context is
-# rebuilt with the same deterministic retrieval. Results: data/eval/v2/judge/<model>.csv + summary.json, and
+# key-point correctness + faithfulness to the retrieved context. No answers are regenerated. The context is the
+# exact one the generator saw (<results-dir>/contexts.jsonl, see app/contexts.py); runs saved before 2026-11-20 have
+# none and are graded on a re-retrieval with the run's own top_k, only under the run's embedding model. Results: data/eval/v2/judge/<model>.csv + summary.json, and
 # judge_* metrics merged into data/eval/v2/models/summary.json for the charts.
 
 import argparse
@@ -17,9 +18,11 @@ import statistics
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 
-from .config import CORPORA, DATA_DIR, EMBEDDING_MODEL_KEY, JUDGE_MODEL, LEGACY_EMBEDDING_KEY
+from .config import (CORPORA, DATA_DIR, EMBEDDING_MODEL, EMBEDDING_MODEL_KEY, EMBEDDING_MODELS, JUDGE_MODEL,
+                     LEGACY_EMBEDDING_KEY)
+from .contexts import load_store
 from .evaluation import load_evaluation_dataset
 from .judge import JUDGE_VERSION, judge_answer
 from .retrieval import perform_search
@@ -35,12 +38,24 @@ JUDGE_DIR = V2 / "judge"
 CACHE = Path(os.getenv("JUDGE_CACHE", str(JUDGE_DIR / "cache.jsonl")))
 
 
-def cache_key(model_id: str, qid: str, answer: str, key_points: List[str]) -> str:
-    """The expected key points are part of the key: a corrected dataset (v2.1) must not reuse grades given
-    against the old key points. Entries cached before 2026-11-19 were re-keyed with the v2 key points."""
+def cache_key(model_id: str, qid: str, answer: str, key_points: List[str], context: Optional[str] = None) -> str:
+    """Everything the grade depends on. Key points: a corrected dataset (v2.1) must not reuse grades given against
+    the old ones (entries cached before 2026-11-19 were re-keyed with the v2 key points). Context hash: the same
+    answer over different evidence is a different grading task; legacy rows have none, so their keys are unchanged."""
     points = hashlib.sha256(json.dumps(key_points, ensure_ascii=False).encode("utf-8")).hexdigest()[:12]
-    raw = f"{JUDGE_MODEL}|{JUDGE_VERSION}|{model_id}|{qid}|{answer}|{points}"
+    raw = f"{JUDGE_MODEL}|{JUDGE_VERSION}|{model_id}|{qid}|{answer}|{points}" + (f"|{context}" if context else "")
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:24]
+
+
+def legacy_retrieval_check(run: dict) -> int:
+    """For rows without a stored context: re-retrieval reproduces it only under the run's embedding model (runs that
+    don't record one used the legacy model). Returns the run's top_k."""
+    run_model = run.get("embedding_model") or EMBEDDING_MODELS[LEGACY_EMBEDDING_KEY]
+    if run_model != EMBEDDING_MODEL:
+        key = next((k for k, m in EMBEDDING_MODELS.items() if m == run_model), run_model)
+        sys.exit(f"Run {run.get('model_id')} has no stored contexts and was answered with {run_model}: set "
+                 f"EMBEDDING_MODEL_KEY={key} to grade it (now {EMBEDDING_MODEL_KEY}).")
+    return int(run.get("top_k") or 3)
 
 
 def require_published_embeddings() -> None:
@@ -104,8 +119,6 @@ def main():
     main_run = results_dir.resolve() == (V2 / "models").resolve()
     dataset = Path(args.dataset_path)
     default_dataset = dataset.resolve() == (V2 / "questions.json").resolve()
-    if main_run:
-        require_published_embeddings()
     # Grading the published runs against another dataset version (e.g. v2.1) writes next to the v2 grades and
     # leaves both them and the model summary (README charts) untouched.
     judge_dir = (JUDGE_DIR if default_dataset else JUDGE_DIR / dataset.stem) if main_run else results_dir / "judge"
@@ -119,7 +132,8 @@ def main():
         sys.exit(f"No price for judge {JUDGE_MODEL} — refusing to run without a cost estimate.")
 
     cache = load_cache()
-    contexts: Dict[str, list] = {}
+    store = load_store(results_dir)
+    retrieved: Dict[tuple, list] = {}  # legacy rows: (question id, top_k) → re-retrieved context
     spent = 0.0
     judge_summary = {"judge_model": JUDGE_MODEL, "judge_version": JUDGE_VERSION, "dataset": dataset.name, "runs": {}}
 
@@ -139,12 +153,20 @@ def main():
                 continue
             if args.limit and judged_now >= args.limit:
                 continue
-            ck = cache_key(key, q["id"], r["answer_text"], q["expected_key_points"])
+            ctx_hash = r.get("context_hash") or None
+            if ctx_hash and ctx_hash not in store:
+                sys.exit(f"{key} {q['id']}: context {ctx_hash} missing from {results_dir / 'contexts.jsonl'}")
+            ck = cache_key(key, q["id"], r["answer_text"], q["expected_key_points"], ctx_hash)
             grade = cache.get(ck)
             if grade is None:
-                if q["id"] not in contexts:
-                    contexts[q["id"]] = perform_search(q["question"], top_k=3)
-                grade = judge_answer(q["question"], q["expected_key_points"], contexts[q["id"]], r["answer_text"])
+                if ctx_hash:
+                    context = store[ctx_hash]
+                else:
+                    top_k = legacy_retrieval_check(runs[key])
+                    if (q["id"], top_k) not in retrieved:
+                        retrieved[(q["id"], top_k)] = perform_search(q["question"], top_k=top_k)
+                    context = retrieved[(q["id"], top_k)]
+                grade = judge_answer(q["question"], q["expected_key_points"], context, r["answer_text"])
                 spent += (grade["prompt_tokens"] or 0) * price["prompt"] + (grade["completion_tokens"] or 0) * price["completion"]
                 if not args.limit:
                     append_cache(ck, grade)

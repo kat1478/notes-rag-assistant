@@ -25,6 +25,7 @@ from typing import Dict, List, Optional
 import httpx
 
 from .answering import FALLBACK_PREFIX, PROMPT_VERSIONS, generate_answer_with_meta
+from .contexts import context_hash, save_contexts
 from .config import (
     CORPORA, DATA_DIR, EMBEDDING_MODEL, OPENROUTER_BASE_URL, PROMPT_VERSION, REASONING, REFUSAL_MODEL, TEMPERATURE,
 )
@@ -149,6 +150,8 @@ def run_model(model_id: str, items: List[dict], contexts: Dict[str, list], price
             "reasoning_tokens": gen.reasoning_tokens,
             "reasoning": gen.reasoning or "",
             "retrieval_hit": hits[item["id"]],
+            # The judge grades against this exact context (see app/contexts.py), not a later re-retrieval.
+            "context_hash": context_hash(sources),
             "question_language": q_lang,
             "answer_language": a_lang,
             "language_match": (q_lang == a_lang) if "unknown" not in (q_lang, a_lang) and not failed else None,
@@ -394,6 +397,7 @@ def main():
             logger.error(f"{key}: {result['failures']}/{len(rows)} generations failed — not saved to the summary")
             continue
         write_csv(out_dir / f"{slug(key)}.csv", rows)
+        save_contexts(out_dir, contexts)
         result.update({
             "dataset": dataset_path.name,
             "corpus": args.corpus,
