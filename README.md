@@ -13,6 +13,14 @@ Repository: https://github.com/kat1478/notes-rag-assistant
 
 **Live demo:** https://iwpihtdkkdhsjuo5vinbtg6pty0dsvhz.lambda-url.eu-north-1.on.aws/ — serverless on AWS Lambda; the first question after a quiet period takes ~15 s while the function starts ([why](#deployment-aws-lambda)).
 
+### Start here
+
+| | |
+| :--- | :--- |
+| **Try it** | Open the [live demo](https://iwpihtdkkdhsjuo5vinbtg6pty0dsvhz.lambda-url.eu-north-1.on.aws/) and ask: *"How does Q-learning update its action values?"* — an English question answered from a **Polish** note, with clickable citations. *"What is the capital of France?"* — a refusal, because no note covers it. |
+| **See the numbers** | [Interactive model benchmark](https://kat1478.github.io/notes-rag-assistant/benchmark/): six LLMs on 94 questions, judged for correctness and faithfulness. The headline decision: [multilingual embeddings](#multilingual-embeddings-closing-the-cross-language-gap) took cross-language retrieval from 56% to 100% and correct answers from 52/77 to 72/77. |
+| **Reproduce it** | Run the app with `docker compose up --build` ([Quickstart](#quickstart)). From `backend/`: `python -m app.ingest_corpus --corpus v2 && python -m app.run_model_benchmark --corpus v2 --retrieval-only` (free, embeddings only) and `python -m app.quality_gate` (~$0.07, needs an OpenRouter key) — the same checks [CI](#tests-and-ci) runs. |
+
 ---
 
 ## Demo screenshots
@@ -59,14 +67,17 @@ This repository contains a working MVP:
 - pluggable LLM providers: OpenRouter (default model Claude Haiku 5.5, chosen by benchmark) or local Ollama
 - per-request model and temperature selection, with token usage reported per answer
 - static browser frontend linking each citation to its source chunk
-- answer status (grounded / refused / no citation), run statistics and backend status
-- Docker Compose setup; CI with lint, 36 offline tests, a retrieval gate, a container smoke test and a paid
+- answer status (cited / refused / no citation), the retrieval path that ran, run statistics and backend status
+- Docker Compose setup; CI with lint, 62 offline tests, a retrieval gate, a container smoke test and a paid
   LLM quality gate on release PRs
+- public demo on AWS Lambda (Terraform), with cost alerts and a CloudWatch dashboard for latency, tokens, cost and
+  refusals
 - retrieval, answer-quality, and validation evaluation artifacts
 - a model benchmark (6 models, 94 questions, frozen corpus) with charts and an interactive comparison view
 - an LLM-as-judge for answer correctness and faithfulness, calibrated against blind human labels
 
-The next planned technical step is a public cloud deployment (AWS) of the containerised app.
+Next: evidence-level evaluation (does the context hold the exact passage, does each citation support its claim),
+then hybrid search and reranking measured on it — see [Roadmap](#roadmap--next-steps).
 
 ---
 
@@ -467,7 +478,7 @@ n is small: one question is 1.7–6 pp.
 
 | Check | When | What it does |
 | :--- | :--- | :--- |
-| Lint + unit tests | every push / PR | `ruff` (pyflakes rules) and 52 offline `pytest` tests: chunking, language and refusal detection, citation parsing, prompt versions (v1 frozen by hash), allowlist / temperature / reasoning rules, API contract with retrieval and generation mocked, demo-mode guards, telemetry format and privacy |
+| Lint + unit tests | every push / PR | `ruff` (pyflakes rules) and 62 offline `pytest` tests: chunking, language and refusal detection, citation parsing, prompt versions (v1 frozen by hash), allowlist / temperature / reasoning rules, API contract with retrieval and generation mocked, demo-mode guards and request bounds, retrieval-path reporting, telemetry format and privacy |
 | Retrieval gate | every push / PR | indexes the v2 corpus and fails if the right note is in the top 3 for < 95% of questions (free — embeddings only) |
 | Docker smoke test | every push / PR | builds the image, starts the container and runs `smoke_test.py` against it |
 | **LLM quality gate** | PRs to `master` (releases) + manual | the default model answers the v2.1 questions and the Polish probe, the [calibrated judge](#is-the-judge-trustworthy) grades them, and each metric must stay within tolerance of [`quality_baseline.json`](backend/data/eval/v2/quality_baseline.json) (~$0.07 per run, budget-guarded, separate API key with a spend limit) |
@@ -651,7 +662,7 @@ scripts/               # deploy.sh, measure_cold_start.sh
 - [x] **Docker Compose** — one-command setup; CPU-only PyTorch and the embedding model baked into the image.
 - [ ] **API authentication** — protect the endpoints for any non-local deployment.
 - [x] **Deployment** — public demo on AWS Lambda (container image, Terraform, ~$0/month) ([details](#deployment-aws-lambda)).
-- [x] **Tests and CI** — 52 offline tests, retrieval gate, container smoke test, LLM quality gate on release PRs ([details](#tests-and-ci)).
+- [x] **Tests and CI** — 62 offline tests, retrieval gate, container smoke test, LLM quality gate on release PRs ([details](#tests-and-ci)).
 
 ---
 

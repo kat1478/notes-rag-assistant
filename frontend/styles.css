@@ -239,7 +239,7 @@ code, pre, kbd, output, .mono { font-family: var(--mono); }
     border-radius: 3px;
     border: 1px solid currentColor;
 }
-.tag[data-kind="grounded"] { color: var(--ok); }
+.tag[data-kind="cited"] { color: var(--ok); }
 .tag[data-kind="refused"]  { color: var(--info); }
 .tag[data-kind="uncited"]  { color: var(--warn); }
 

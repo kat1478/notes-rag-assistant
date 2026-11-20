@@ -253,8 +253,19 @@ function renderAnswer(text, sourceCount) {
 
 function classify(text, citedCount, error) {
     if (error) return { kind: 'failed', label: 'generation failed', hint: error };
-    if (citedCount > 0) return { kind: 'grounded', label: 'grounded' };
-    if (REFUSAL_RE.test(text)) return { kind: 'refused', label: 'refused · out of scope' };
+    // "cited", not "grounded": the UI only knows the answer points at chunks that were in the context, not that
+    // those chunks support each claim (that is what the offline judge measures).
+    if (citedCount > 0) return {
+        kind: 'cited',
+        label: 'cited',
+        hint: 'Cites sources that were in the context. Whether they support every claim is checked offline by the judge, not here.',
+    };
+    // "not in context", not "out of scope": a refusal can also mean retrieval missed a note that does hold the answer.
+    if (REFUSAL_RE.test(text)) return {
+        kind: 'refused',
+        label: 'refused · not in context',
+        hint: 'The retrieved chunks do not answer this. Either the notes do not cover it or retrieval missed the right note.',
+    };
     return {
         kind: 'uncited',
         label: 'no citation',

@@ -12,10 +12,11 @@ from .schemas import (
     IngestResponse, FileIngestDetail, ModelInfo,
 )
 from .ingestion import process_upload
-from .retrieval import perform_search
+from .retrieval import retrieve
 from .answering import generate_answer_with_meta
 from .config import (
     TOP_K, OLLAMA_MODEL, DEFAULT_MODEL_ID, DATA_DIR, TEMPERATURE, DEMO_MODE, ASK_RATE_LIMIT, ASK_RATE_WINDOW_S,
+    SEARCH_RATE_LIMIT,
 )
 from .provider import list_models
 from .rate_limit import RateLimiter, client_id
@@ -43,6 +44,7 @@ if frontend_dir.exists():
     app.mount("/frontend", StaticFiles(directory=str(frontend_dir), html=True), name="frontend")
 
 ask_limiter = RateLimiter(ASK_RATE_LIMIT, ASK_RATE_WINDOW_S)
+search_limiter = RateLimiter(SEARCH_RATE_LIMIT, ASK_RATE_WINDOW_S)
 
 
 def require_uploads_enabled():
@@ -50,10 +52,18 @@ def require_uploads_enabled():
         raise HTTPException(status_code=403, detail="Uploads are disabled in the public demo. Run the app locally to add notes.")
 
 
-def enforce_ask_rate_limit(request: Request):
+def _enforce(limiter: RateLimiter, request: Request):
     peer = request.client.host if request.client else None
-    if not ask_limiter.allow(client_id(request.headers.get("x-forwarded-for"), peer)):
-        raise HTTPException(status_code=429, detail="Too many questions from this address — try again later.")
+    if not limiter.allow(client_id(request.headers.get("x-forwarded-for"), peer)):
+        raise HTTPException(status_code=429, detail="Too many requests from this address — try again later.")
+
+
+def enforce_ask_rate_limit(request: Request):
+    _enforce(ask_limiter, request)
+
+
+def enforce_search_rate_limit(request: Request):
+    _enforce(search_limiter, request)
 
 @app.get("/")
 def read_root():
@@ -161,20 +171,16 @@ async def ingest_documents_batch(files: List[UploadFile] = File(...)):
         status=status
     )
 
-@app.post("/search", response_model=SearchResponse)
+@app.post("/search", response_model=SearchResponse, dependencies=[Depends(enforce_search_rate_limit)])
 def search(request: SearchRequest):
     top_k = request.top_k if request.top_k is not None else TOP_K
-    results = perform_search(request.query, top_k)
-    return SearchResponse(
-        query=request.query,
-        results=results
-    )
+    return SearchResponse(query=request.query, results=retrieve(request.query, top_k).results)
 
 @app.post("/ask", response_model=AskResponse, dependencies=[Depends(enforce_ask_rate_limit)])
 def ask(request: AskRequest):
     start_time = time.perf_counter()
     top_k = request.top_k if request.top_k is not None else TOP_K
-    results = perform_search(request.query, top_k)
+    results, retrieval_mode = retrieve(request.query, top_k)
     retrieved_at = time.perf_counter()
     try:
         generation = generate_answer_with_meta(request.query, results, request.model, request.temperature)
@@ -198,7 +204,7 @@ def ask(request: AskRequest):
         sources=results,
         metadata=AskResponseMetadata(
             top_k_used=top_k,
-            retrieval_mode="hybrid (Chroma semantic + TF-IDF fallback)",
+            retrieval_mode=retrieval_mode,
             generation_mode="extractive fallback" if generation.error else f"{provider} ({model})",
             response_time_ms=round(elapsed_ms, 2),
             model=generation.model_id,

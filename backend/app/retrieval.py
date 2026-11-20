@@ -1,6 +1,6 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from typing import List
+from typing import List, NamedTuple
 from .schemas import ChunkResponse, ChunkMetadata
 from .config import TOP_K
 from .vector_store import search_chunks, get_collection
@@ -100,30 +100,37 @@ def expand_chunks_with_neighbors(chunks: List[ChunkResponse]) -> List[ChunkRespo
     
     return sorted_expanded
 
-def perform_search(
-    query: str, 
-    top_k: int = TOP_K, 
-    use_semantic: bool = True,
-    expand_context: bool = True
-) -> List[ChunkResponse]:
-    """Primary retrieval function, using Chroma by default and performing context expansion."""
-    results = []
+class Retrieval(NamedTuple):
+    results: List[ChunkResponse]
+    mode: str  # "semantic", "tfidf_fallback" or "none"
+
+
+def retrieve(query: str, top_k: int = TOP_K, use_semantic: bool = True, expand_context: bool = True) -> Retrieval:
+    """Chroma semantic search with TF-IDF fallback and context expansion; also reports which path produced the results."""
     if use_semantic:
         try:
             results = search_chunks(query, top_k)
             if results:
-                if expand_context:
-                    return expand_chunks_with_neighbors(results)
-                return results
+                return Retrieval(expand_chunks_with_neighbors(results) if expand_context else results, "semantic")
             logger.info("Semantic search returned no results, falling back to TF-IDF.")
         except Exception as e:
             logger.error(f"Semantic search exception: {e}. Falling back to TF-IDF.")
-            
+
     # Fallback or explicit TF-IDF
     tfidf_results = perform_search_tfidf(query, top_k)
-    if tfidf_results and expand_context:
-        return expand_chunks_with_neighbors(tfidf_results)
-    return tfidf_results
+    if not tfidf_results:
+        return Retrieval([], "none")
+    return Retrieval(expand_chunks_with_neighbors(tfidf_results) if expand_context else tfidf_results, "tfidf_fallback")
+
+
+def perform_search(
+    query: str,
+    top_k: int = TOP_K,
+    use_semantic: bool = True,
+    expand_context: bool = True
+) -> List[ChunkResponse]:
+    """Primary retrieval function (results only); see `retrieve` for the path that ran."""
+    return retrieve(query, top_k, use_semantic, expand_context).results
 
 # Inline import to avoid circular dependency
 from .storage import load_chunks
