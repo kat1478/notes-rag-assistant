@@ -1,6 +1,8 @@
 from pydantic import BaseModel, Field
 from typing import List, Optional
 
+from .config import MAX_QUERY_CHARS, MAX_TOP_K
+
 class ChunkMetadata(BaseModel):
     file_name: str
     chunk_index: int
@@ -12,23 +14,23 @@ class ChunkResponse(BaseModel):
     score: Optional[float] = None
 
 class SearchRequest(BaseModel):
-    query: str
-    top_k: Optional[int] = None
+    query: str = Field(..., min_length=1, max_length=MAX_QUERY_CHARS)
+    top_k: Optional[int] = Field(None, ge=1, le=MAX_TOP_K)
 
 class SearchResponse(BaseModel):
     query: str
     results: List[ChunkResponse]
 
 class AskRequest(BaseModel):
-    query: str
-    top_k: Optional[int] = None
+    query: str = Field(..., min_length=1, max_length=MAX_QUERY_CHARS)
+    top_k: Optional[int] = Field(None, ge=1, le=MAX_TOP_K)
     model: Optional[str] = None  # "<provider>:<model>" from GET /models; default model when omitted
     # Sampling temperature; default from config (0.0). Ignored by models that don't accept it (reported as null).
     temperature: Optional[float] = Field(None, ge=0.0, le=1.0)
 
 class AskResponseMetadata(BaseModel):
     top_k_used: int
-    retrieval_mode: str
+    retrieval_mode: str  # path that ran: "semantic", "tfidf_fallback" or "none" (nothing retrieved)
     generation_mode: str
     response_time_ms: float
     model: Optional[str] = None

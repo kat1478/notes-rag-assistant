@@ -33,6 +33,10 @@ CHUNK_OVERLAP = 50
 
 # Retrieval settings
 TOP_K = 3
+# Request bounds for /search and /ask: each extra chunk is paid prompt tokens, so top_k is capped (the UI stepper
+# stops at the same value) and so is the question length.
+MAX_TOP_K = 10
+MAX_QUERY_CHARS = 1000
 
 # Chroma settings
 # Overridable because Lambda's filesystem is read-only except /tmp: the baked index is copied there on cold start.
@@ -123,3 +127,5 @@ DEFAULT_MODEL_ID = os.getenv("DEFAULT_MODEL_ID", "openrouter:anthropic/claude-ha
 DEMO_MODE = os.getenv("DEMO_MODE", "false").lower() == "true"
 ASK_RATE_LIMIT = int(os.getenv("ASK_RATE_LIMIT", "0"))  # requests per window and client; 0 = unlimited
 ASK_RATE_WINDOW_S = int(os.getenv("ASK_RATE_WINDOW_S", "3600"))
+# /search is free (no LLM) but still a Lambda invocation; same cap by default, so no extra infra setting is needed.
+SEARCH_RATE_LIMIT = int(os.getenv("SEARCH_RATE_LIMIT", str(ASK_RATE_LIMIT)))
