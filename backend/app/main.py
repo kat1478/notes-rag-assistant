@@ -5,6 +5,8 @@ from fastapi.staticfiles import StaticFiles
 from typing import List, Optional
 from pathlib import Path
 import json
+import logging
+import re
 import time
 from .schemas import (
     SearchRequest, SearchResponse,
@@ -22,6 +24,8 @@ from .provider import list_models
 from .rate_limit import RateLimiter, client_id
 from .evaluation import is_refusal_response
 from . import telemetry
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="Notes RAG Assistant API",
@@ -176,6 +180,22 @@ def search(request: SearchRequest):
     top_k = request.top_k if request.top_k is not None else TOP_K
     return SearchResponse(query=request.query, results=retrieve(request.query, top_k).results)
 
+# The selected model is gone, rate limited or down upstream: another model can still answer.
+MODEL_UNAVAILABLE_RE = re.compile(r"OpenRouter error (404|429|5\d\d)\b")
+
+
+def answer_with_fallback(query, results, model_id, temperature):
+    """(generation, unavailable model id or None). Only /ask falls back — benchmarks must report the model they
+    name, so `generate_answer_with_meta` itself never switches models."""
+    generation = generate_answer_with_meta(query, results, model_id, temperature)
+    if (not generation.error or generation.model_id == DEFAULT_MODEL_ID
+            or not MODEL_UNAVAILABLE_RE.search(generation.error)):
+        return generation, None
+    logger.warning(f"{generation.model_id} unavailable ({generation.error}); answering with {DEFAULT_MODEL_ID}")
+    fallback = generate_answer_with_meta(query, results, DEFAULT_MODEL_ID, temperature)
+    return (generation, None) if fallback.error else (fallback, generation.model_id)
+
+
 @app.post("/ask", response_model=AskResponse, dependencies=[Depends(enforce_ask_rate_limit)])
 def ask(request: AskRequest):
     start_time = time.perf_counter()
@@ -183,7 +203,7 @@ def ask(request: AskRequest):
     results, retrieval_mode = retrieve(request.query, top_k)
     retrieved_at = time.perf_counter()
     try:
-        generation = generate_answer_with_meta(request.query, results, request.model, request.temperature)
+        generation, fallback_from = answer_with_fallback(request.query, results, request.model, request.temperature)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     done_at = time.perf_counter()
@@ -196,7 +216,7 @@ def ask(request: AskRequest):
         retrieval_ms=(retrieved_at - start_time) * 1000, generation_ms=(done_at - retrieved_at) * 1000,
         n_sources=len(results), refused=is_refusal_response(generation.text),
         generation_error=generation.error is not None, prompt_tokens=generation.prompt_tokens,
-        completion_tokens=generation.completion_tokens, cost_usd=generation.cost_usd,
+        completion_tokens=generation.completion_tokens, cost_usd=generation.cost_usd, fallback_from=fallback_from,
     ))
 
     return AskResponse(
@@ -214,6 +234,7 @@ def ask(request: AskRequest):
             generation_error=generation.error,
             temperature=generation.temperature,
             cost_usd=generation.cost_usd,
+            fallback_from=fallback_from,
         )
     )
 

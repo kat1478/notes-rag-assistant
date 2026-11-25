@@ -72,3 +72,35 @@ def test_ask_and_search_reject_out_of_bounds_requests(client, payload):
 
 def test_search_accepts_the_bounds(client):
     assert client.post("/search", json={"query": "x" * MAX_QUERY_CHARS, "top_k": MAX_TOP_K}).status_code == 200
+
+
+LLAMA = "openrouter:meta-llama/llama-3.2-3b-instruct"
+
+
+def _failing(error, calls, default_error=None):
+    def fake(query, sources, model_id, temperature):
+        calls.append(model_id)
+        err = default_error if model_id == main.DEFAULT_MODEL_ID else error
+        return Generation(text="LLM generation failed." if err else "ok [Source 1].", model_id=model_id, error=err)
+    return fake
+
+
+def test_unavailable_model_falls_back_to_the_default_and_says_so(client, monkeypatch):
+    calls = []
+    monkeypatch.setattr(main, "generate_answer_with_meta", _failing("OpenRouter error 429: rate limited", calls))
+    meta = client.post("/ask", json={"query": "q", "model": LLAMA}).json()["metadata"]
+    assert calls == [LLAMA, main.DEFAULT_MODEL_ID]
+    assert meta["model"] == main.DEFAULT_MODEL_ID and meta["fallback_from"] == LLAMA and meta["generation_error"] is None
+
+
+@pytest.mark.parametrize("model,error,default_error", [
+    (LLAMA, "OpenRouter error 401: invalid OPENROUTER_API_KEY", None),  # no other model would work either
+    (LLAMA, "OpenRouter error 503: down", "OpenRouter error 503: down"),
+    (main.DEFAULT_MODEL_ID, None, "OpenRouter error 429: rate limited"),
+])
+def test_errors_without_a_working_alternative_are_reported(client, monkeypatch, model, error, default_error):
+    calls = []
+    monkeypatch.setattr(main, "generate_answer_with_meta", _failing(error, calls, default_error))
+    meta = client.post("/ask", json={"query": "q", "model": model}).json()["metadata"]
+    assert meta["model"] == model and meta["fallback_from"] is None and meta["generation_error"]
+    assert len(calls) <= 2

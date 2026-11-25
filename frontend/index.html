@@ -7,10 +7,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='4' fill='%23ffd43b'/%3E%3Cpath d='M4 5h8M4 8h8M4 11h5' stroke='%231a2138' stroke-width='1.5'/%3E%3C/svg%3E">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header class="topbar">
+    <header class="topbar"><div class="topbar-in wrap">
         <div class="brand">
             <span class="brand-mark" aria-hidden="true"></span>
             <span class="brand-name">notes-rag</span>
@@ -27,49 +28,55 @@
             <a href="/docs" target="_blank" rel="noopener">API</a>
             <a href="https://github.com/kat1478/notes-rag-assistant" target="_blank" rel="noopener">GitHub</a>
         </nav>
-    </header>
+    </div></header>
 
-    <section class="query">
+    <section class="query wrap" aria-label="Ask a question">
+        <div id="hero" class="hero">
+            <h1>Ask the notes. <mark>See the source.</mark></h1>
+            <p>Answers come only from a set of English and Polish study notes, with links to the passages they cite.
+               If the passages found don't answer the question, the model should say so.</p>
+        </div>
         <form id="ask-form" class="query-form" autocomplete="off">
-            <label for="question-input" class="visually-hidden">Question</label>
-            <span class="prompt" aria-hidden="true">&gt;</span>
-            <input
-                id="question-input"
-                class="query-input"
-                type="text"
-                placeholder="Ask your notes — e.g. What is the dying ReLU problem?"
-                required
-            >
-            <div class="model-pick">
-                <label for="model-select" class="visually-hidden">Model</label>
-                <select id="model-select" class="model-select" title="Model that generates the answer — compare them under Models"></select>
+            <div class="query-main">
+                <label for="question-input" class="visually-hidden">Question</label>
+                <input
+                    id="question-input"
+                    class="query-input"
+                    type="text"
+                    maxlength="1000"
+                    placeholder="e.g. What is the dying ReLU problem?"
+                    required
+                >
+                <button type="submit" id="submit-btn" class="ask-btn">Ask</button>
             </div>
-            <div class="topk" title="Number of chunks retrieved before ±1 neighbor expansion">
-                <span class="topk-label">top_k</span>
-                <button type="button" class="topk-btn" data-step="-1" aria-label="Decrease top_k">−</button>
-                <output id="topk-value" class="topk-value" aria-live="polite">3</output>
-                <button type="button" class="topk-btn" data-step="1" aria-label="Increase top_k">+</button>
+            <div class="query-options">
+                <label class="opt model-pick" title="Model that generates the answer — compare them under Models">
+                    <span class="opt-label">Model</span>
+                    <select id="model-select" class="model-select"></select>
+                </label>
+                <div class="opt" title="top_k: number of passages retrieved, before their neighbors are added">
+                    <span class="opt-label">Passages</span>
+                    <button type="button" class="step-btn topk-btn" data-step="-1" aria-label="Fewer passages">−</button>
+                    <output id="topk-value" class="opt-value" aria-live="polite">3</output>
+                    <button type="button" class="step-btn topk-btn" data-step="1" aria-label="More passages">+</button>
+                </div>
+                <div class="opt" id="temp-box" title="Sampling temperature: 0 = deterministic (used for benchmarks), higher = more varied wording">
+                    <span class="opt-label">Temperature</span>
+                    <button type="button" class="step-btn temp-btn" data-step="-1" aria-label="Decrease temperature">−</button>
+                    <output id="temp-value" class="opt-value" aria-live="polite">0.0</output>
+                    <button type="button" class="step-btn temp-btn" data-step="1" aria-label="Increase temperature">+</button>
+                </div>
             </div>
-            <div class="topk temp" id="temp-box" title="Sampling temperature: 0 = deterministic (used for benchmarks), higher = more varied wording">
-                <span class="topk-label">temp</span>
-                <button type="button" class="temp-btn" data-step="-1" aria-label="Decrease temperature">−</button>
-                <output id="temp-value" class="topk-value" aria-live="polite">0.0</output>
-                <button type="button" class="temp-btn" data-step="1" aria-label="Increase temperature">+</button>
-            </div>
-            <button type="submit" id="submit-btn" class="ask-btn">
-                Ask <kbd>⏎</kbd>
-            </button>
         </form>
-        <div class="examples">
-            <span class="examples-label">try</span>
-            <button type="button" class="chip" data-question="What is the dying ReLU problem?">dying ReLU</button>
-            <button type="button" class="chip" data-question="Jak działa algorytm Dijkstry i jaka jest jego złożoność?">Dijkstra (PL)</button>
-            <button type="button" class="chip" data-question="Explain TF-IDF step by step.">TF-IDF</button>
-            <button type="button" class="chip chip-muted" data-question="What is the capital of France?">capital of France <span class="chip-note">out of scope</span></button>
+        <div class="examples" aria-label="Example questions">
+            <button type="button" class="chip" data-question="How does Q-learning update its action values?"><b>Across languages</b><span>How does Q-learning update its action values?</span><i>English question, Polish note</i></button>
+            <button type="button" class="chip" data-question="Jak działa algorytm Dijkstry i jaka jest jego złożoność?"><b>Po polsku</b><span>Jak działa algorytm Dijkstry?</span><i>Polish question, Polish note</i></button>
+            <button type="button" class="chip" data-question="Explain TF-IDF step by step."><b>Step by step</b><span>Explain TF-IDF step by step.</span><i>English question, English note</i></button>
+            <button type="button" class="chip" data-question="What is the capital of France?"><b>Not in the notes</b><span>What is the capital of France?</span><i>Should be refused</i></button>
         </div>
     </section>
 
-    <main class="workspace">
+    <main id="workspace" class="workspace wrap" hidden>
         <section class="panel answer-panel" aria-labelledby="answer-heading">
             <header class="panel-head">
                 <h2 id="answer-heading">Answer</h2>
@@ -77,21 +84,9 @@
                 <span id="answer-time" class="panel-meta"></span>
             </header>
 
-            <div id="view-empty" class="panel-body empty">
-                <p>Answers come <strong>only</strong> from your indexed notes. Every claim carries a citation
-                    <span class="cite cite-demo">1</span> that points to the exact chunk in the context panel.
-                    If the notes don't cover the question, the model refuses instead of guessing.</p>
-                <dl class="hints">
-                    <div><dt>retrieved</dt><dd>chunk found by semantic search (top_k)</dd></div>
-                    <div><dt>±1 neighbor</dt><dd>adjacent chunk added for context</dd></div>
-                    <div><dt>cited</dt><dd>chunk the answer actually relies on</dd></div>
-                </dl>
-            </div>
-
             <div id="view-loading" class="panel-body" hidden>
                 <ol class="steps" aria-live="polite">
-                    <li class="step done">query sent</li>
-                    <li class="step active">retrieving chunks &amp; generating answer <span id="elapsed" class="mono">0.0 s</span></li>
+                    <li class="step active">Searching the notes and writing an answer <span id="elapsed" class="mono">0.0 s</span></li>
                 </ol>
                 <p id="loading-note" class="note"></p>
             </div>
@@ -103,25 +98,29 @@
                     <p class="note">Start it from <code>backend/</code>:</p>
                     <pre class="cmd">python -m uvicorn app.main:app --host 127.0.0.1 --port 8000</pre>
                 </div>
-                <button type="button" id="retry-btn" class="ghost-btn">Retry</button>
+                <div class="actions">
+                    <button type="button" id="retry-btn" class="ghost-btn">Try again</button>
+                    <button type="button" id="use-default-btn" class="ghost-btn" hidden></button>
+                </div>
             </div>
 
             <div id="view-answer" class="panel-body" hidden>
                 <p id="answer-question" class="answer-question"></p>
+                <p id="answer-notice" class="answer-notice" hidden></p>
                 <div id="answer-text" class="answer-text" aria-live="polite"></div>
             </div>
         </section>
 
         <section class="panel context-panel" aria-labelledby="context-heading">
             <header class="panel-head">
-                <h2 id="context-heading">Context</h2>
-                <span id="context-summary" class="panel-meta">chunks sent to the LLM, in prompt order</span>
+                <h2 id="context-heading">Sources</h2>
+                <span id="context-summary" class="panel-meta">sent to the model, in this order</span>
             </header>
             <ol id="sources-list" class="sources"></ol>
         </section>
     </main>
 
-    <footer id="run-stats" class="stats" aria-label="Run statistics">
+    <footer id="run-stats" class="stats wrap" hidden aria-label="Run statistics">
         <div class="stat"><span class="stat-k">retrieval</span><span class="stat-v" id="stat-retrieval">—</span></div>
         <div class="stat"><span class="stat-k">generation</span><span class="stat-v" id="stat-generation">—</span></div>
         <div class="stat"><span class="stat-k">top_k</span><span class="stat-v" id="stat-topk">—</span></div>
