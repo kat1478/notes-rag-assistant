@@ -7,10 +7,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='4' fill='%23ffd43b'/%3E%3Cpath d='M4 5h8M4 8h8M4 11h5' stroke='%231a2138' stroke-width='1.5'/%3E%3C/svg%3E">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header class="topbar">
+    <header class="topbar"><div class="topbar-in wrap">
         <div class="brand">
             <span class="brand-mark" aria-hidden="true"></span>
             <span class="brand-name">notes-rag</span>
@@ -23,9 +24,9 @@
             <a href="/docs" target="_blank" rel="noopener">API</a>
             <a href="https://github.com/kat1478/notes-rag-assistant" target="_blank" rel="noopener">GitHub</a>
         </nav>
-    </header>
+    </div></header>
 
-    <main class="page viz">
+    <main class="page viz wrap">
         <h1>Model comparison</h1>
         <p class="page-lede">
             Every model answers the same questions from the <strong>same retrieved context</strong>
@@ -37,6 +38,8 @@
             <span><i class="swatch swatch-accent"></i>model selected in Ask</span>
             <span><i class="swatch swatch-muted"></i>other models</span>
         </div>
+
+        <div id="pick-bar" class="pick-bar" role="status" hidden></div>
 
         <div id="notice" class="notice" hidden></div>
 
