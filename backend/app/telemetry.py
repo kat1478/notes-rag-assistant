@@ -34,7 +34,8 @@ def question_hash(question: str) -> str:
 
 def ask_event(question: str, model_id: str, retrieval_ms: float, generation_ms: float, n_sources: int,
               refused: bool, generation_error: bool, prompt_tokens: Optional[int],
-              completion_tokens: Optional[int], cost_usd: Optional[float], now_ms: Optional[int] = None) -> Dict:
+              completion_tokens: Optional[int], cost_usd: Optional[float], now_ms: Optional[int] = None,
+              fallback_from: Optional[str] = None) -> Dict:
     values = {
         "LatencyMs": round(retrieval_ms + generation_ms, 1),
         "RetrievalMs": round(retrieval_ms, 1),
@@ -61,6 +62,7 @@ def ask_event(question: str, model_id: str, retrieval_ms: float, generation_ms: 
         "question_hash": question_hash(question),
         "question_chars": len(question),
         "sources": n_sources,
+        **({"fallback_from": fallback_from} if fallback_from else {}),
         **present,
     }
 

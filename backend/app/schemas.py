@@ -40,6 +40,7 @@ class AskResponseMetadata(BaseModel):
     generation_error: Optional[str] = None
     temperature: Optional[float] = None  # applied value; null = model ignores temperature
     cost_usd: Optional[float] = None  # billed by the provider; null = unknown or local model
+    fallback_from: Optional[str] = None  # requested model that was unavailable; `model` answered instead
 
 class ModelInfo(BaseModel):
     id: str
