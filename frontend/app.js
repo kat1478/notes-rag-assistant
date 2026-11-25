@@ -33,7 +33,6 @@ const el = {
     answerStatus: $('answer-status'),
     answerTime: $('answer-time'),
     views: {
-        empty: $('view-empty'),
         loading: $('view-loading'),
         error: $('view-error'),
         answer: $('view-answer'),
@@ -42,6 +41,11 @@ const el = {
     errorDetail: $('error-detail'),
     errorTitle: $('error-title'),
     errorHelp: $('error-help'),
+    useDefault: $('use-default-btn'),
+    hero: $('hero'),
+    workspace: $('workspace'),
+    runStats: $('run-stats'),
+    notice: $('answer-notice'),
     question: $('answer-question'),
     answer: $('answer-text'),
     sources: $('sources-list'),
@@ -66,6 +70,7 @@ const state = {
     defaultModel: null,
     pinned: null,   // source number kept highlighted after a click
     timer: null,
+    busy: false,    // one question at a time (chips and Retry bypass the disabled Ask button)
     demoMode: false,   // public demo on AWS Lambda (from /health): cold starts after idle, rate-limited /ask
 };
 
@@ -130,6 +135,10 @@ document.querySelectorAll('.temp-btn').forEach((btn) => {
 // ── View switching ─────────────────────────────────────────
 
 function show(viewName) {
+    el.hero.hidden = true;
+    el.workspace.hidden = false;
+    document.body.classList.add('has-result');
+    el.runStats.hidden = viewName !== 'answer';
     Object.entries(el.views).forEach(([name, node]) => { node.hidden = name !== viewName; });
 }
 
@@ -153,8 +162,8 @@ function stopTimer() {
 function resetResult() {
     el.answerStatus.hidden = true;
     el.answerTime.textContent = '';
-    el.sources.innerHTML = '<li class="sources-empty">Waiting for retrieval…</li>';
-    el.contextSummary.textContent = 'chunks sent to the LLM, in prompt order';
+    el.sources.innerHTML = '<li class="sources-empty">Searching the notes…</li>';
+    el.contextSummary.textContent = 'sent to the model, in this order';
     Object.values(el.stats).forEach((node) => { node.textContent = '—'; });
     state.pinned = null;
 }
@@ -163,7 +172,8 @@ function resetResult() {
 
 async function ask(question) {
     question = question.trim();
-    if (!question) return;
+    if (!question || state.busy) return;
+    state.busy = true;
     state.lastQuestion = question;
 
     resetResult();
@@ -172,6 +182,7 @@ async function ask(question) {
         : 'Hosted model via OpenRouter — usually a few seconds.';
     show('loading');
     el.submit.disabled = true;
+    el.submit.textContent = 'Asking…';
     startTimer();
 
     try {
@@ -196,8 +207,7 @@ async function ask(question) {
             throw new Error(`HTTP ${res.status}${detail ? ` — ${detail.slice(0, 200)}` : ''}`);
         }
         const data = await res.json();
-        renderResult(question, data);
-        show('answer');
+        show(renderResult(question, data));
         checkHealth();
     } catch (err) {
         console.error('Ask failed:', err);
@@ -208,12 +218,15 @@ async function ask(question) {
     } finally {
         stopTimer();
         el.submit.disabled = false;
+        el.submit.textContent = 'Ask';
+        state.busy = false;
     }
 }
 
 function showError(title, detail, showStartHelp) {
     el.errorTitle.textContent = title;
     el.errorDetail.textContent = detail;
+    el.useDefault.hidden = true;
     el.errorHelp.hidden = !showStartHelp;   // "start uvicorn" only helps when running locally
     el.sources.innerHTML = '<li class="sources-empty">No context — the request did not complete.</li>';
     show('error');
@@ -235,7 +248,7 @@ function renderAnswer(text, sourceCount) {
     let missing = 0;
 
     // Hosted models answer in light Markdown; render **bold** (on already-escaped text, so no HTML injection).
-    const html = escapeHtml(text).replace(/\*\*([^*\n]+?)\*\*/g, '<strong>$1</strong>').replace(CITATION_RE, (_, nums) => {
+    const html = escapeHtml(text).replace(/\*\*([^\n]+?)\*\*/g, '<strong>$1</strong>').replace(CITATION_RE, (_, nums) => {
         return nums.match(/\d+/g).map((n) => {
             const num = Number(n);
             if (num < 1 || num > sourceCount) {
@@ -252,7 +265,7 @@ function renderAnswer(text, sourceCount) {
 }
 
 function classify(text, citedCount, error) {
-    if (error) return { kind: 'failed', label: 'generation failed', hint: error };
+    if (error) return { kind: 'failed', label: 'no answer', hint: error };
     // "cited", not "grounded": the UI only knows the answer points at chunks that were in the context, not that
     // those chunks support each claim (that is what the offline judge measures).
     if (citedCount > 0) return {
@@ -275,7 +288,7 @@ function classify(text, citedCount, error) {
 
 function renderSources(sources, cited) {
     if (!sources.length) {
-        el.sources.innerHTML = '<li class="sources-empty">No chunks were retrieved for this question.</li>';
+        el.sources.innerHTML = '<li class="sources-empty">No passages were retrieved for this question.</li>';
         return;
     }
 
@@ -288,7 +301,7 @@ function renderSources(sources, cited) {
         return `
             <li class="${classes}" id="source-${n}" data-source="${n}">
                 <button type="button" class="source-row" aria-expanded="${isCited}" aria-controls="source-text-${n}">
-                    <span class="src-n">${isCited ? '●' : ''}${n}</span>
+                    <span class="src-n">${n}</span>
                     <span class="src-id">${escapeHtml(meta.file_name || 'unknown')}<span class="chunk">:${meta.chunk_index ?? '?'}</span></span>
                     <span class="src-kind" data-kind="${retrieved ? 'retrieved' : 'neighbor'}">${retrieved ? 'retrieved' : '±1 neighbor'}</span>
                     <span class="src-score" title="${retrieved ? 'Raw retrieval score: Chroma distance (lower is closer); TF-IDF fallback reports similarity (higher is closer)' : 'Neighbor chunks have no score'}">${retrieved ? src.score.toFixed(3) : '—'}</span>
@@ -307,7 +320,7 @@ function renderStats(meta, sources, cited, missing) {
     el.stats.retrieval.textContent = meta?.retrieval_mode ?? '—';
     el.stats.generation.textContent = meta?.generation_mode ?? '—';
     el.stats.topk.textContent = meta?.top_k_used ?? state.topK;
-    el.stats.temp.textContent = typeof meta?.temperature === 'number' ? meta.temperature.toFixed(1) : 'n/a (model ignores it)';
+    el.stats.temp.textContent = typeof meta?.temperature === 'number' ? meta.temperature.toFixed(1) : 'n/a';
     el.stats.chunks.textContent = `${sources.length} (${retrievedCount} retrieved + ${neighbors} neighbors)`;
     el.stats.cited.textContent = `${cited.size} / ${sources.length}${missing ? ` · ${missing} invalid` : ''}`;
     el.stats.tokens.textContent = meta?.prompt_tokens ? `${meta.prompt_tokens} in · ${meta.completion_tokens ?? '?'} out` : '—';
@@ -320,16 +333,37 @@ function renderResult(question, data) {
     const answer = data.answer || '';
 
     el.question.textContent = question;
-    const { cited, missing } = renderAnswer(answer, sources.length);
+    const error = data.metadata?.generation_error;
+    // A failed generation carries the raw context as its text; the Sources panel already shows those passages.
+    const { cited, missing } = renderAnswer(error ? '' : answer, sources.length);
     renderSources(sources, cited);
     renderStats(data.metadata, sources, cited, missing);
 
-    const status = classify(answer, cited.size, data.metadata?.generation_error);
+    const status = classify(answer, cited.size, error);
     el.answerStatus.dataset.kind = status.kind;
     el.answerStatus.textContent = status.label;
     el.answerStatus.title = status.hint || '';
     el.answerStatus.hidden = false;
-    el.contextSummary.textContent = `${sources.length} chunks · ${cited.size} cited`;
+    el.contextSummary.textContent = `${sources.length} passages · ${cited.size} cited`;
+
+    const fallbackFrom = data.metadata?.fallback_from;
+    el.notice.hidden = !fallbackFrom;
+    if (fallbackFrom) {
+        el.notice.textContent = `${shortModel(fallbackFrom)} is unavailable right now, so ${shortModel(data.metadata.model)} answered instead.`;
+    }
+    if (error) {
+        const failed = data.metadata.model;
+        el.errorTitle.textContent = `${shortModel(failed)} could not answer`;
+        el.errorDetail.textContent = /error 429/.test(error)
+            ? 'The model provider is limiting requests at the moment. The passages found for your question are listed under Sources.'
+            : `${error}. The passages found for your question are listed under Sources.`;
+        el.errorHelp.hidden = true;
+        const canSwitch = state.defaultModel && failed !== state.defaultModel;
+        el.useDefault.hidden = !canSwitch;
+        if (canSwitch) el.useDefault.textContent = `Ask ${shortModel(state.defaultModel)}`;
+        return 'error';
+    }
+    return 'answer';
 }
 
 // ── Citation ↔ source linking ──────────────────────────────
@@ -388,9 +422,11 @@ document.addEventListener('keydown', (e) => {
 
 const isLocal = (modelId) => (modelId || state.defaultModel || '').startsWith('ollama:');
 
+const shortModel = (id) => (id || 'The model').split(/[:/]/).pop();
+
 function modelLabel(m) {
     const name = m.model.includes('/') ? m.model.split('/').pop() : m.model;
-    return `${name}${m.local ? ' · local' : ''}${m.available ? '' : ' (needs API key)'}`;
+    return `${name}${m.local ? ' · local' : ''}${m.id === state.defaultModel ? ' (recommended)' : ''}${m.available ? '' : ' (needs API key)'}`;
 }
 
 async function loadModels() {
@@ -414,15 +450,11 @@ async function loadModels() {
     syncTemperatureSupport();
 }
 
-// Reasoning models (e.g. Claude 4.5+, GPT-5.x) don't accept temperature — show that instead of a dead control.
+// Reasoning models (e.g. Claude 4.5+, GPT-5.x) don't accept temperature — hide the control.
 function syncTemperatureSupport() {
     const m = state.models.find((x) => x.id === el.model.value);
     const off = m?.supports_temperature === false;
-    el.tempBox.classList.toggle('is-off', off);
-    el.tempBox.querySelectorAll('button').forEach((b) => { b.disabled = off; });
-    el.tempBox.title = off
-        ? `${m.model} does not accept temperature (reasoning model) — the setting is ignored`
-        : 'Sampling temperature: 0 = deterministic (used for benchmarks), higher = more varied wording';
+    el.tempBox.hidden = off;
 }
 
 el.model.addEventListener('change', () => {
@@ -439,6 +471,7 @@ el.form.addEventListener('submit', (e) => {
 
 document.querySelectorAll('.chip[data-question]').forEach((chip) => {
     chip.addEventListener('click', () => {
+        if (state.busy) return;
         el.input.value = chip.dataset.question;
         ask(chip.dataset.question);
     });
@@ -449,5 +482,11 @@ $('retry-btn').addEventListener('click', () => {
     else checkHealth();
 });
 
-el.sources.innerHTML = '<li class="sources-empty">No query yet. Retrieved chunks will appear here.</li>';
+el.useDefault.addEventListener('click', () => {
+    el.model.value = state.defaultModel;
+    store.set(state.defaultModel);
+    syncTemperatureSupport();
+    ask(state.lastQuestion);
+});
+
 checkHealth().then(loadModels);

@@ -57,7 +57,8 @@ const val = (r, chart) => r[chart.key] ?? (chart.fallback ? r[chart.fallback] : 
 const state = { rows: [], selected: store.get(), corpus: 'v1' };
 
 function shortName(r) {
-    const name = r.model.includes('/') ? r.model.split('/').pop() : r.model;
+    // Drop tuning suffixes (-instruct-2507, -it) that don't help tell models apart; the full id is in the tooltip.
+    const name = r.model.split('/').pop().replace(/-(instruct|it)(-\d+)?$/, '');
     const temp = r.temperature_requested ? ` · t=${r.temperature_requested}` : '';
     return `${name}${r.provider === 'ollama' ? ' · local' : ''}${temp}`;
 }
@@ -169,7 +170,7 @@ function renderTable() {
         const tr = node('tr');
         const na = (v, f) => (v === null || v === undefined ? '—' : f(v));
         const cells = [
-            r.model_id,
+            shortName(r),
             na(r.judge_correct_rate_supported, pct),
             na(r.judge_faithful_rate, pct),
             na(r.answer_rate_supported ?? r.answer_rate_in_scope, (v) => `${pct(v)} (n=${r.n_supported ?? r.n_in_scope})`),
@@ -185,6 +186,7 @@ function renderTable() {
         ];
         cells.forEach((c, i) => tr.append(node(i === 0 ? 'th' : 'td', '', String(c))));
         tr.firstChild.scope = 'row';
+        tr.firstChild.title = r.model_id;
         tr.dataset.model = r.model_id;
         return tr;
     }));
@@ -202,6 +204,26 @@ function select(modelId) {
     state.selected = modelId;
     store.set(modelId);
     applySelection();
+    renderPickBar();
+}
+
+// A bar click changes which model answers in Ask: say so, and offer a way back.
+function renderPickBar() {
+    const row = state.rows.find((r) => r.model_id === state.selected);
+    const bar = document.getElementById('pick-bar');
+    bar.hidden = STATIC || !row;
+    if (bar.hidden) return;
+    bar.replaceChildren(node('span', '', 'Ask uses '), node('strong', '', shortName(row)));
+    const best = state.rows.find((r) => r.model_id === recommended(state.rows));
+    if (best && best !== row) {
+        const back = node('button', 'ghost-btn', `Use ${shortName(best)} (recommended)`);
+        back.type = 'button';
+        back.addEventListener('click', () => select(best.model_id));
+        bar.append(back);
+    } else if (best) bar.append(node('span', 'badge', 'recommended'));
+    const go = node('a', 'go-ask', 'Ask a question');
+    go.href = 'index.html';
+    bar.append(go);
 }
 
 function renderMeta(runs) {
@@ -270,6 +292,7 @@ async function init() {
     document.getElementById('charts').replaceChildren(...CHARTS.map(renderChart));
     renderTable();
     applySelection();
+    renderPickBar();
 }
 
 window.addEventListener('scroll', hideTip, { passive: true });

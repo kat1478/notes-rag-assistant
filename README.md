@@ -26,12 +26,13 @@ Repository: https://github.com/kat1478/notes-rag-assistant
 ## Demo screenshots
 
 **Answer ↔ context.** Every citation in the answer links to the exact chunk that was sent to the LLM.
-The context panel lists all chunks in prompt order — retrieved by semantic search or added as ±1 neighbors —
-with their raw retrieval score; the bottom strip shows retrieval/generation mode, citation coverage and latency.
+The Sources panel lists all chunks in prompt order — retrieved by semantic search or added as ±1 neighbors —
+with their raw retrieval score; the line below shows retrieval/generation mode, citation coverage and latency.
+If the selected model is unavailable upstream, the default model answers and the UI says so.
 
-![Grounded answer with the cited chunk highlighted](docs/screenshots/answer_dark.png)
+![Answer with the cited chunk highlighted](docs/screenshots/answer_dark.png)
 
-![Light theme, multi-step answer citing three chunks](docs/screenshots/answer_light.png)
+![The same answer in the light theme](docs/screenshots/answer_light.png)
 
 ![Models view: the benchmark inside the app — pick a model to use it for answers](docs/screenshots/models_view.png)
 
@@ -68,7 +69,7 @@ This repository contains a working MVP:
 - per-request model and temperature selection, with token usage reported per answer
 - static browser frontend linking each citation to its source chunk
 - answer status (cited / refused / no citation), the retrieval path that ran, run statistics and backend status
-- Docker Compose setup; CI with lint, 68 offline tests, a retrieval gate, a container smoke test and a paid
+- Docker Compose setup; CI with lint, 72 offline tests, a retrieval gate, a container smoke test and a paid
   LLM quality gate on release PRs
 - public demo on AWS Lambda (Terraform), with cost alerts and a CloudWatch dashboard for latency, tokens, cost and
   refusals
@@ -485,7 +486,7 @@ n is small: one question is 1.7–6 pp.
 
 | Check | When | What it does |
 | :--- | :--- | :--- |
-| Lint + unit tests | every push / PR | `ruff` (pyflakes rules) and 68 offline `pytest` tests: chunking, language and refusal detection, citation parsing, prompt versions (v1 frozen by hash), allowlist / temperature / reasoning rules, API contract with retrieval and generation mocked, demo-mode guards and request bounds, retrieval-path reporting, telemetry format and privacy, stored judge contexts |
+| Lint + unit tests | every push / PR | `ruff` (pyflakes rules) and 72 offline `pytest` tests: chunking, language and refusal detection, citation parsing, prompt versions (v1 frozen by hash), allowlist / temperature / reasoning rules, API contract with retrieval and generation mocked, demo-mode guards and request bounds, retrieval-path reporting, telemetry format and privacy, stored judge contexts |
 | Retrieval gate | every push / PR | indexes the v2 corpus and fails if the right note is in the top 3 for < 95% of questions (free — embeddings only) |
 | Docker smoke test | every push / PR | builds the image, starts the container and runs `smoke_test.py` against it |
 | **LLM quality gate** | PRs to `master` (releases) + manual | the default model answers the v2.1 questions and the Polish probe, the [calibrated judge](#is-the-judge-trustworthy) grades them, and each metric must stay within tolerance of [`quality_baseline.json`](backend/data/eval/v2/quality_baseline.json) (~$0.07 per run, budget-guarded, separate API key with a spend limit) |
@@ -669,7 +670,7 @@ scripts/               # deploy.sh, measure_cold_start.sh
 - [x] **Docker Compose** — one-command setup; CPU-only PyTorch and the embedding model baked into the image.
 - [ ] **API authentication** — protect the endpoints for any non-local deployment.
 - [x] **Deployment** — public demo on AWS Lambda (container image, Terraform, ~$0/month) ([details](#deployment-aws-lambda)).
-- [x] **Tests and CI** — 68 offline tests, retrieval gate, container smoke test, LLM quality gate on release PRs ([details](#tests-and-ci)).
+- [x] **Tests and CI** — 72 offline tests, retrieval gate, container smoke test, LLM quality gate on release PRs ([details](#tests-and-ci)).
 
 ---
 
